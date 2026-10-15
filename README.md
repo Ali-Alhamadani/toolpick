@@ -1,6 +1,11 @@
 # ToolPick
-Needs-based AI tool finder (video, writing, coding, images, audio) with verified prices, a best-value pick and free alternatives.
-- `tools.py` — all data (edit prices here; set `CHECKED` date; use "check site" if unverified)
-- `build.py` — `BASE=https://<site> python3 build.py` writes static files into `public/`
-- Live: https://toolpick-ai-alhamdaniali10-7277.vercel.app
-- Deploy: upload `public/` files to Vercel project `toolpick-ai` (target production, framework none) via Vercel create_deployment.
+Needs-based AI tool finder: 80 tools in 11 categories, prices copied from official pricing pages, a best-value pick and a free option.
+Live: https://toolpick-ai-alhamdaniali10-7277.vercel.app
+
+- `tools.py`: all data. Tool fields: name/url/pricing/price/free/about/why/affiliate (empty = official link). `PRICE_TABLE` holds the entry-plan monthly/annual price and cost per output; also `COMPARISONS`, `JOBS`, `SPONSOR_TIERS`, `CHECKED` date. Never invent prices; write "check site" when unverified.
+- `build.py`: `python3 build.py` writes `public/` (index + finder, category pages, /tools/, /compare/, best-ai-tool-for-*, sponsor, newsletter, sitemap, robots, llms.txt, tools.json, og.png).
+- `og_data.py`: base64 OG image, used when PIL is missing (e.g. in the Vercel build).
+- `affiliates.md`, `growth.md`: monetization research and traffic plan.
+
+## Deploy
+Vercel project `toolpick-ai` runs `python3 build.py` itself (install `echo skip`, output `public`). Deploy with the Vercel MCP `create_deployment`, target production, `files` = build.py, tools.py, og_data.py, README.md (inline via `$file:`).

@@ -14,7 +14,7 @@ CATEGORIES = [
   {"name":"CapCut","url":"https://www.capcut.com","pricing":"https://www.capcut.com/pricing","price":"Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo","free":"Free plan with basic editing and templates","about":"Easy editor for short-form social video, AI features built in."},
   {"name":"InVideo","url":"https://invideo.io","pricing":"https://invideo.io/pricing","price":"Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150","free":"Free editor available","about":"Prompt-to-video for explainer and social videos."},
  ]},
- {"id":"writing","name":"Writing","need":"Write, edit or brainstorm text","best":"Claude","free":["ChatGPT","Gemini","Grammarly"],"tools":[
+ {"id":"writing","name":"Writing","need":"Write, edit or brainstorm text","best":"Claude","free":["ChatGPT","Google Gemini","Grammarly"],"tools":[
   {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong long-form writing, editing and analysis assistant.","why":"Pro is $17-20/mo with a usable free tier, and is excellent at long, natural-sounding drafts."},
   {"name":"ChatGPT","url":"https://chatgpt.com","pricing":"https://chatgpt.com/pricing","price":"check site","free":"Free plan with unlimited text chats on GPT-6 (limits on tools)","about":"General-purpose AI assistant: writing, research, images, voice."},
   {"name":"Google Gemini","url":"https://gemini.google.com","pricing":"https://one.google.com/about/ai-premium","price":"Google AI plans starting at $8/mo (other tiers: check site)","free":"Gemini app is free to use","about":"Google's assistant, integrated with Gmail, Docs and Drive."},
@@ -50,3 +50,137 @@ CATEGORIES = [
   {"name":"Udio","url":"https://www.udio.com","pricing":"https://www.udio.com/pricing","price":"check site","free":"check site","about":"AI music generation."},
  ]},
 ]
+
+CATEGORIES += [
+ {"id":"presentations","name":"Presentations","need":"Make slides and pitch decks","best":"Pitch","free":["Pitch","SlidesAI","Canva"],"tools":[
+  {"name":"Pitch","url":"https://pitch.com","pricing":"https://pitch.com/pricing","price":"Plus €10/mo; Team €15/mo; Business €20/mo","free":"Free forever: unlimited presentations","about":"Collaborative presentation software with AI credits on paid plans.","why":"Free plan with unlimited presentations, and the cheapest paid tier at €10/mo."},
+  {"name":"Beautiful.ai","url":"https://www.beautiful.ai","pricing":"https://www.beautiful.ai/pricing","price":"Pro $14.50/mo (billed annually); Team $40/user/mo yearly ($50 monthly)","free":"14-day free trial","about":"Smart Slide layouts that auto-format as you type; PowerPoint import/export."},
+  {"name":"Plus AI","url":"https://plusai.com","pricing":"https://plusai.com/pricing","price":"Basic $10/user/mo yearly ($15 monthly); Pro $20 ($25); Team $30 ($40); Max $200 ($240)","free":"7-day free trial (card required)","about":"AI slide generation inside Google Slides and PowerPoint."},
+  {"name":"SlidesAI","url":"https://www.slidesai.io","pricing":"https://www.slidesai.io/pricing","price":"$10/mo (billed $120/yr); $20.83/mo (billed $250/yr)","free":"Basic $0: 12 presentations/year","about":"Turns text into Google Slides presentations."},
+  {"name":"Gamma","url":"https://gamma.app","pricing":"https://gamma.app/pricing","price":"check site","free":"check site","about":"AI-generated decks, docs and web pages from a prompt."},
+  {"name":"Canva","url":"https://www.canva.com","pricing":"https://www.canva.com/pricing/","price":"check site","free":"Free plan available","about":"Design tool with presentation templates and AI features."},
+ ]},
+ {"id":"assistants","name":"AI Assistants","need":"Chat with an AI assistant","best":"Le Chat (Mistral)","free":["ChatGPT","Claude","Google Gemini"],"tools":[
+  {"name":"Le Chat (Mistral)","url":"https://chat.mistral.ai","pricing":"https://mistral.ai/pricing","price":"Pro $14.99/mo; Team $24.99/user/mo (excl. tax)","free":"Free plan with limited access","about":"Mistral's assistant with web search, image generation and the Vibe coding agent.","why":"Lowest-priced pro tier among the major assistants ($14.99/mo), plus a free plan."},
+  {"name":"ChatGPT","url":"https://chatgpt.com","pricing":"https://chatgpt.com/pricing","price":"check site","free":"Free plan with unlimited text chats on GPT-6 (limits on tools)","about":"General-purpose AI assistant: writing, research, images, voice."},
+  {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Assistant known for long-form writing, analysis and coding."},
+  {"name":"Google Gemini","url":"https://gemini.google.com","pricing":"https://one.google.com/about/ai-premium","price":"Google AI plans starting at $8/mo (other tiers: check site)","free":"Gemini app is free to use","about":"Google's assistant, integrated with Gmail, Docs and Drive."},
+  {"name":"Perplexity","url":"https://www.perplexity.ai","pricing":"https://www.perplexity.ai/pricing","price":"check site","free":"check site","about":"Answer engine that cites web sources."},
+  {"name":"Microsoft Copilot","url":"https://copilot.microsoft.com","pricing":"https://www.microsoft.com/en-us/microsoft-365/copilot/pricing","price":"check site","free":"check site","about":"Microsoft's assistant, built into Windows and Microsoft 365."},
+ ]},
+]
+
+COMPARISONS = [
+ ("runway-vs-kling","Runway vs Kling AI","Runway","Kling AI","video"),
+ ("claude-vs-chatgpt-for-writing","Claude vs ChatGPT for writing","Claude","ChatGPT","writing"),
+ ("github-copilot-vs-cursor","GitHub Copilot vs Cursor","GitHub Copilot","Cursor","coding"),
+ ("midjourney-vs-leonardo","Midjourney vs Leonardo","Midjourney","Leonardo","images"),
+ ("elevenlabs-vs-murf","ElevenLabs vs Murf","ElevenLabs","Murf","audio"),
+ ("heygen-vs-synthesia","HeyGen vs Synthesia","HeyGen","Synthesia","video"),
+ ("pitch-vs-beautiful-ai","Pitch vs Beautiful.ai","Pitch","Beautiful.ai","presentations"),
+]
+
+def T(name,url,pricing,price,free,about,why=None,**kw):
+    d=dict(name=name,url=url,pricing=pricing,price=price,free=free,about=about,**kw)
+    if why: d["why"]=why
+    return d
+CK="check site"
+_extra = {
+ "video":[T("Opus Clip","https://www.opus.pro","https://www.opus.pro/pricing","Paid from $15/mo billed monthly","Free forever plan ($0)","Turns long videos into short viral clips automatically."),
+          T("Captions","https://www.captions.ai","https://www.captions.ai/pricing","From $24.99/mo; higher tiers $69.99, $139.99, $279.99/mo",CK,"AI video editing, captions and AI actors for creators.")],
+ "writing":[T("Wordtune","https://www.wordtune.com","https://www.wordtune.com/plans","From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99)","Basic $0 (limited)","Rewrites sentences for clarity and tone."),
+            T("Rytr","https://rytr.me","https://rytr.me/pricing","$7.50/mo; $24.16/mo for multiple brands","Free forever, no card","Budget AI writer for short-form content.")],
+ "coding":[T("Warp","https://www.warp.dev","https://www.warp.dev/pricing","$20/mo (includes $20 of agent usage)","Free: $0","AI-powered terminal with coding agents."),
+           T("Qodo","https://www.qodo.ai","https://www.qodo.ai/pricing/","Pro Team $30 (per user/mo)",CK,"AI code review and test generation.")],
+ "images":[T("Freepik AI","https://www.freepik.com","https://www.freepik.com/pricing","$20/mo ($14.50 yearly); $45 ($33.75); $110 ($82.50)",CK,"AI image/video generation plus stock content."),
+           T("Photoroom","https://www.photoroom.com","https://www.photoroom.com/pricing","Pro $7.50/mo; Max $20.99/mo; Ultra $82.50/mo (billed yearly)",CK,"Product photos: background removal and AI scenes.")],
+ "audio":[T("Riverside","https://riverside.com","https://riverside.com/pricing","Paid plans billed $288/yr or $408/yr","Free: $0","Studio-quality remote podcast/video recording with AI editing."),
+          T("Krisp","https://krisp.ai","https://krisp.ai/pricing/","$16/user/mo ($8/user/mo billed yearly)","Free plan: $0","AI noise cancellation and meeting notes.")],
+}
+for c in CATEGORIES:
+    c["tools"] += _extra.get(c["id"], [])
+
+CATEGORIES += [
+ {"id":"marketing","name":"Marketing & SEO","need":"Market, do SEO or post on social","best":"Buffer","free":["Buffer","Surfer","Writesonic"],"tools":[
+  T("Buffer","https://buffer.com","https://buffer.com/pricing","Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel","Free plan available","Schedule social posts with an AI assistant.","Real social scheduling from $5/mo, the cheapest entry in this category."),
+  T("Surfer","https://surferseo.com","https://surferseo.com/pricing/","AI visibility tracking from $82/mo billed yearly; Standard $99/mo billed yearly","Start for free","SEO content optimization and AI-search visibility tracking."),
+  T("Writesonic","https://writesonic.com","https://writesonic.com/pricing","Starter $79/mo billed annually; $199; $399","Start free","AI-search visibility (GEO) and SEO content platform."),
+  T("Frase","https://www.frase.io","https://www.frase.io/pricing","$49/mo month-to-month ($39 billed yearly); team $129 ($103)","7-day free trial, no card","SEO briefs and content optimization."),
+  T("Predis.ai","https://predis.ai","https://predis.ai/pricing/","Rise $79/mo ($474/yr billed yearly)","3-day trial","AI social media posts, carousels and ads."),
+  T("Ocoya","https://www.ocoya.com","https://www.ocoya.com/pricing","Starter $29/mo; Team $79/mo (billed monthly)","Free trial","AI copy + social scheduling."),
+  T("Copy.ai","https://www.copy.ai","https://www.copy.ai/prices","Chat $29/mo ($24 yearly)","Free trial available","Marketing copy and GTM workflow automation."),
+  T("Jasper","https://www.jasper.ai","https://www.jasper.ai/pricing",CK,"7-day free trial of Pro","On-brand marketing content for teams."),
+ ]},
+ {"id":"research","name":"Research","need":"Research papers and sources","best":"Elicit","free":["Scite"],"tools":[
+  T("Elicit","https://elicit.com","https://elicit.com/pricing","From $11/user/mo billed annually ($132/yr); $39; $89",CK,"AI research assistant for papers and systematic reviews.","Entry tier is $11/mo billed yearly, built specifically for academic literature."),
+  T("Scite","https://scite.ai","https://scite.ai/pricing","Basic $12/mo; Pro $40/mo","7-day free trial","Shows whether papers support or contrast a claim."),
+  T("Consensus","https://consensus.app","https://consensus.app/pricing/",CK,CK,"Search engine that answers from peer-reviewed research."),
+  T("SciSpace","https://scispace.com","https://scispace.com/pricing",CK,CK,"Read, explain and search research papers."),
+  T("Humata","https://www.humata.ai","https://www.humata.ai/pricing","Extra pages $0.01-$0.02/page (plans: check site)",CK,"Chat with your PDFs and documents."),
+  T("You.com API","https://you.com","https://you.com/plans","Web search API $5 per 1,000 calls",CK,"Search and research APIs for building AI apps."),
+  T("Perplexity","https://www.perplexity.ai","https://www.perplexity.ai/pricing",CK,CK,"Answer engine that cites web sources."),
+ ]},
+ {"id":"productivity","name":"Productivity & Meetings","need":"Save time on meetings, tasks and email","best":"Fireflies","free":["Fireflies","Zapier","Superhuman"],"tools":[
+  T("Fireflies","https://fireflies.ai","https://fireflies.ai/pricing","Pro $18/seat/mo ($10 billed annually); Business $29 ($19)","Free forever: $0","AI meeting notes and transcription.","Free-forever tier plus a $10/mo (yearly) Pro, the cheapest full-featured meeting assistant here."),
+  T("Fathom","https://www.fathom.ai","https://www.fathom.ai/pricing","From $15/user/mo; Business $25-$34/user/mo","Free plan","AI meeting recorder and summaries."),
+  T("Otter","https://otter.ai","https://otter.ai/pricing","Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly)","Basic: free forever","Meeting transcription and notes."),
+  T("Motion","https://www.usemotion.com","https://www.usemotion.com/pricing","Pro AI $19/seat/mo; Business AI $29/seat/mo","Free trial","AI calendar that auto-schedules your tasks."),
+  T("Reclaim","https://reclaim.ai","https://reclaim.ai/pricing","$10/seat/mo for small teams",CK,"Smart calendar scheduling for habits and tasks."),
+  T("ClickUp","https://clickup.com","https://clickup.com/pricing","Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly)","Free plan","Project management with built-in AI."),
+  T("Taskade","https://www.taskade.com","https://www.taskade.com/pricing","Pro $10/mo (yearly, 10 users incl.); $25; $100; $250","Free: $0","Projects, notes and AI agents in one workspace."),
+  T("Superhuman","https://superhuman.com","https://superhuman.com/plans","$12/member/mo yearly ($15 monthly); $33 ($40)","Free: $0","AI assistance across your apps (includes Grammarly)."),
+  T("Zapier","https://zapier.com","https://zapier.com/pricing","Professional from $19.99/mo; Team from $69/mo","Free forever: 100 tasks/mo","Automate workflows between 7,000+ apps with AI."),
+  T("Notion AI","https://www.notion.com","https://www.notion.com/pricing","Plus $10/member/mo; Business $20/member/mo","Free plan: $0 (AI trial only)","AI writing inside your notes, docs and wikis."),
+ ]},
+ {"id":"agents","name":"Chatbots & Agents","need":"Build a chatbot or AI agent","best":"Botpress","free":["Botpress","Lindy","Zapier Agents"],"tools":[
+  T("Botpress","https://botpress.com","https://botpress.com/pricing","Plus $150/mo billed annually (250 conversations); extra $0.65/conversation","Free: $0, 100 conversations","Build and deploy AI chatbots and agents.","Free tier with 100 conversations and transparent per-conversation pricing."),
+  T("Chatbase","https://www.chatbase.co","https://www.chatbase.co/pricing","Hobby $40/mo ($32 yearly); Standard $150 ($120)",CK,"Train a support chatbot on your own content."),
+  T("Lindy","https://www.lindy.ai","https://www.lindy.ai/pricing","Credit tiers from $29.99/mo","Start with $50 in free credits, no card","No-code AI agents for email, meetings and ops."),
+  T("Zapier Agents","https://zapier.com","https://zapier.com/pricing","Professional from $19.99/mo; Team from $69/mo","Free forever: 100 tasks/mo","Automations and AI agents connected to 7,000+ apps."),
+  T("Relevance AI","https://relevanceai.com","https://relevanceai.com/pricing",CK,CK,"Build an AI workforce of agents."),
+  T("Voiceflow","https://www.voiceflow.com","https://www.voiceflow.com/pricing",CK,CK,"Design chat and voice AI agents."),
+  T("n8n","https://n8n.io","https://n8n.io/pricing/",CK,"Self-hosted community edition is free (check site for cloud)","Workflow automation with AI agents."),
+ ]},
+]
+for _c in CATEGORIES:
+    if _c["id"]=="assistants": _c["free"]=["ChatGPT","Claude","Google Gemini"]
+
+# Entry paid plan: (monthly billing, per-month when billed yearly, cost per output). None = not verified.
+PRICE_TABLE = {
+ "Runway":(15,12,"Gen-4.5: 60 credits per 5s; Standard's 625 credits ≈ 52s of Gen-4.5"),"Pika":(10,8,"Seedance 2.5 720p 5s = 122 credits; Starter 900 credits ≈ 7 clips"),
+ "Luma Dream Machine":(30,25,None),"HeyGen":(29,24,None),"Synthesia":(29,18,"~100 credits per finished video minute"),"Descript":(24,16,None),"CapCut":(19.99,None,None),
+ "InVideo":(20,10,None),"Claude":(20,17,None),"Claude (Pro)":(20,17,None),"Grammarly":(12,None,None),"Notion AI":(10,None,None),"Copy.ai":(29,24,None),"GitHub Copilot":(10,None,None),
+ "Cursor":(8,None,None),"Windsurf":(20,None,None),"Bolt":(25,None,None),"v0":(30,None,None),"Leonardo":(12,None,None),"Midjourney":(10,8,"Extra Fast GPU time $4/hr"),
+ "Ideogram":(20,15,"Pay-as-you-go 1¢ per credit"),"Krea":(35,21,None),"ElevenLabs":(6,None,None),"Suno":(None,8,None),"Murf":(None,None,"$0.01-$0.03 per 1,000 characters (API)"),
+ "Speechify":(29,None,None),"Otter":(16.99,8.33,None),"Pitch":("€10",None,None),"Beautiful.ai":(None,14.50,None),"Plus AI":(15,10,None),"SlidesAI":(None,10,None),"Le Chat (Mistral)":(14.99,None,None),
+ "Opus Clip":(15,None,None),"Captions":(24.99,None,None),"Wordtune":(6.99,4.89,None),"Rytr":(7.50,None,None),"Warp":(20,None,None),"Qodo":(30,None,None),"Freepik AI":(20,14.50,None),
+ "Photoroom":(None,7.50,None),"Riverside":(None,24,None),"Krisp":(16,8,None),"Buffer":(5,None,"per channel"),"Surfer":(None,82,None),"Writesonic":(None,79,None),"Frase":(49,39,None),
+ "Predis.ai":(79,39.50,None),"Ocoya":(29,None,None),"Elicit":(None,11,None),"Scite":(12,None,None),"Humata":(None,None,"$0.01-$0.02 per extra page"),"You.com API":(None,None,"$5 per 1,000 search calls"),
+ "Fireflies":(18,10,None),"Fathom":(None,None,None),"Motion":(19,None,None),"Reclaim":(10,None,None),"ClickUp":(10,7,None),"Taskade":(None,10,None),"Superhuman":(15,12,None),
+ "Zapier":(19.99,None,"Free tier: 100 tasks/mo"),"Zapier Agents":(19.99,None,None),"Botpress":(None,150,"$0.65 per extra conversation (pack of 100 for $65)"),"Chatbase":(40,32,None),"Lindy":(29.99,None,None),
+}
+# Jobs pages: "best AI tool for [job]" -> (title, category id, intro, tool names in ranked order)
+JOBS = [
+ ("youtube-shorts","making YouTube Shorts & TikToks","video",["Opus Clip","CapCut","Captions"]),
+ ("podcast-editing","editing a podcast","audio",["Descript","Riverside","Krisp"]),
+ ("voiceovers","voiceovers & text-to-speech","audio",["ElevenLabs","Murf","Speechify"]),
+ ("pitch-decks","making a pitch deck","presentations",["Pitch","Beautiful.ai","Plus AI"]),
+ ("blog-seo","writing SEO blog posts","marketing",["Frase","Surfer","Writesonic"]),
+ ("meeting-notes","meeting notes","productivity",["Fireflies","Otter","Fathom"]),
+ ("customer-support-bot","a customer-support chatbot","agents",["Botpress","Chatbase","Lindy"]),
+ ("literature-review","a literature review","research",["Elicit","Scite","Consensus"]),
+ ("logos-text-in-images","logos & text in images","images",["Ideogram","Recraft","Leonardo"]),
+ ("product-photos","e-commerce product photos","images",["Photoroom","Freepik AI","Leonardo"]),
+ ("beginner-coding","learning to code / beginners","coding",["GitHub Copilot","Bolt","v0"]),
+ ("ai-avatar-videos","AI avatar / training videos","video",["HeyGen","Synthesia","Captions"]),
+]
+COMPARISONS += [
+ ("fireflies-vs-otter","Fireflies vs Otter","Fireflies","Otter","productivity"),
+ ("botpress-vs-chatbase","Botpress vs Chatbase","Botpress","Chatbase","agents"),
+ ("frase-vs-surfer","Frase vs Surfer","Frase","Surfer","marketing"),
+ ("elicit-vs-scite","Elicit vs Scite","Elicit","Scite","research"),
+ ("opus-clip-vs-capcut","Opus Clip vs CapCut","Opus Clip","CapCut","video"),
+]
+SPONSOR_TIERS = [("Category spotlight","Your tool in the sponsored slot on one category page, clearly labelled 'Sponsored'.","Contact for pricing"),
+ ("Sitewide banner","Sponsored slot on every page for a month.","Contact for pricing"),
+ ("Newsletter feature","Feature in the ToolPick newsletter (launching soon).","Contact for pricing")]
