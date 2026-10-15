@@ -1,0 +1,662 @@
+{
+ "2026-10-14": {
+  "Runway": {
+   "price": "Standard $15/mo ($12/mo billed yearly); Pro $35 ($28); Max $95 ($76)",
+   "free": "Free plan: one-time 125 credits"
+  },
+  "Pika": {
+   "price": "Starter $10/mo ($8 yearly); Creator $35 ($28); Fancy $95-$880",
+   "free": "Free plan: $0, credit packs only, no commercial license"
+  },
+  "Luma Dream Machine": {
+   "price": "Plus $30/mo ($25 yearly); Pro $90 ($75); Ultra $300 ($250)",
+   "free": "No free plan listed on pricing page"
+  },
+  "Kling AI": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "HeyGen": {
+   "price": "Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat",
+   "free": "Free: 3 videos/mo, up to 1 min each"
+  },
+  "Synthesia": {
+   "price": "Starter $29/mo (yearly from $18/mo); Pro $89/mo ($64 yearly)",
+   "free": "Basic free: 10 min video/mo + 500 credits, watermarked"
+  },
+  "Descript": {
+   "price": "Hobbyist $24/mo ($16 yearly); Creator $35 ($24)",
+   "free": "Free: 1 media hour/mo"
+  },
+  "CapCut": {
+   "price": "Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo",
+   "free": "Free plan with basic editing and templates"
+  },
+  "InVideo": {
+   "price": "Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150",
+   "free": "Free editor available"
+  },
+  "Opus Clip": {
+   "price": "Paid from $15/mo billed monthly",
+   "free": "Free forever plan ($0)"
+  },
+  "Captions": {
+   "price": "From $24.99/mo; higher tiers $69.99, $139.99, $279.99/mo",
+   "free": "check site"
+  },
+  "Claude": {
+   "price": "Pro $20/mo ($17/mo billed yearly); Max from $100/mo",
+   "free": "Free plan: $0"
+  },
+  "ChatGPT": {
+   "price": "check site",
+   "free": "Free plan with unlimited text chats on GPT-6 (limits on tools)"
+  },
+  "Google Gemini": {
+   "price": "Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo",
+   "free": "Gemini app is free to use"
+  },
+  "Grammarly": {
+   "price": "Pro $12/mo",
+   "free": "Free: $0 spelling & grammar checks"
+  },
+  "Notion AI": {
+   "price": "Plus $10/member/mo; Business $20/member/mo",
+   "free": "Free plan: $0 (AI trial only)"
+  },
+  "Copy.ai": {
+   "price": "Chat $29/mo ($24 yearly)",
+   "free": "Free trial available"
+  },
+  "Jasper": {
+   "price": "check site",
+   "free": "7-day free trial of Pro"
+  },
+  "Wordtune": {
+   "price": "From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99)",
+   "free": "Basic $0 (limited)"
+  },
+  "Rytr": {
+   "price": "$7.50/mo; $24.16/mo for multiple brands",
+   "free": "Free forever, no card"
+  },
+  "GitHub Copilot": {
+   "price": "Pro $10/mo; Pro+ $39/mo; Max $100/mo",
+   "free": "Free plan: $0"
+  },
+  "Cursor": {
+   "price": "Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user",
+   "free": "Free: $0 with limited agent requests"
+  },
+  "Windsurf": {
+   "price": "Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat",
+   "free": "Free: $0"
+  },
+  "Claude (Pro)": {
+   "price": "Pro $20/mo ($17 yearly); Max from $100/mo",
+   "free": "Free plan: $0"
+  },
+  "Bolt": {
+   "price": "Pro $25/mo; Teams $30/member/mo",
+   "free": "Free: 300K tokens/day, 1M/month"
+  },
+  "v0": {
+   "price": "Team $30/user/mo; Business $100/user/mo",
+   "free": "Free: $0 with daily credits"
+  },
+  "Lovable": {
+   "price": "check site",
+   "free": "Free: 5 build credits/day (up to 30/mo)"
+  },
+  "Warp": {
+   "price": "$20/mo (includes $20 of agent usage)",
+   "free": "Free: $0"
+  },
+  "Qodo": {
+   "price": "Pro Team $30 (per user/mo)",
+   "free": "check site"
+  },
+  "Leonardo": {
+   "price": "Essential $12/mo; Premium $30; Ultimate $60",
+   "free": "Free: 150 fast tokens/day"
+  },
+  "Midjourney": {
+   "price": "Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96)",
+   "free": "No free plan (subscription only)"
+  },
+  "Ideogram": {
+   "price": "Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20)",
+   "free": "Free weekly credits for eligible accounts"
+  },
+  "Krea": {
+   "price": "From $35/mo ($21 yearly); $105 ($63); $200 ($160)",
+   "free": "Free: 100 units/day"
+  },
+  "Canva": {
+   "price": "check site",
+   "free": "Free plan available"
+  },
+  "Recraft": {
+   "price": "check site",
+   "free": "Free plan (images not licensed for commercial use)"
+  },
+  "Freepik AI": {
+   "price": "$20/mo ($14.50 yearly); $45 ($33.75); $110 ($82.50)",
+   "free": "check site"
+  },
+  "Photoroom": {
+   "price": "Pro $7.50/mo; Max $20.99/mo; Ultra $82.50/mo (billed yearly)",
+   "free": "check site"
+  },
+  "ElevenLabs": {
+   "price": "Starter $6/mo; Creator $22; Pro $99; Scale $299 (intro discounts shown on site)",
+   "free": "Free: $0"
+  },
+  "Suno": {
+   "price": "Pro $8/mo; Premier $24/mo (yearly billing prices)",
+   "free": "Free: 50 credits/day"
+  },
+  "Murf": {
+   "price": "API pay-as-you-go from $0.01/1,000 chars (Studio plans: check site)",
+   "free": "$10 free API credit"
+  },
+  "Speechify": {
+   "price": "Premium $29/mo (billed monthly)",
+   "free": "Free plan, speeds up to 1.5x"
+  },
+  "Otter": {
+   "price": "Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly)",
+   "free": "Basic: free forever"
+  },
+  "Udio": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Riverside": {
+   "price": "Paid plans billed $288/yr or $408/yr",
+   "free": "Free: $0"
+  },
+  "Krisp": {
+   "price": "$16/user/mo ($8/user/mo billed yearly)",
+   "free": "Free plan: $0"
+  },
+  "Pitch": {
+   "price": "Plus €10/mo; Team €15/mo; Business €20/mo",
+   "free": "Free forever: unlimited presentations"
+  },
+  "Beautiful.ai": {
+   "price": "Pro $14.50/mo (billed annually); Team $40/user/mo yearly ($50 monthly)",
+   "free": "14-day free trial"
+  },
+  "Plus AI": {
+   "price": "Basic $10/user/mo yearly ($15 monthly); Pro $20 ($25); Team $30 ($40); Max $200 ($240)",
+   "free": "7-day free trial (card required)"
+  },
+  "SlidesAI": {
+   "price": "$10/mo (billed $120/yr); $20.83/mo (billed $250/yr)",
+   "free": "Basic $0: 12 presentations/year"
+  },
+  "Gamma": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Le Chat (Mistral)": {
+   "price": "Pro $14.99/mo; Team $24.99/user/mo (excl. tax)",
+   "free": "Free plan with limited access"
+  },
+  "Perplexity": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Microsoft Copilot": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Buffer": {
+   "price": "Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel",
+   "free": "Free plan available"
+  },
+  "Surfer": {
+   "price": "AI visibility tracking from $82/mo billed yearly; Standard $99/mo billed yearly",
+   "free": "Start for free"
+  },
+  "Writesonic": {
+   "price": "Starter $79/mo billed annually; $199; $399",
+   "free": "Start free"
+  },
+  "Frase": {
+   "price": "$49/mo month-to-month ($39 billed yearly); team $129 ($103)",
+   "free": "7-day free trial, no card"
+  },
+  "Predis.ai": {
+   "price": "Rise $79/mo ($474/yr billed yearly)",
+   "free": "3-day trial"
+  },
+  "Ocoya": {
+   "price": "Starter $29/mo; Team $79/mo (billed monthly)",
+   "free": "Free trial"
+  },
+  "Elicit": {
+   "price": "From $11/user/mo billed annually ($132/yr); $39; $89",
+   "free": "check site"
+  },
+  "Scite": {
+   "price": "Basic $12/mo; Pro $40/mo",
+   "free": "7-day free trial"
+  },
+  "Consensus": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "SciSpace": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Humata": {
+   "price": "Extra pages $0.01-$0.02/page (plans: check site)",
+   "free": "check site"
+  },
+  "You.com API": {
+   "price": "Web search API $5 per 1,000 calls",
+   "free": "check site"
+  },
+  "ResearchRabbit": {
+   "price": "ResearchRabbit+ $10/mo (annual plan) or $12.50/mo (monthly plan)",
+   "free": "Free: $0, forever"
+  },
+  "Scholarcy": {
+   "price": "check site",
+   "free": "Free Article Summarizer: $0 (1 summary/day); 7-day trial of full app"
+  },
+  "Fireflies": {
+   "price": "Pro $18/seat/mo ($10 billed annually); Business $29 ($19)",
+   "free": "Free forever: $0"
+  },
+  "Fathom": {
+   "price": "From $15/user/mo; Business $25-$34/user/mo",
+   "free": "Free plan"
+  },
+  "Motion": {
+   "price": "Pro AI $19/seat/mo; Business AI $29/seat/mo",
+   "free": "Free trial"
+  },
+  "Reclaim": {
+   "price": "$10/seat/mo for small teams",
+   "free": "check site"
+  },
+  "ClickUp": {
+   "price": "Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly)",
+   "free": "Free plan"
+  },
+  "Taskade": {
+   "price": "Pro $10/mo (yearly, 10 users incl.); $25; $100; $250",
+   "free": "Free: $0"
+  },
+  "Superhuman": {
+   "price": "$12/member/mo yearly ($15 monthly); $33 ($40)",
+   "free": "Free: $0"
+  },
+  "Zapier": {
+   "price": "Professional from $19.99/mo; Team from $69/mo",
+   "free": "Free forever: 100 tasks/mo"
+  },
+  "Botpress": {
+   "price": "Plus $150/mo billed annually (250 conversations); extra $0.65/conversation",
+   "free": "Free: $0, 100 conversations"
+  },
+  "Chatbase": {
+   "price": "Hobby $40/mo ($32 yearly); Standard $150 ($120)",
+   "free": "check site"
+  },
+  "Lindy": {
+   "price": "Credit tiers from $29.99/mo",
+   "free": "Start with $50 in free credits, no card"
+  },
+  "Zapier Agents": {
+   "price": "Professional from $19.99/mo; Team from $69/mo",
+   "free": "Free forever: 100 tasks/mo"
+  },
+  "Relevance AI": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Voiceflow": {
+   "price": "Usage-based; businesses request pricing",
+   "free": "Free trial, no credit card"
+  },
+  "n8n": {
+   "price": "Starter €20/mo, Pro €50/mo, Business €667/mo (billed annually)",
+   "free": "Free self-hosted Community Edition; cloud trial, no card"
+  }
+ },
+ "2026-10-15": {
+  "Runway": {
+   "price": "Standard $15/mo ($12/mo billed yearly); Pro $35 ($28); Max $95 ($76)",
+   "free": "Free plan: one-time 125 credits"
+  },
+  "Pika": {
+   "price": "Starter $10/mo ($8 yearly); Creator $35 ($28); Fancy $95-$880",
+   "free": "Free plan: $0, credit packs only, no commercial license"
+  },
+  "Luma Dream Machine": {
+   "price": "Plus $30/mo ($25 yearly); Pro $90 ($75); Ultra $300 ($250)",
+   "free": "No free plan listed on pricing page"
+  },
+  "Kling AI": {
+   "price": "List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $92/mo ($728.64/yr); Ultra $180/mo ($1,429.99/yr). Promotional: Standard $6.99 first month, then discounted monthly rates (checked 2026-10-15)",
+   "free": "Basic: free"
+  },
+  "HeyGen": {
+   "price": "Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat",
+   "free": "Free: 3 videos/mo, up to 1 min each"
+  },
+  "Synthesia": {
+   "price": "Starter $29/mo (yearly from $18/mo); Pro $89/mo ($64 yearly)",
+   "free": "Basic free: 10 min video/mo + 500 credits, watermarked"
+  },
+  "Descript": {
+   "price": "Hobbyist $24/mo ($16 yearly); Creator $35 ($24)",
+   "free": "Free: 1 media hour/mo"
+  },
+  "CapCut": {
+   "price": "Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo",
+   "free": "Free plan with basic editing and templates"
+  },
+  "InVideo": {
+   "price": "Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150",
+   "free": "Free editor available"
+  },
+  "Opus Clip": {
+   "price": "Paid from $15/mo billed monthly",
+   "free": "Free forever plan ($0)"
+  },
+  "Captions": {
+   "price": "From $24.99/mo; higher tiers $69.99, $139.99, $279.99/mo",
+   "free": "check site"
+  },
+  "Claude": {
+   "price": "Pro $20/mo ($17/mo billed yearly); Max from $100/mo",
+   "free": "Free plan: $0"
+  },
+  "ChatGPT": {
+   "price": "Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing (checked 2026-10-15)",
+   "free": "Free: $0 (unlimited text chats on GPT-6, limits on tools)"
+  },
+  "Google Gemini": {
+   "price": "Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo",
+   "free": "Gemini app is free to use"
+  },
+  "Grammarly": {
+   "price": "Pro $12/mo",
+   "free": "Free: $0 spelling & grammar checks"
+  },
+  "Notion AI": {
+   "price": "Plus $10/member/mo; Business $20/member/mo",
+   "free": "Free plan: $0 (AI trial only)"
+  },
+  "Copy.ai": {
+   "price": "Chat $29/mo ($24 yearly)",
+   "free": "Free trial available"
+  },
+  "Jasper": {
+   "price": "check site",
+   "free": "7-day free trial of Pro"
+  },
+  "Wordtune": {
+   "price": "From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99)",
+   "free": "Basic $0 (limited)"
+  },
+  "Rytr": {
+   "price": "$7.50/mo; $24.16/mo for multiple brands",
+   "free": "Free forever, no card"
+  },
+  "GitHub Copilot": {
+   "price": "Pro $10/mo; Pro+ $39/mo; Max $100/mo",
+   "free": "Free plan: $0"
+  },
+  "Cursor": {
+   "price": "Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user",
+   "free": "Free: $0 with limited agent requests"
+  },
+  "Windsurf": {
+   "price": "Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat",
+   "free": "Free: $0"
+  },
+  "Claude (Pro)": {
+   "price": "Pro $20/mo ($17 yearly); Max from $100/mo",
+   "free": "Free plan: $0"
+  },
+  "Bolt": {
+   "price": "Pro $25/mo; Teams $30/member/mo",
+   "free": "Free: 300K tokens/day, 1M/month"
+  },
+  "v0": {
+   "price": "Team $30/user/mo; Business $100/user/mo",
+   "free": "Free: $0 with daily credits"
+  },
+  "Lovable": {
+   "price": "check site",
+   "free": "Free: 5 build credits/day (up to 30/mo)"
+  },
+  "Warp": {
+   "price": "$20/mo (includes $20 of agent usage)",
+   "free": "Free: $0"
+  },
+  "Qodo": {
+   "price": "Pro Team $30 (per user/mo)",
+   "free": "check site"
+  },
+  "Leonardo": {
+   "price": "Essential $12/mo; Premium $30; Ultimate $60",
+   "free": "Free: 150 fast tokens/day"
+  },
+  "Midjourney": {
+   "price": "Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96)",
+   "free": "No free plan (subscription only)"
+  },
+  "Ideogram": {
+   "price": "Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20)",
+   "free": "Free weekly credits for eligible accounts"
+  },
+  "Krea": {
+   "price": "From $35/mo ($21 yearly); $105 ($63); $200 ($160)",
+   "free": "Free: 100 units/day"
+  },
+  "Canva": {
+   "price": "Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person (checked 2026-10-15)",
+   "free": "Free plan available"
+  },
+  "Recraft": {
+   "price": "check site",
+   "free": "Free plan (images not licensed for commercial use)"
+  },
+  "Freepik AI": {
+   "price": "$20/mo ($14.50 yearly); $45 ($33.75); $110 ($82.50)",
+   "free": "check site"
+  },
+  "Photoroom": {
+   "price": "Pro $7.50/mo; Max $20.99/mo; Ultra $82.50/mo (billed yearly)",
+   "free": "check site"
+  },
+  "ElevenLabs": {
+   "price": "Starter $6/mo; Creator $22; Pro $99; Scale $299 (intro discounts shown on site)",
+   "free": "Free: $0"
+  },
+  "Suno": {
+   "price": "Pro $8/mo; Premier $24/mo (yearly billing prices)",
+   "free": "Free: 50 credits/day"
+  },
+  "Murf": {
+   "price": "API pay-as-you-go from $0.01/1,000 chars (Studio plans: check site)",
+   "free": "$10 free API credit"
+  },
+  "Speechify": {
+   "price": "Premium $29/mo (billed monthly)",
+   "free": "Free plan, speeds up to 1.5x"
+  },
+  "Otter": {
+   "price": "Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly)",
+   "free": "Basic: free forever"
+  },
+  "Udio": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Riverside": {
+   "price": "Paid plans billed $288/yr or $408/yr",
+   "free": "Free: $0"
+  },
+  "Krisp": {
+   "price": "$16/user/mo ($8/user/mo billed yearly)",
+   "free": "Free plan: $0"
+  },
+  "Pitch": {
+   "price": "Plus €10/mo; Team €15/mo; Business €20/mo",
+   "free": "Free forever: unlimited presentations"
+  },
+  "Beautiful.ai": {
+   "price": "Pro $14.50/mo (billed annually); Team $40/user/mo yearly ($50 monthly)",
+   "free": "14-day free trial"
+  },
+  "Plus AI": {
+   "price": "Basic $10/user/mo yearly ($15 monthly); Pro $20 ($25); Team $30 ($40); Max $200 ($240)",
+   "free": "7-day free trial (card required)"
+  },
+  "SlidesAI": {
+   "price": "$10/mo (billed $120/yr); $20.83/mo (billed $250/yr)",
+   "free": "Basic $0: 12 presentations/year"
+  },
+  "Gamma": {
+   "price": "Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-15)",
+   "free": "Free plan available"
+  },
+  "Le Chat (Mistral)": {
+   "price": "Pro $14.99/mo; Team $24.99/user/mo (excl. tax)",
+   "free": "Free plan with limited access"
+  },
+  "Perplexity": {
+   "price": "Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15)",
+   "free": "Free tier available"
+  },
+  "Microsoft Copilot": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Buffer": {
+   "price": "Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel",
+   "free": "Free plan available"
+  },
+  "Surfer": {
+   "price": "AI visibility tracking from $82/mo billed yearly; Standard $99/mo billed yearly",
+   "free": "Start for free"
+  },
+  "Writesonic": {
+   "price": "Starter $79/mo billed annually; $199; $399",
+   "free": "Start free"
+  },
+  "Frase": {
+   "price": "$49/mo month-to-month ($39 billed yearly); team $129 ($103)",
+   "free": "7-day free trial, no card"
+  },
+  "Predis.ai": {
+   "price": "Rise $79/mo ($474/yr billed yearly)",
+   "free": "3-day trial"
+  },
+  "Ocoya": {
+   "price": "Starter $29/mo; Team $79/mo (billed monthly)",
+   "free": "Free trial"
+  },
+  "Elicit": {
+   "price": "From $11/user/mo billed annually ($132/yr); $39; $89",
+   "free": "check site"
+  },
+  "Scite": {
+   "price": "Basic $12/mo; Pro $40/mo",
+   "free": "7-day free trial"
+  },
+  "Consensus": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "SciSpace": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Humata": {
+   "price": "Extra pages $0.01-$0.02/page (plans: check site)",
+   "free": "check site"
+  },
+  "You.com API": {
+   "price": "Web search API $5 per 1,000 calls",
+   "free": "check site"
+  },
+  "ResearchRabbit": {
+   "price": "ResearchRabbit+ $10/mo (annual plan) or $12.50/mo (monthly plan)",
+   "free": "Free: $0, forever"
+  },
+  "Scholarcy": {
+   "price": "check site",
+   "free": "Free Article Summarizer: $0 (1 summary/day); 7-day trial of full app"
+  },
+  "Fireflies": {
+   "price": "Pro $18/seat/mo ($10 billed annually); Business $29 ($19)",
+   "free": "Free forever: $0"
+  },
+  "Fathom": {
+   "price": "From $15/user/mo; Business $25-$34/user/mo",
+   "free": "Free plan"
+  },
+  "Motion": {
+   "price": "Pro AI $19/seat/mo; Business AI $29/seat/mo",
+   "free": "Free trial"
+  },
+  "Reclaim": {
+   "price": "$10/seat/mo for small teams",
+   "free": "check site"
+  },
+  "ClickUp": {
+   "price": "Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly)",
+   "free": "Free plan"
+  },
+  "Taskade": {
+   "price": "Pro $10/mo (yearly, 10 users incl.); $25; $100; $250",
+   "free": "Free: $0"
+  },
+  "Superhuman": {
+   "price": "$12/member/mo yearly ($15 monthly); $33 ($40)",
+   "free": "Free: $0"
+  },
+  "Zapier": {
+   "price": "Professional from $19.99/mo; Team from $69/mo",
+   "free": "Free forever: 100 tasks/mo"
+  },
+  "Botpress": {
+   "price": "Plus $150/mo billed annually (250 conversations); extra $0.65/conversation",
+   "free": "Free: $0, 100 conversations"
+  },
+  "Chatbase": {
+   "price": "Hobby $40/mo ($32 yearly); Standard $150 ($120)",
+   "free": "check site"
+  },
+  "Lindy": {
+   "price": "Credit tiers from $29.99/mo",
+   "free": "Start with $50 in free credits, no card"
+  },
+  "Zapier Agents": {
+   "price": "Professional from $19.99/mo; Team from $69/mo",
+   "free": "Free forever: 100 tasks/mo"
+  },
+  "Relevance AI": {
+   "price": "check site",
+   "free": "check site"
+  },
+  "Voiceflow": {
+   "price": "Usage-based; businesses request pricing",
+   "free": "Free trial, no credit card"
+  },
+  "n8n": {
+   "price": "Starter €20/mo, Pro €50/mo, Business €667/mo (billed annually)",
+   "free": "Free self-hosted Community Edition; cloud trial, no card"
+  }
+ }
+}
