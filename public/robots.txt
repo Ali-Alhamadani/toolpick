@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://toolpick-ai-alhamdaniali10-7277.vercel.app/sitemap.xml
