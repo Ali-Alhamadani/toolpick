@@ -92,7 +92,7 @@ _extra = {
             T("Rytr","https://rytr.me","https://rytr.me/pricing","$7.50/mo; $24.16/mo for multiple brands","Free forever, no card","Budget AI writer for short-form content.")],
  "coding":[T("Warp","https://www.warp.dev","https://www.warp.dev/pricing","$20/mo (includes $20 of agent usage)","Free: $0","AI-powered terminal with coding agents."),
            T("Qodo","https://www.qodo.ai","https://www.qodo.ai/pricing/","Pro Team $30 (per user/mo)",CK,"AI code review and test generation.")],
- "images":[T("Freepik AI","https://www.freepik.com","https://www.freepik.com/pricing","$20/mo ($14.50 yearly); $45 ($33.75); $110 ($82.50)",CK,"AI image/video generation plus stock content."),
+ "images":[T("Magnific","https://www.magnific.com","https://www.magnific.com/pricing","$20/mo ($14.50 yearly); $45 ($33.75); $110 ($82.50)",CK,"AI image/video generation plus stock content."),
            T("Photoroom","https://www.photoroom.com","https://www.photoroom.com/pricing","Pro $7.50/mo; Max $20.99/mo; Ultra $82.50/mo (billed yearly)",CK,"Product photos: background removal and AI scenes.")],
  "audio":[T("Riverside","https://riverside.com","https://riverside.com/pricing","Paid plans billed $288/yr or $408/yr","Free: $0","Studio-quality remote podcast/video recording with AI editing."),
           T("Krisp","https://krisp.ai","https://krisp.ai/pricing/","$16/user/mo ($8/user/mo billed yearly)","Free plan: $0","AI noise cancellation and meeting notes.")],
@@ -111,7 +111,7 @@ CATEGORIES += [
   T("Copy.ai","https://www.copy.ai","https://www.copy.ai/prices","Chat $29/mo ($24 yearly)","Free trial available","Marketing copy and GTM workflow automation."),
   T("Jasper","https://www.jasper.ai","https://www.jasper.ai/pricing",CK,"7-day free trial of Pro","On-brand marketing content for teams."),
  ]},
- {"id":"research","name":"Research","need":"Research papers and sources","best":"Elicit","free":["ResearchRabbit","Scholarcy","Scite"],"tools":[
+ {"id":"research","name":"Research","need":"Research papers and sources","best":"Elicit","free":["Consensus","Elicit","ResearchRabbit"],"tools":[
   T("Elicit","https://elicit.com","https://elicit.com/pricing","From $11/user/mo billed annually ($132/yr); $39; $89",CK,"AI research assistant for papers and systematic reviews.","Entry tier is $11/mo billed yearly, built specifically for academic literature."),
   T("Scite","https://scite.ai","https://scite.ai/pricing","Basic $12/mo; Pro $40/mo","7-day free trial","Shows whether papers support or contrast a claim."),
   T("Consensus","https://consensus.app","https://consensus.app/pricing/",CK,CK,"Search engine that answers from peer-reviewed research."),
@@ -155,7 +155,7 @@ PRICE_TABLE = {
  "Cursor":(8,None,None),"Windsurf":(20,None,None),"Bolt":(25,None,None),"v0":(30,None,None),"Leonardo":(12,None,None),"Midjourney":(10,8,"Extra Fast GPU time $4/hr"),
  "Ideogram":(20,15,"Pay-as-you-go 1¢ per credit"),"Krea":(35,21,None),"ElevenLabs":(6,None,None),"Suno":(None,8,None),"Murf":(None,None,"$0.01-$0.03 per 1,000 characters (API)"),
  "Speechify":(29,None,None),"Otter":(16.99,8.33,None),"Pitch":("€10",None,None),"Beautiful.ai":(None,14.50,None),"Plus AI":(15,10,None),"SlidesAI":(None,10,None),"Le Chat (Mistral)":(14.99,None,None),
- "Opus Clip":(15,None,None),"Captions":(24.99,None,None),"Wordtune":(6.99,4.89,None),"Rytr":(7.50,None,None),"Warp":(20,None,None),"Qodo":(30,None,None),"Freepik AI":(20,14.50,None),
+ "Opus Clip":(15,None,None),"Captions":(24.99,None,None),"Wordtune":(6.99,4.89,None),"Rytr":(7.50,None,None),"Warp":(20,None,None),"Qodo":(30,None,None),"Magnific":(20,14.50,None),
  "Photoroom":(None,7.50,None),"Riverside":(None,24,None),"Krisp":(16,8,None),"Buffer":(5,None,"per channel"),"Surfer":(None,82,None),"Writesonic":(None,79,None),"Frase":(49,39,None),
  "Predis.ai":(79,39.50,None),"Ocoya":(29,None,None),"Elicit":(None,11,None),"Scite":(12,None,None),"Humata":(None,None,"$0.01-$0.02 per extra page"),"You.com API":(None,None,"$5 per 1,000 search calls"),
  "Fireflies":(18,10,None),"Fathom":(None,None,None),"Motion":(19,None,None),"Reclaim":(10,None,None),"ClickUp":(10,7,None),"Taskade":(None,10,None),"Superhuman":(15,12,None),
@@ -172,7 +172,7 @@ JOBS = [
  ("customer-support-bot","a customer-support chatbot","agents",["Botpress","Chatbase","Lindy"]),
  ("literature-review","a literature review","research",["Elicit","Scite","Consensus"]),
  ("logos-text-in-images","logos & text in images","images",["Ideogram","Recraft","Leonardo"]),
- ("product-photos","e-commerce product photos","images",["Photoroom","Freepik AI","Leonardo"]),
+ ("product-photos","e-commerce product photos","images",["Photoroom","Magnific","Leonardo"]),
  ("beginner-coding","learning to code / beginners","coding",["GitHub Copilot","Bolt","v0"]),
  ("ai-avatar-videos","AI avatar / training videos","video",["HeyGen","Synthesia","Captions"]),
 ]
@@ -198,7 +198,7 @@ JOBS += [
  ("code-autocomplete","code autocomplete in your editor","coding",["GitHub Copilot","Cursor","Windsurf"]),
  ("code-review","AI code review","coding",["Qodo","GitHub Copilot","Cursor"]),
  ("ai-art","AI art & illustrations","images",["Midjourney","Leonardo","Krea"]),
- ("social-media-graphics","social media graphics","images",["Canva","Freepik AI","Ideogram"]),
+ ("social-media-graphics","social media graphics","images",["Canva","Magnific","Ideogram"]),
  ("ai-music","making AI music & songs","audio",["Suno","Udio","ElevenLabs"]),
  ("noise-removal","removing background noise from calls","audio",["Krisp","Descript","Riverside"]),
  ("transcription","transcribing audio","audio",["Otter","Fireflies","Descript"]),
@@ -214,7 +214,7 @@ JOBS += [
 ]
 # Paid tools to build "free alternative to X" pages for (alternatives = same-category tools with a verified free tier)
 FREE_ALT_FOR = ["Midjourney","Luma Dream Machine","Runway","Synthesia","HeyGen","Descript","Captions","Jasper","Copy.ai","Grammarly","Cursor","Bolt",
- "Ideogram","Freepik AI","Photoroom","Speechify","Murf","Beautiful.ai","Plus AI","Frase","Predis.ai","Ocoya","Elicit","Scite","Motion","Chatbase","Otter","Le Chat (Mistral)"]
+ "Ideogram","Magnific","Photoroom","Speechify","Murf","Beautiful.ai","Plus AI","Frase","Predis.ai","Ocoya","Elicit","Scite","Motion","Chatbase","Otter","Le Chat (Mistral)"]
 
 COMPARISONS += [
  ("chatgpt-vs-claude-vs-gemini","ChatGPT vs Claude vs Gemini",["ChatGPT","Claude","Google Gemini"],None,"assistants"),
@@ -239,3 +239,41 @@ for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in _BV: _t.update(_BV[_t["name"]])
 PRICE_TABLE.update({"ChatGPT":(8,None,None),"Perplexity":(None,17,None),"Gamma":(12,9,None),"Canva":(18,12,None),"Kling AI":(10,6.60,None)})
+
+# Browser-verified 2026-10-15, batch 2 (official pages)
+_BV2 = {
+ "Captions": dict(price="Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote)", free="Free plan available"),
+ "Jasper": dict(price="Pro $59/seat/mo", free="No free plan; 7-day free trial"),
+ "Lovable": dict(price="Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually)", free="Free: $0 (5 build credits/day, up to 30/mo)"),
+ "Qodo": dict(price="Credit-based: $0.012 per credit (packs of 2,500, 5,000, 20,000)", free="No free plan; 14-day trial"),
+ "Recraft": dict(price="Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually", free="Free plan (images not licensed for commercial use)"),
+ "Magnific": dict(price="Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50)", free="No free plan shown", about="Formerly Freepik AI: AI image/video generation and upscaling."),
+ "Photoroom": dict(price="Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99)", free="No free plan; trial available"),
+ "Murf": dict(price="Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars", free="Free: 10 minutes of voice generation"),
+ "Udio": dict(price="Standard $10/mo ($8 annually); Pro $30/mo ($24 annually)", free="Free: 100 credits/mo"),
+ "Microsoft Copilot": dict(price="Copilot Pro appears discontinued; Microsoft 365 Personal $9.99/mo; Microsoft 365 Premium $19.99/mo ($199.99/yr)", free="Free Copilot available", about="Microsoft's assistant; paid AI features come with Microsoft 365 plans."),
+ "Elicit": dict(price="Pro $49/user/mo billed annually; Scale $169/user/mo annually", free="Basic: free"),
+ "Consensus": dict(price="Pro $20/mo ($12/mo annually); higher plan $65/mo ($45 annually)", free="Free plan available"),
+ "SciSpace": dict(price="Premium from $12/mo billed yearly (monthly price: check site)", free="No free plan shown"),
+ "Humata": dict(price="Expert $9.99/mo; Team $49/user/mo", free="Free: 60 pages/mo"),
+ "You.com API": dict(price="API only: Search $5 per 1,000 calls", free="$100 free API credit", about="Search and research APIs for building AI apps (consumer plan pricing not listed)."),
+ "Scholarcy": dict(price="$9.99/month (1-week trial)", free="Free Article Summarizer (limited, 1 summary/day)"),
+ "Reclaim": dict(price="Starter $12/seat/mo ($10 yearly); Business $18 ($15 yearly)", free="Lite: free forever"),
+ "Chatbase": dict(price="Hobby $32/mo; Standard $120/mo; Pro $400/mo (billed yearly)", free="No free plan; 7-day trial"),
+ "Relevance AI": dict(price="Enterprise only (custom pricing)", free="No free plan shown"),
+}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _BV2: _t.update(_BV2[_t["name"]])
+PRICE_TABLE.update({"Captions":(24.99,None,None),"Jasper":(59,None,None),"Lovable":(25,21,None),"Qodo":(None,None,"$0.012 per credit"),"Recraft":(None,10,None),
+ "Magnific":(20,14.50,None),"Photoroom":(12.99,7.50,None),"Murf":(None,19,"API $0.01-$0.03 per 1,000 characters"),"Udio":(10,8,None),"Microsoft Copilot":(9.99,None,None),
+ "Elicit":(None,49,None),"Consensus":(20,12,None),"SciSpace":(None,12,None),"Humata":(9.99,None,"Extra pages $0.01-$0.02/page"),"Scholarcy":(9.99,None,None),
+ "Reclaim":(12,10,None),"Chatbase":(None,32,None),"Relevance AI":(None,None,None)})
+
+# Elicit, browser-checked 2026-10-15
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] == "Elicit":
+            _t["price"] = "Industry: Pro $75/mo ($49/mo yearly, $588/yr); Scale $279/mo ($169 yearly, $2,028/yr). Academic: Plus from $11/mo yearly ($19 monthly); Pro $69 ($39); Scale $149 ($89)"
+            _t["free"] = "Basic: free"
+PRICE_TABLE["Elicit"] = (75, 49, None)

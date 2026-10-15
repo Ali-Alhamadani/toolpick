@@ -10,7 +10,7 @@
 - [Presentations](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-presentations-tools.html): best value Pitch; free options Pitch, SlidesAI, Canva
 - [AI Assistants](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-assistants-tools.html): best value Le Chat (Mistral); free options ChatGPT, Claude, Google Gemini
 - [Marketing & SEO](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-marketing-tools.html): best value Buffer; free options Buffer, Surfer, Writesonic
-- [Research](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-research-tools.html): best value Elicit; free options ResearchRabbit, Scholarcy, Scite
+- [Research](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-research-tools.html): best value Elicit; free options Consensus, Elicit, ResearchRabbit
 - [Productivity & Meetings](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-productivity-tools.html): best value Fireflies; free options Fireflies, Zapier, Superhuman
 - [Chatbots & Agents](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-agents-tools.html): best value Botpress; free options Botpress, Lindy, Zapier Agents
 
@@ -25,14 +25,14 @@
 - [CapCut](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/capcut.html): Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo | free: Free plan with basic editing and templates
 - [InVideo](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/invideo.html): Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150 | free: Free editor available
 - [Opus Clip](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/opus-clip.html): Paid from $15/mo billed monthly | free: Free forever plan ($0)
-- [Captions](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/captions.html): From $24.99/mo; higher tiers $69.99, $139.99, $279.99/mo | free: check site
+- [Captions](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
 - [Claude](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
 - [ChatGPT](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing (checked 2026-10-15) | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
 - [Google Gemini](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/google-gemini.html): Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo | free: Gemini app is free to use
 - [Grammarly](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/grammarly.html): Pro $12/mo | free: Free: $0 spelling & grammar checks
 - [Notion AI](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/notion-ai.html): Plus $10/member/mo; Business $20/member/mo | free: Free plan: $0 (AI trial only)
 - [Copy.ai](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/copy-ai.html): Chat $29/mo ($24 yearly); team plans from $1,000/mo | free: Free trial available
-- [Jasper](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/jasper.html): check site | free: 7-day free trial of Pro
+- [Jasper](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/jasper.html): Pro $59/seat/mo | free: No free plan; 7-day free trial
 - [Wordtune](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/wordtune.html): From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99) | free: Basic $0 (limited)
 - [Rytr](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/rytr.html): $7.50/mo; $24.16/mo for multiple brands | free: Free forever, no card
 - [GitHub Copilot](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/github-copilot.html): Pro $10/mo; Pro+ $39/mo; Max $100/mo | free: Free plan: $0
@@ -41,23 +41,23 @@
 - [Claude (Pro)](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/claude-pro.html): Pro $20/mo ($17 yearly); Max from $100/mo | free: Free plan: $0
 - [Bolt](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/bolt.html): Pro $25/mo; Teams $30/member/mo | free: Free: 300K tokens/day, 1M/month
 - [v0](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/v0.html): Team $30/user/mo; Business $100/user/mo | free: Free: $0 with daily credits
-- [Lovable](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/lovable.html): check site | free: Free: 5 build credits/day (up to 30/mo)
+- [Lovable](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually) | free: Free: $0 (5 build credits/day, up to 30/mo)
 - [Warp](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
-- [Qodo](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/qodo.html): Pro Team $30 (per user/mo) | free: check site
+- [Qodo](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/qodo.html): Credit-based: $0.012 per credit (packs of 2,500, 5,000, 20,000) | free: No free plan; 14-day trial
 - [Leonardo](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/leonardo.html): Essential $12/mo; Premium $30; Ultimate $60 | free: Free: 150 fast tokens/day
 - [Midjourney](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/midjourney.html): Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96) | free: No free plan (subscription only)
 - [Ideogram](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/ideogram.html): Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20) | free: Free weekly credits for eligible accounts
 - [Krea](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/krea.html): From $35/mo ($21 yearly); $105 ($63); $200 ($160) | free: Free: 100 units/day
 - [Canva](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/canva.html): Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person (checked 2026-10-15) | free: Free plan available
-- [Recraft](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/recraft.html): check site | free: Free plan (images not licensed for commercial use)
-- [Freepik AI](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/freepik-ai.html): $20/mo ($14.50 yearly); $45 ($33.75); $110 ($82.50) | free: check site
-- [Photoroom](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/photoroom.html): Pro $7.50/mo; Max $20.99/mo; Ultra $82.50/mo (billed yearly) | free: check site
+- [Recraft](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
+- [Magnific](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
+- [Photoroom](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
 - [ElevenLabs](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/elevenlabs.html): Starter $6/mo; Creator $22; Pro $99; Scale $299 (intro discounts shown on site) | free: Free: $0
 - [Suno](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
-- [Murf](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/murf.html): API pay-as-you-go from $0.01/1,000 chars (Studio plans: check site) | free: $10 free API credit
+- [Murf](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
 - [Otter](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/otter.html): Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly) | free: Basic: free forever
-- [Udio](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/udio.html): check site | free: check site
+- [Udio](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/udio.html): Standard $10/mo ($8 annually); Pro $30/mo ($24 annually) | free: Free: 100 credits/mo
 - [Riverside](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/riverside.html): Paid plans billed $288/yr or $408/yr | free: Free: $0
 - [Krisp](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/krisp.html): $16/user/mo ($8/user/mo billed yearly) | free: Free plan: $0
 - [Pitch](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/pitch.html): Plus €10/mo; Team €15/mo; Business €20/mo | free: Free forever: unlimited presentations
@@ -67,34 +67,34 @@
 - [Gamma](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/gamma.html): Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-15) | free: Free plan available
 - [Le Chat (Mistral)](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/le-chat-mistral.html): Pro $14.99/mo; Team $24.99/user/mo (excl. tax) | free: Free plan with limited access
 - [Perplexity](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/perplexity.html): Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15) | free: Free tier available
-- [Microsoft Copilot](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/microsoft-copilot.html): check site | free: check site
+- [Microsoft Copilot](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/microsoft-copilot.html): Copilot Pro appears discontinued; Microsoft 365 Personal $9.99/mo; Microsoft 365 Premium $19.99/mo ($199.99/yr) | free: Free Copilot available
 - [Buffer](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/buffer.html): Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel | free: Free plan available
 - [Surfer](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/surfer.html): AI visibility tracking from $82/mo billed yearly; Standard $99/mo billed yearly | free: Start for free
 - [Writesonic](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/writesonic.html): Starter $79/mo billed annually; $199; $399 | free: Start free
 - [Frase](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/frase.html): $49/mo month-to-month ($39 billed yearly); team $129 ($103) | free: 7-day free trial, no card
 - [Predis.ai](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/predis-ai.html): Rise $79/mo ($474/yr billed yearly) | free: 3-day trial
 - [Ocoya](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/ocoya.html): Starter $29/mo; Team $79/mo (billed monthly) | free: Free trial
-- [Elicit](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/elicit.html): From $11/user/mo billed annually ($132/yr); $39; $89 | free: check site
+- [Elicit](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/elicit.html): Industry: Pro $75/mo ($49/mo yearly, $588/yr); Scale $279/mo ($169 yearly, $2,028/yr). Academic: Plus from $11/mo yearly ($19 monthly); Pro $69 ($39); Scale $149 ($89) | free: Basic: free
 - [Scite](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/scite.html): Basic $12/mo; Pro $40/mo | free: 7-day free trial
-- [Consensus](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/consensus.html): check site | free: check site
-- [SciSpace](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/scispace.html): check site | free: check site
-- [Humata](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/humata.html): Extra pages $0.01-$0.02/page (plans: check site) | free: check site
-- [You.com API](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/you-com-api.html): Web search API $5 per 1,000 calls | free: check site
+- [Consensus](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/consensus.html): Pro $20/mo ($12/mo annually); higher plan $65/mo ($45 annually) | free: Free plan available
+- [SciSpace](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/scispace.html): Premium from $12/mo billed yearly (monthly price: check site) | free: No free plan shown
+- [Humata](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/humata.html): Expert $9.99/mo; Team $49/user/mo | free: Free: 60 pages/mo
+- [You.com API](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/you-com-api.html): API only: Search $5 per 1,000 calls | free: $100 free API credit
 - [ResearchRabbit](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/researchrabbit.html): ResearchRabbit+ $10/mo (annual plan) or $12.50/mo (monthly plan) | free: Free: $0, forever
-- [Scholarcy](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/scholarcy.html): check site | free: Free Article Summarizer: $0 (1 summary/day); 7-day trial of full app
+- [Scholarcy](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/scholarcy.html): $9.99/month (1-week trial) | free: Free Article Summarizer (limited, 1 summary/day)
 - [Fireflies](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/fireflies.html): Pro $18/seat/mo ($10 billed annually); Business $29 ($19) | free: Free forever: $0
 - [Fathom](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/fathom.html): From $15/user/mo; Business $25-$34/user/mo | free: Free plan
 - [Motion](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/motion.html): Pro AI $19/seat/mo; Business AI $29/seat/mo | free: Free trial
-- [Reclaim](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/reclaim.html): $10/seat/mo for small teams | free: check site
+- [Reclaim](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/reclaim.html): Starter $12/seat/mo ($10 yearly); Business $18 ($15 yearly) | free: Lite: free forever
 - [ClickUp](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/clickup.html): Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly) | free: Free plan
 - [Taskade](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/taskade.html): Pro $10/mo (yearly, 10 users incl.); $25; $100; $250 | free: Free: $0
 - [Superhuman](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/superhuman.html): $12/member/mo yearly ($15 monthly); $33 ($40) | free: Free: $0
 - [Zapier](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/zapier.html): Professional from $19.99/mo; Team from $69/mo | free: Free forever: 100 tasks/mo
 - [Botpress](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/botpress.html): Plus $150/mo billed annually (250 conversations); extra $0.65/conversation | free: Free: $0, 100 conversations
-- [Chatbase](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/chatbase.html): Hobby $40/mo ($32 yearly); Standard $150 ($120) | free: check site
+- [Chatbase](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/chatbase.html): Hobby $32/mo; Standard $120/mo; Pro $400/mo (billed yearly) | free: No free plan; 7-day trial
 - [Lindy](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/lindy.html): Credit tiers from $29.99/mo | free: Start with $50 in free credits, no card
 - [Zapier Agents](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/zapier-agents.html): Professional from $19.99/mo; Team from $69/mo | free: Free forever: 100 tasks/mo
-- [Relevance AI](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/relevance-ai.html): check site | free: check site
+- [Relevance AI](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/relevance-ai.html): Enterprise only (custom pricing) | free: No free plan shown
 - [Voiceflow](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/voiceflow.html): Usage-based; businesses request pricing | free: Free trial, no credit card
 - [n8n](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/n8n.html): Starter €20/mo, Pro €50/mo, Business €667/mo (billed annually) | free: Free self-hosted Community Edition; cloud trial, no card
 
