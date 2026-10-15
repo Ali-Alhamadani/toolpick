@@ -1,7 +1,7 @@
 """Builds public/ from tools.py.  Usage: BASE=https://your-site python3 build.py
 Pages: index, /best-ai-<category>-tools.html, /tools/<slug>.html, /compare/<slug>.html, sitemap, robots, tools.json"""
 import os, re, html, json, shutil
-from tools import CATEGORIES, CHECKED, COMPARISONS, PRICE_TABLE, JOBS, SPONSOR_TIERS, FREE_ALT_FOR
+from tools import CATEGORIES, CHECKED, COMPARISONS, PRICE_TABLE, JOBS, SPONSOR_TIERS, FREE_ALT_FOR, REDIRECTS
 BASE = os.environ.get("BASE", "https://toolpick-ai-alhamdaniali10-7277.vercel.app").rstrip("/")
 e = html.escape
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
@@ -37,6 +37,14 @@ def proscons(t, c):
     if t["name"] == c["best"]: pros.append("ToolPick best-value pick for " + c["name"].lower())
     return pros, cons
 DISCLOSURE = '<p class="small disc">Disclosure: this is an affiliate link. ToolPick may earn a commission at no extra cost to you; it never changes our picks or prices.</p>'
+def faq(qas):
+    html_ = "<h2>FAQ</h2>" + "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q, a in qas)
+    ld = {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q, a in qas]}
+    return html_, ld
+def tool_qas(t):
+    ck = t.get('checked', CHECKED)
+    return [(f"How much does {t['name']} cost?", f"Per its official pricing page (checked {ck}): {t['price']}."),
+            (f"Does {t['name']} have a free plan?", f"{t['free']} (checked {ck}).")]
 URLS = []
 for _c in CATEGORIES:
     for _t in _c['tools']:
@@ -54,7 +62,7 @@ def card(t, c):
     pc = "price check" if t["price"] == "check site" else "price"
     return f"""<div class="card{' best' if best else ''}">{badges}<h3><a href="{turl(t['name'])}">{e(t['name'])}</a></h3><p>{e(t['about'])}</p>
 <p class="{pc}">💲 {e(t['price'])}</p><p>🆓 {e(t['free'])}</p>
-<p class="small"><a href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Official site</a> · <a href="{e(t['pricing'])}" rel="noopener" target="_blank">Pricing page</a> · checked {CHECKED}</p>{DISCLOSURE if t.get('affiliate') else ''}</div>"""
+<p class="small"><a href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Official site</a> · <a href="{e(t['pricing'])}" rel="noopener" target="_blank">Pricing page</a> · checked {t.get('checked', CHECKED)}</p>{DISCLOSURE if t.get('affiliate') else ''}</div>"""
 def picks(c):
     b = next(t for t in c["tools"] if t["name"] == c["best"])
     return f"""<div class="pick"><span class="badge b-best">BEST VALUE</span><b><a href="{turl(b['name'])}">{e(b['name'])}</a></b> — {e(b.get('why',''))}</div>
@@ -63,7 +71,7 @@ def comps_for(names): return [x for x in COMPARISONS if set(x[2] if isinstance(x
 def complinks(lst): return ("<h2>Comparisons</h2><ul>" + "".join(f'<li><a href="/compare/{s}.html">{e(ti)}</a></li>' for s,ti,*_ in lst) + "</ul>") if lst else ""
 total_tools = len(tool_pages)
 # index
-FDATA = json.dumps([dict(n=t["name"],c=c["id"],cn=c["name"],u=turl(t["name"]),p=t["price"],f=t["free"],a=t["about"]+" "+c["need"],
+FDATA = json.dumps([dict(n=t["name"],c=c["id"],cn=c["name"],u=turl(t["name"]),p=t["price"],f=t["free"],k=t.get("checked",CHECKED),a=t["about"]+" "+c["need"],
     m=min([v for v in (t["monthly"],t["annual"]) if isinstance(v,(int,float))],default=None),b=t["name"]==c["best"],fr=t["name"] in c["free"]) for c in CATEGORIES for t in c["tools"]])
 FOPTS = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES)
 FINDER = ('''<div class="finder"><h2 style="margin-top:0">What do you need?</h2><input type="text" id="q" placeholder="e.g. turn my podcast into short clips, cheap voiceover, pitch deck for investors">
@@ -78,7 +86,7 @@ if(q.length&&!c){const mx=Math.max(...L.map(t=>t.s));if(mx>2)L=L.filter(t=>t.s>=
 if(bu=='0')L=L.filter(hasFree);else if(bu!='any')L=L.filter(t=>hasFree(t)||(t.m!=null&&t.m<=+bu));
 L.sort((x,y)=>y.s-x.s);const seen=new Set();L=L.filter(t=>!seen.has(t.n)&&seen.add(t.n));
 const top=L.slice(0,3),bv=L.filter(t=>t.b)[0]||L.filter(t=>t.m!=null).sort((x,y)=>x.m-y.m)[0],fo=L.filter(hasFree)[0];
-const card=(t,lab)=>t?`<div class="card"><span class="badge ${lab=='FREE OPTION'?'b-free':'b-best'}">${lab}</span><h3><a href="${t.u}">${t.n}</a></h3><p class="small">${t.cn}</p><p class="price">💲 ${t.p}</p><p>🆓 ${t.f}</p></div>`:'';
+const card=(t,lab)=>t?`<div class="card"><span class="badge ${lab=='FREE OPTION'?'b-free':'b-best'}">${lab}</span><h3><a href="${t.u}">${t.n}</a></h3><p class="small">${t.cn}</p><p class="price">💲 ${t.p}</p><p>🆓 ${t.f}</p><p class="small">checked ${t.k}</p></div>`:'';
 document.getElementById('out').innerHTML=L.length?`<h3>Top matches</h3><div class="res">${top.map((t,i)=>card(t,'#'+(i+1))).join('')}</div><h3>Best value &amp; free option</h3><div class="res">${card(bv,'BEST VALUE')}${card(fo,'FREE OPTION')}</div>`:'<p>No match, try a broader budget or use case.</p>'}
 ['q','cat','budget','skill'].forEach(i=>document.getElementById(i).addEventListener('input',run));run();</script>''')
 desc = f"Tell us what you need and compare {total_tools} AI tools across {len(CATEGORIES)} categories — prices checked on official pages, a best-value pick and a free option."
@@ -108,16 +116,17 @@ for name, cats in tool_pages.items():
     c = cats[0]; t = next(x for x in c["tools"] if x["name"] == name); path = turl(name)
     pros, cons = proscons(t, c)
     title = f"{name} Pricing & Free Plan ({CHECKED[:7]}) — Pros, Cons, Alternatives"
-    d = f"{name} pricing checked {CHECKED}: {t['price']}. Free tier: {t['free']}. Pros, cons and alternatives."[:300]
+    d = f"{name} pricing checked {t.get('checked', CHECKED)}: {t['price']}. Free tier: {t['free']}. Pros, cons and alternatives."[:300]
     alts = [x["name"] for cc in cats for x in cc["tools"] if x["name"] != name]
     body = f"""<h1>{e(name)} pricing &amp; review</h1><p class="tag">{e(t['about'])}</p>
 <table><tr><th>Price</th><td class="{'check' if t['price']=='check site' else ''}">{e(t['price'])}</td></tr><tr><th>Free tier</th><td>{e(t['free'])}</td></tr>
-<tr><th>Categories</th><td>{', '.join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)}</td></tr><tr><th>Checked</th><td>{CHECKED} on the <a href="{e(t['pricing'])}" rel="noopener">official pricing page</a></td></tr></table>
+<tr><th>Categories</th><td>{', '.join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)}</td></tr><tr><th>Checked</th><td>{t.get('checked', CHECKED)} on the <a href="{e(t['pricing'])}" rel="noopener">official pricing page</a></td></tr></table>
 <h2>Pros</h2><ul>{''.join(f'<li>{e(x)}</li>' for x in pros)}</ul><h2>Cons</h2><ul>{''.join(f'<li>{e(x)}</li>' for x in cons) or '<li>Paid features require a subscription — compare plans on the official page</li>'}</ul>
 <p><a class="btn" href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Visit {e(name)} official site</a></p>{DISCLOSURE if t.get('affiliate') else ''}
 <h2>Alternatives</h2><ul>{''.join(f'<li><a href="{turl(a)}">{e(a)}</a></li>' for a in dict.fromkeys(alts))}</ul>{complinks(comps_for([name]))}"""
     sw = {"@context":"https://schema.org","@type":"SoftwareApplication","name":name,"applicationCategory":"BusinessApplication","operatingSystem":"Web","url":t["url"],"description":t["about"]}
-    page(path, title, d, body, [sw, crumbs([("ToolPick","/"),(f"Best AI {c['name']} tools",f"/best-ai-{c['id']}-tools.html"),(name,path)])])
+    fh, fl = faq(tool_qas(t)); body += fh
+    page(path, title, d, body, [sw, fl, crumbs([("ToolPick","/"),(f"Best AI {c['name']} tools",f"/best-ai-{c['id']}-tools.html"),(name,path)])])
 # comparison pages
 def find(n): return next(x for c in CATEGORIES for x in c["tools"] if x["name"] == n)
 def cnames(x): return x[2] if isinstance(x[2], list) else [x[2], x[3]]
@@ -135,13 +144,15 @@ for x in COMPARISONS:
       + row("Official", lambda t: f'<a href="{e(t["pricing"])}" rel="noopener">pricing page</a>') + "</table></div>"
       + f'<h2>Verdict</h2><p>{verdict}</p><p>See all <a href="/best-ai-{cid}-tools.html">best AI {e(c["name"].lower())} tools</a>.</p>{complinks([y for y in COMPARISONS if y[0]!=s_])}')
     il = {"@context":"https://schema.org","@type":"ItemList","name":title0,"itemListElement":[{"@type":"ListItem","position":k+1,"url":BASE+turl(n),"name":n} for k,n in enumerate(N)]}
-    page(path, title, d, body, [il, crumbs([("ToolPick","/"),(title0,path)])])
+    qas = [q for t in TT for q in tool_qas(t)] + [(f"What is ToolPick's best-value pick for {c['name'].lower()}?", f"{c['best']}: {find(c['best']).get('why','')}".strip())]
+    fh, fl = faq(qas)
+    page(path, title, d, body + fh, [il, fl, crumbs([("ToolPick","/"),(title0,path)])])
 # best AI tool for [job] pages
 for js, job, cid, ranked in JOBS:
     path = f"/best-ai-tool-for-{js}.html"; c = next(x for x in CATEGORIES if x["id"] == cid)
     title = f"Best AI Tool for {job[0].upper()+job[1:]} ({CHECKED[:4]}) — Top 3 with Prices"
     d = f"The top 3 AI tools for {job}: {', '.join(ranked)}. Prices checked {CHECKED} on official pricing pages."
-    items = "".join(f"<li><h3><a href='{turl(n)}'>{e(n)}</a></h3><p>{e(find(n)['about'])}</p><p class='price'>💲 {e(find(n)['price'])}</p><p>🆓 {e(find(n)['free'])}</p></li>" for n in ranked)
+    items = "".join(f"<li><h3><a href='{turl(n)}'>{e(n)}</a></h3><p>{e(find(n)['about'])}</p><p class='price'>💲 {e(find(n)['price'])}</p><p>🆓 {e(find(n)['free'])}</p><p class='small'>checked {find(n).get('checked', CHECKED)}</p></li>" for n in ranked)
     body = f"""<h1>Best AI tool for {e(job)}</h1><p class="tag">{e(d)}</p><ol>{items}</ol><div class="sponsor">Sponsored slot available — <a href="/sponsor.html">sponsor ToolPick</a></div>
 <p>More options: <a href="/best-ai-{cid}-tools.html">all AI {e(c['name'].lower())} tools</a>.</p>{complinks(comps_for(ranked))}
 <h2>Other jobs</h2><ul>{''.join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS if j[0]!=js)}</ul>"""
@@ -160,7 +171,7 @@ for name in FREE_ALT_FOR:
     path = f"/free-alternative-to-{slug(name)}.html"; FREE_ALT_URLS.append((name, path))
     title = f"Free Alternatives to {name} ({CHECKED[:4]}) — {len(alts)} Options with Free Plans"
     d = f"{name} costs {t['price']}. Free alternatives with a verified free tier: {', '.join(alts[:5])}. Checked {CHECKED}."[:300]
-    items = "".join(f"<li><h3><a href='{turl(a)}'>{e(a)}</a></h3><p>{e(find(a)['about'])}</p><p>🆓 {e(find(a)['free'])}</p><p class='price'>💲 Paid: {e(find(a)['price'])}</p></li>" for a in alts)
+    items = "".join(f"<li><h3><a href='{turl(a)}'>{e(a)}</a></h3><p>{e(find(a)['about'])}</p><p>🆓 {e(find(a)['free'])}</p><p class='price'>💲 Paid: {e(find(a)['price'])}</p><p class='small'>checked {find(a).get('checked', CHECKED)}</p></li>" for a in alts)
     body = f"""<h1>Free alternatives to {e(name)}</h1><p class="tag">{e(d)}</p><p><a href="{turl(name)}">{e(name)}</a>: {e(t['price'])}. Free tier: {e(t['free'])}.</p><ol>{items}</ol>
 <p class="small">Only tools whose official pricing page showed a free plan on {CHECKED} are listed.</p><p>See all <a href="/best-ai-{cats[0]['id']}-tools.html">AI {e(cats[0]['name'].lower())} tools</a>.</p>"""
     il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(a),"name":a} for i,a in enumerate(alts)]}
@@ -168,7 +179,7 @@ for name in FREE_ALT_FOR:
 
 # /free and best-free pages
 FREE_LIST = [(c, t) for c in CATEGORIES for t in c["tools"] if hasfree(t, c)]
-fcards = "".join(f'<div class="card" data-c="{c["id"]}"><span class="badge b-free">FREE</span><h3><a href="{turl(t["name"])}">{e(t["name"])}</a></h3><p class="small">{e(c["name"])}</p><p>🆓 {e(t["free"])}</p><p class="price">💲 Paid: {e(t["price"])}</p></div>' for c, t in FREE_LIST)
+fcards = "".join(f'<div class="card" data-c="{c["id"]}"><span class="badge b-free">FREE</span><h3><a href="{turl(t["name"])}">{e(t["name"])}</a></h3><p class="small">{e(c["name"])}</p><p>🆓 {e(t["free"])}</p><p class="price">💲 Paid: {e(t["price"])}</p><p class="small">checked {t.get("checked", CHECKED)}</p></div>' for c, t in FREE_LIST)
 page("/free.html", f"Free AI Tools ({CHECKED[:4]}): {len({t['name'] for _,t in FREE_LIST})} Tools with a Confirmed Free Plan", "Every AI tool on ToolPick with a free plan confirmed on its official pricing page, filterable by category.",
   f"""<h1>Free AI tools</h1><p class="tag">Tools whose official pricing page showed a free plan on {CHECKED}. Free trials are not counted.</p>
 <select id="fc" class="finder" style="padding:10px"><option value="">All categories</option>{''.join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES)}</select>
@@ -181,7 +192,7 @@ for c in CATEGORIES:
     path = f"/best-free-ai-{c['id']}-tools.html"; n = c["name"]
     title = f"Best Free AI {n} Tools ({CHECKED[:4]}) — {len(L)} with Free Plans"
     d = f"{len(L)} free AI {n.lower()} tools with a free plan confirmed on the official pricing page ({CHECKED}): {', '.join(t['name'] for t in L[:5])}."
-    body = f"""<h1>Best free AI {e(n.lower())} tools</h1><p class="tag">{e(d)}</p><ol>{''.join(f"<li><h3><a href='{turl(t['name'])}'>{e(t['name'])}</a></h3><p>{e(t['about'])}</p><p>🆓 {e(t['free'])}</p><p class='price'>💲 Paid: {e(t['price'])}</p></li>" for t in L)}</ol>
+    body = f"""<h1>Best free AI {e(n.lower())} tools</h1><p class="tag">{e(d)}</p><ol>{''.join(f"<li><h3><a href='{turl(t['name'])}'>{e(t['name'])}</a></h3><p>{e(t['about'])}</p><p>🆓 {e(t['free'])}</p><p class='price'>💲 Paid: {e(t['price'])}</p><p class='small'>checked {t.get('checked', CHECKED)}</p></li>" for t in L)}</ol>
 <p>Compare paid options: <a href="/best-ai-{c['id']}-tools.html">all AI {e(n.lower())} tools</a> · <a href="/free.html">all free AI tools</a></p>"""
     il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":k+1,"url":BASE+turl(t["name"]),"name":t["name"]} for k,t in enumerate(L)]}
     page(path, title, d, body, [il, crumbs([("ToolPick","/"),("Free AI tools","/free.html"),(f"Best free AI {n} tools",path)])])
@@ -238,6 +249,9 @@ except Exception as ex:
     import base64
     from og_data import OG_PNG
     open("public/og.png","wb").write(base64.b64decode(OG_PNG)); print("OG image from og_data.py (PIL unavailable)")
+for old, new in REDIRECTS.items():
+    fp = "public" + old; os.makedirs(os.path.dirname(fp), exist_ok=True)
+    open(fp, "w").write(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title><link rel="canonical" href="{BASE}{new}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={new}"><script>location.replace("{new}")</script></head><body><p>This page moved to <a href="{new}">{BASE}{new}</a>.</p></body></html>')
 open("public/robots.txt","w").write(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc><lastmod>{CHECKED}</lastmod></url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))

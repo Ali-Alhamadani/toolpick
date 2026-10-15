@@ -1,6 +1,36 @@
-# ToolPick affiliate programs: all listed tools (researched 2026-10-15). Research only: nothing joined.
-Source: **official page** = the vendor's own affiliate page or terms; **third-party summary** = an aggregator or search summary (verify before applying). A blank cell = not found.
+# ToolPick affiliate shortlist: top 15 for Ali's approval (researched 2026-10-15). Nothing joined.
+Ranked by expected value for ToolPick: commission x duration x how prominent the tool is on the site. Approve per program; joining usually needs an application (some need Awin/PartnerStack/Impact accounts).
 
+## A. Terms from the official affiliate page (9)
+| # | Program | Commission | Duration | Cookie | Signup |
+|---|---|---|---|---|---|
+| 1 | ElevenLabs | 22% (11% Business) | 12 months | 90 days | https://elevenlabs.io/affiliate (PartnerStack) |
+| 2 | Synthesia | 25% of Starter/Creator payments | not stated | 60 days | https://www.synthesia.io/partners/affiliates (Rewardful) |
+| 3 | Opus Clip | 25% recurring | first year | not stated | https://www.opus.pro/affiliate ($20 min payout, PayPal) |
+| 4 | Rytr | 30% recurring | 12 months | not stated | https://rytr.me/affiliates ($100 threshold) |
+| 5 | Buffer | 25% recurring | 12 months | not stated | https://buffer.com/partners |
+| 6 | Writesonic | 20% recurring | 12 months | 60 days | https://writesonic.com/affiliate (FirstPromoter; no brand-term ads) |
+| 7 | Beautiful.ai | 30% Pro / 15-30% Team | first year (annual) / first month (monthly) | not stated | https://www.beautiful.ai/affiliate-program-terms-of-service |
+| 8 | Photoroom | 20% on eligible plans | n/a | 30 days | https://www.photoroom.com/affiliates (Awin account required) |
+| 9 | Gamma | % of first-12-month net revenue (rate in dashboard) | 12 months | not stated | https://gamma.app/partners |
+
+## B. Third-party reported, so verify before applying (6)
+| # | Program | Reported commission | Cookie | Notes |
+|---|---|---|---|---|
+| 10 | CapCut | 35% recurring, lifetime | unpublished / 30 days (conflicting) | US/UK/DE/FR only, Impact |
+| 11 | Murf | 20% for up to 24 months | 90 days | PartnerStack |
+| 12 | HeyGen | 35% for 3 months | 30 days | $100 min payout |
+| 13 | Fireflies | up to 30% for 12 months | 90 days | FirstPromoter |
+| 14 | Botpress | 30% recurring | not published | PartnerStack |
+| 15 | Lovable | up to $100 per first-time subscriber | 7 days | Impact |
+
+Also official but low value or code-based: Runway ($15/subscriber via code; needs an active social channel), Descript ($25 one-time), Pitch (30%, capped at $100).
+**Recommended first 3 to apply to:** ElevenLabs, Synthesia and Opus Clip. All are official terms, recurring, and the tools are prominent on the site.
+
+Rules: the site auto-shows a disclosure when the `affiliate` field is set. Commissions never change picks. Follow each program's bans (brand-term bidding, coupon sites).
+
+---
+## Appendix: all 82 tools
 | Tool | Program? | Commission | Cookie | Signup / network | Source |
 |---|---|---|---|---|---|
 | Runway | yes | $15 per new subscriber (code-based) | n/a (code) | https://runway.com/affiliate-program | official page |
@@ -85,12 +115,3 @@ Source: **official page** = the vendor's own affiliate page or terms; **third-pa
 | Relevance AI | not found |  |  |  | search found nothing |
 | Voiceflow | not found |  |  |  | search found nothing |
 | n8n | unconfirmed |  |  |  | third-party summary |
-
-## Top programs by expected value
-1. ElevenLabs: 22% x 12 mo, 90-day cookie (official). It's our audio best-value pick.
-2. CapCut: 35% recurring lifetime in US/UK/DE/FR (summary). Huge search demand.
-3. Synthesia: 25%, 60-day cookie (official). High-ticket plans.
-4. Rytr / Buffer / Opus Clip: 25-30% recurring for 12 mo (all official pages).
-5. Murf: 20% for up to 24 mo, 90-day cookie (summary).
-
-Rules: add a disclosure (the site shows one automatically when the `affiliate` field is set), never let commissions change picks, and follow each program's ban on brand-term ads and coupon sites.

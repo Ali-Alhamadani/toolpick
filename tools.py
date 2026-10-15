@@ -183,9 +183,8 @@ COMPARISONS += [
  ("elicit-vs-scite","Elicit vs Scite","Elicit","Scite","research"),
  ("opus-clip-vs-capcut","Opus Clip vs CapCut","Opus Clip","CapCut","video"),
 ]
-SPONSOR_TIERS = [("Category spotlight","Your tool in the sponsored slot on one category page, clearly labelled 'Sponsored'.","Contact for pricing"),
- ("Sitewide banner","Sponsored slot on every page for a month.","Contact for pricing"),
- ("Newsletter feature","Feature in the ToolPick newsletter (launching soon).","Contact for pricing")]
+SPONSOR_TIERS = [("Category Sponsor","Labelled slot on one category page, its best-free page and matching job pages.","Contact for pricing"),
+ ("Sitewide Sponsor","One labelled slot on every page (one sponsor at a time).","Contact for pricing")]
 
 JOBS += [
  ("text-to-video","text-to-video generation","video",["Runway","Pika","Luma Dream Machine"]),
@@ -277,3 +276,49 @@ for _c in CATEGORIES:
             _t["price"] = "Industry: Pro $75/mo ($49/mo yearly, $588/yr); Scale $279/mo ($169 yearly, $2,028/yr). Academic: Plus from $11/mo yearly ($19 monthly); Pro $69 ($39); Scale $149 ($89)"
             _t["free"] = "Basic: free"
 PRICE_TABLE["Elicit"] = (75, 49, None)
+
+# Per-tool checked dates (default CHECKED)
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _BV or _t["name"] in _BV2 or _t["name"] == "Elicit": _t["checked"] = "2026-10-15"
+        if _t["name"] == "ElevenLabs":
+            _t["price"] = "List prices: Starter $6/mo; Creator $22/mo; Pro $99/mo; Scale $299/mo; Business $990/mo. Promotional: Starter $1 first month (83% off, until Oct 18); Creator $11 first month (50% off)"
+
+# Old URL -> new URL (renamed/removed pages); build.py writes redirect stubs
+REDIRECTS = {
+ "/tools/freepik-ai.html": "/tools/magnific.html",
+ "/free-alternative-to-freepik-ai.html": "/free-alternative-to-magnific.html",
+}
+
+COMPARISONS += [
+ ("chatgpt-vs-claude","ChatGPT vs Claude","ChatGPT","Claude","assistants"),
+ ("chatgpt-vs-gemini","ChatGPT vs Gemini","ChatGPT","Google Gemini","assistants"),
+ ("claude-vs-gemini","Claude vs Gemini","Claude","Google Gemini","assistants"),
+ ("chatgpt-vs-le-chat","ChatGPT vs Le Chat (Mistral)","ChatGPT","Le Chat (Mistral)","assistants"),
+ ("jasper-vs-copy-ai","Jasper vs Copy.ai","Jasper","Copy.ai","marketing"),
+ ("lovable-vs-bolt","Lovable vs Bolt","Lovable","Bolt","coding"),
+ ("lovable-vs-v0","Lovable vs v0","Lovable","v0","coding"),
+ ("bolt-vs-v0","Bolt vs v0","Bolt","v0","coding"),
+ ("github-copilot-vs-windsurf","GitHub Copilot vs Windsurf","GitHub Copilot","Windsurf","coding"),
+ ("canva-vs-gamma","Canva vs Gamma","Canva","Gamma","presentations"),
+ ("gamma-vs-pitch","Gamma vs Pitch","Gamma","Pitch","presentations"),
+ ("perplexity-vs-consensus","Perplexity vs Consensus","Perplexity","Consensus","research"),
+ ("elicit-vs-consensus","Elicit vs Consensus","Elicit","Consensus","research"),
+ ("notion-ai-vs-clickup","Notion AI vs ClickUp","Notion AI","ClickUp","productivity"),
+ ("motion-vs-reclaim","Motion vs Reclaim","Motion","Reclaim","productivity"),
+ ("fathom-vs-fireflies","Fathom vs Fireflies","Fathom","Fireflies","productivity"),
+ ("zapier-vs-n8n","Zapier vs n8n","Zapier Agents","n8n","agents"),
+ ("lindy-vs-zapier","Lindy vs Zapier Agents","Lindy","Zapier Agents","agents"),
+ ("suno-vs-udio","Suno vs Udio","Suno","Udio","audio"),
+ ("elevenlabs-vs-speechify","ElevenLabs vs Speechify","ElevenLabs","Speechify","audio"),
+ ("descript-vs-riverside","Descript vs Riverside","Descript","Riverside","audio"),
+ ("runway-vs-pika","Runway vs Pika","Runway","Pika","video"),
+ ("runway-vs-luma","Runway vs Luma Dream Machine","Runway","Luma Dream Machine","video"),
+ ("kling-vs-pika","Kling vs Pika","Kling AI","Pika","video"),
+ ("captions-vs-opus-clip","Captions vs Opus Clip","Captions","Opus Clip","video"),
+ ("leonardo-vs-ideogram","Leonardo vs Ideogram","Leonardo","Ideogram","images"),
+ ("midjourney-vs-krea","Midjourney vs Krea","Midjourney","Krea","images"),
+ ("grammarly-vs-wordtune","Grammarly vs Wordtune","Grammarly","Wordtune","writing"),
+ ("surfer-vs-writesonic","Surfer vs Writesonic","Surfer","Writesonic","marketing"),
+ ("buffer-vs-ocoya","Buffer vs Ocoya","Buffer","Ocoya","marketing"),
+]

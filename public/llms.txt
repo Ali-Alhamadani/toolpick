@@ -52,7 +52,7 @@
 - [Recraft](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
-- [ElevenLabs](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/elevenlabs.html): Starter $6/mo; Creator $22; Pro $99; Scale $299 (intro discounts shown on site) | free: Free: $0
+- [ElevenLabs](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/elevenlabs.html): List prices: Starter $6/mo; Creator $22/mo; Pro $99/mo; Scale $299/mo; Business $990/mo. Promotional: Starter $1 first month (83% off, until Oct 18); Creator $11 first month (50% off) | free: Free: $0
 - [Suno](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
 - [Murf](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai-alhamdaniali10-7277.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
@@ -118,6 +118,36 @@
 - [Perplexity vs ChatGPT](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/perplexity-vs-chatgpt.html)
 - [Gamma vs Beautiful.ai](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/gamma-vs-beautiful-ai.html)
 - [ResearchRabbit vs Elicit](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/researchrabbit-vs-elicit.html)
+- [ChatGPT vs Claude](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/chatgpt-vs-claude.html)
+- [ChatGPT vs Gemini](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/chatgpt-vs-gemini.html)
+- [Claude vs Gemini](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/claude-vs-gemini.html)
+- [ChatGPT vs Le Chat (Mistral)](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/chatgpt-vs-le-chat.html)
+- [Jasper vs Copy.ai](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/jasper-vs-copy-ai.html)
+- [Lovable vs Bolt](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/lovable-vs-bolt.html)
+- [Lovable vs v0](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/lovable-vs-v0.html)
+- [Bolt vs v0](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/bolt-vs-v0.html)
+- [GitHub Copilot vs Windsurf](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/github-copilot-vs-windsurf.html)
+- [Canva vs Gamma](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/canva-vs-gamma.html)
+- [Gamma vs Pitch](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/gamma-vs-pitch.html)
+- [Perplexity vs Consensus](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/perplexity-vs-consensus.html)
+- [Elicit vs Consensus](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/elicit-vs-consensus.html)
+- [Notion AI vs ClickUp](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/notion-ai-vs-clickup.html)
+- [Motion vs Reclaim](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/motion-vs-reclaim.html)
+- [Fathom vs Fireflies](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/fathom-vs-fireflies.html)
+- [Zapier vs n8n](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/zapier-vs-n8n.html)
+- [Lindy vs Zapier Agents](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/lindy-vs-zapier.html)
+- [Suno vs Udio](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/suno-vs-udio.html)
+- [ElevenLabs vs Speechify](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/elevenlabs-vs-speechify.html)
+- [Descript vs Riverside](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/descript-vs-riverside.html)
+- [Runway vs Pika](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/runway-vs-pika.html)
+- [Runway vs Luma Dream Machine](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/runway-vs-luma.html)
+- [Kling vs Pika](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/kling-vs-pika.html)
+- [Captions vs Opus Clip](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/captions-vs-opus-clip.html)
+- [Leonardo vs Ideogram](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/leonardo-vs-ideogram.html)
+- [Midjourney vs Krea](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/midjourney-vs-krea.html)
+- [Grammarly vs Wordtune](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/grammarly-vs-wordtune.html)
+- [Surfer vs Writesonic](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/surfer-vs-writesonic.html)
+- [Buffer vs Ocoya](https://toolpick-ai-alhamdaniali10-7277.vercel.app/compare/buffer-vs-ocoya.html)
 
 ## Best tool for a job
 - [making YouTube Shorts & TikToks](https://toolpick-ai-alhamdaniali10-7277.vercel.app/best-ai-tool-for-youtube-shorts.html)
