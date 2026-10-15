@@ -2,7 +2,7 @@
 Pages: index, /best-ai-<category>-tools.html, /tools/<slug>.html, /compare/<slug>.html, sitemap, robots, tools.json"""
 import os, re, html, json, shutil
 from tools import CATEGORIES, CHECKED, COMPARISONS, PRICE_TABLE, JOBS, SPONSOR_TIERS, FREE_ALT_FOR, REDIRECTS
-BASE = os.environ.get("BASE", "https://toolpick-ai-alhamdaniali10-7277.vercel.app").rstrip("/")
+BASE = os.environ.get("BASE", "https://toolpick-ai.vercel.app").rstrip("/")
 e = html.escape
 slug = lambda s: re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-")
 CSS = """*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0f1117;color:#e7e9ee;line-height:1.55}
@@ -45,6 +45,13 @@ def tool_qas(t):
     ck = t.get('checked', CHECKED)
     return [(f"How much does {t['name']} cost?", f"Per its official pricing page (checked {ck}): {t['price']}."),
             (f"Does {t['name']} have a free plan?", f"{t['free']} (checked {ck}).")]
+import re as _re
+NOT_FREE = _re.compile(r"trial|one-time|free (api )?credit|in free credits|start (for )?free|^no free|^check site", _re.I)
+def realfree(t):
+    f = t["free"]
+    return bool(_re.search(r"free|\$0", f, _re.I)) and not NOT_FREE.search(f)
+for _c in CATEGORIES:
+    _c["free"] = [n for n in _c["free"] if any(x["name"] == n and realfree(x) for x in _c["tools"])]
 URLS = []
 for _c in CATEGORIES:
     for _t in _c['tools']:
@@ -72,23 +79,23 @@ def complinks(lst): return ("<h2>Comparisons</h2><ul>" + "".join(f'<li><a href="
 total_tools = len(tool_pages)
 # index
 FDATA = json.dumps([dict(n=t["name"],c=c["id"],cn=c["name"],u=turl(t["name"]),p=t["price"],f=t["free"],k=t.get("checked",CHECKED),a=t["about"]+" "+c["need"],
-    m=min([v for v in (t["monthly"],t["annual"]) if isinstance(v,(int,float))],default=None),b=t["name"]==c["best"],fr=t["name"] in c["free"]) for c in CATEGORIES for t in c["tools"]])
+    m=min([v for v in (t["monthly"],t["annual"]) if isinstance(v,(int,float))],default=None),b=t["name"]==c["best"],fr=realfree(t)) for c in CATEGORIES for t in c["tools"]])
 FOPTS = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES)
 FINDER = ('''<div class="finder"><h2 style="margin-top:0">What do you need?</h2><input type="text" id="q" placeholder="e.g. turn my podcast into short clips, cheap voiceover, pitch deck for investors">
 <div><select id="cat"><option value="">Any use case</option>''' + FOPTS + '''</select>
 <select id="budget"><option value="any">Any budget</option><option value="0">Free only</option><option value="15">Up to $15/mo</option><option value="30">Up to $30/mo</option><option value="100">Up to $100/mo</option></select>
 <select id="skill"><option value="beginner">Beginner</option><option value="pro">Pro / power user</option></select></div><div id="out"></div></div>
 <script>const D=''' + FDATA.replace("</", "<\\/") + r''';
-const SW=new Set('the and for with into turn make want need some best good cheap free tool tools that this from your using use help'.split(' '));const hasFree=t=>t.fr||(/free|\$0/i.test(t.f)&&!/^(no free|check site)/i.test(t.f)&&!/trial/i.test(t.f));
+const SW=new Set('the and for with into turn make want need some best good cheap free tool tools that this from your using use help'.split(' '));const hasFree=t=>t.fr;
 function run(){const q=document.getElementById('q').value.toLowerCase().split(/\W+/).filter(w=>w.length>2&&!SW.has(w)),c=document.getElementById('cat').value,bu=document.getElementById('budget').value,sk=document.getElementById('skill').value;
-let L=D.filter(t=>!c||t.c==c).map(t=>{let s=0;const h=(t.n+' '+t.a+' '+t.cn+' '+t.c).toLowerCase();q.forEach(w=>{if(h.includes(w))s+=3;else if(h.includes(w.slice(0,5)))s+=1});if(t.b)s+=2;if(hasFree(t)&&sk=='beginner')s+=1.5;if(t.m!=null&&sk=='pro')s+=0.5;return Object.assign({s},t)});
-if(q.length&&!c){const mx=Math.max(...L.map(t=>t.s));if(mx>2)L=L.filter(t=>t.s>=2)}
+let L=D.filter(t=>!c||t.c==c).map(t=>{let s=0;const h=(t.n+' '+t.a+' '+t.cn+' '+t.c).toLowerCase();q.forEach(w=>{if(h.includes(w))s+=3;else if(h.includes(w.slice(0,5)))s+=1});const ms=s;if(t.b)s+=2;if(hasFree(t)&&sk=='beginner')s+=1.5;if(t.m!=null&&sk=='pro')s+=0.5;return Object.assign({s,ms},t)});
+let nm=false;if(q.length){const mx=Math.max(0,...L.map(t=>t.ms));if(mx>0)L=L.filter(t=>t.ms>0);else nm=true}
 if(bu=='0')L=L.filter(hasFree);else if(bu!='any')L=L.filter(t=>hasFree(t)||(t.m!=null&&t.m<=+bu));
 L.sort((x,y)=>y.s-x.s);const seen=new Set();L=L.filter(t=>!seen.has(t.n)&&seen.add(t.n));
-const top=L.slice(0,3),bv=L.filter(t=>t.b)[0]||L.filter(t=>t.m!=null).sort((x,y)=>x.m-y.m)[0],fo=L.filter(hasFree)[0];
+const top=L.slice(0,3),bv=L.filter(t=>t.b&&(!L[0]||t.c==L[0].c))[0]||L.filter(t=>t.m!=null&&t.c==L[0].c).sort((x,y)=>x.m-y.m)[0]||L.filter(t=>t.m!=null).sort((x,y)=>x.m-y.m)[0],fo=L.filter(hasFree)[0];
 const card=(t,lab)=>t?`<div class="card"><span class="badge ${lab=='FREE OPTION'?'b-free':'b-best'}">${lab}</span><h3><a href="${t.u}">${t.n}</a></h3><p class="small">${t.cn}</p><p class="price">💲 ${t.p}</p><p>🆓 ${t.f}</p><p class="small">checked ${t.k}</p></div>`:'';
-document.getElementById('out').innerHTML=L.length?`<h3>Top matches</h3><div class="res">${top.map((t,i)=>card(t,'#'+(i+1))).join('')}</div><h3>Best value &amp; free option</h3><div class="res">${card(bv,'BEST VALUE')}${card(fo,'FREE OPTION')}</div>`:'<p>No match, try a broader budget or use case.</p>'}
-['q','cat','budget','skill'].forEach(i=>document.getElementById(i).addEventListener('input',run));run();</script>''')
+document.getElementById('out').innerHTML=L.length?`${nm?'<p class="small">No close match for those words, so here are our overall picks. Try other words or pick a use case.</p>':''}<h3>${nm?'Popular picks':'Top matches'}</h3><div class="res">${top.map((t,i)=>card(t,'#'+(i+1))).join('')}</div><h3>Best value &amp; free option</h3><div class="res">${card(bv,'BEST VALUE')}${card(fo,'FREE OPTION')}</div>`:'<p>No match, try a broader budget or use case.</p>'}
+['q','cat','budget','skill'].forEach(i=>{const el=document.getElementById(i);el.addEventListener('input',run);el.addEventListener('change',run)});run();</script>''')
 desc = f"Tell us what you need and compare {total_tools} AI tools across {len(CATEGORIES)} categories — prices checked on official pages, a best-value pick and a free option."
 body = f"""<h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p>{FINDER}
 <div class="needs">{''.join(f'<button data-id="{c["id"]}" class="{"on" if i==0 else ""}">{e(c["name"])}</button>' for i,c in enumerate(CATEGORIES))}</div><div class="tabs">
@@ -162,7 +169,7 @@ for js, job, cid, ranked in JOBS:
 # free alternative pages
 def hasfree(t, c):
     f = t["free"].lower()
-    return t["name"] in c["free"] or (("free" in f or "$0" in f) and not f.startswith(("no free","check site")) and "trial" not in f)
+    return realfree(t)
 FREE_ALT_URLS = []
 for name in FREE_ALT_FOR:
     cats = tool_pages[name]; t = find(name)

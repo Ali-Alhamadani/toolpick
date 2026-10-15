@@ -322,3 +322,23 @@ COMPARISONS += [
  ("surfer-vs-writesonic","Surfer vs Writesonic","Surfer","Writesonic","marketing"),
  ("buffer-vs-ocoya","Buffer vs Ocoya","Buffer","Ocoya","marketing"),
 ]
+
+# v7: more high-intent comparisons (verified tools only)
+COMPARISONS += [
+ ("chatgpt-vs-perplexity-vs-claude","ChatGPT vs Perplexity vs Claude",["ChatGPT","Perplexity","Claude"],None,"assistants"),
+ ("chatgpt-vs-microsoft-copilot","ChatGPT vs Microsoft Copilot","ChatGPT","Microsoft Copilot","assistants"),
+ ("gemini-vs-microsoft-copilot","Google Gemini vs Microsoft Copilot","Google Gemini","Microsoft Copilot","assistants"),
+ ("perplexity-vs-gemini","Perplexity vs Google Gemini","Perplexity","Google Gemini","assistants"),
+ ("cursor-vs-github-copilot-vs-windsurf","Cursor vs GitHub Copilot vs Windsurf",["Cursor","GitHub Copilot","Windsurf"],None,"coding"),
+ ("cursor-vs-lovable","Cursor vs Lovable","Cursor","Lovable","coding"),
+ ("warp-vs-cursor","Warp vs Cursor","Warp","Cursor","coding"),
+ ("heygen-vs-captions","HeyGen vs Captions","HeyGen","Captions","video"),
+ ("capcut-vs-invideo","CapCut vs InVideo","CapCut","InVideo","video"),
+ ("synthesia-vs-invideo","Synthesia vs InVideo","Synthesia","InVideo","video"),
+ ("elevenlabs-vs-murf-vs-speechify","ElevenLabs vs Murf vs Speechify",["ElevenLabs","Murf","Speechify"],None,"audio"),
+ ("otter-vs-fathom","Otter vs Fathom","Otter","Fathom","productivity"),
+ ("canva-vs-recraft","Canva vs Recraft","Canva","Recraft","images"),
+ ("ideogram-vs-recraft","Ideogram vs Recraft","Ideogram","Recraft","images"),
+ ("rytr-vs-copy-ai","Rytr vs Copy.ai","Rytr","Copy.ai","writing"),
+ ("botpress-vs-voiceflow","Botpress vs Voiceflow","Botpress","Voiceflow","agents"),
+]

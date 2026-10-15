@@ -1,6 +1,6 @@
 # ToolPick
 Needs-based AI tool finder: 80 tools in 11 categories, prices copied from official pricing pages, a best-value pick and a free option.
-Live: https://toolpick-ai-alhamdaniali10-7277.vercel.app
+Live: https://toolpick-ai.vercel.app
 
 - `tools.py`: all data. Tool fields: name/url/pricing/price/free/about/why/affiliate (empty = official link). `PRICE_TABLE` holds the entry-plan monthly/annual price and cost per output; also `COMPARISONS`, `JOBS`, `SPONSOR_TIERS`, `CHECKED` date. Never invent prices; write "check site" when unverified.
 - `build.py`: `python3 build.py` writes `public/` (index + finder, category pages, /tools/, /compare/, best-ai-tool-for-*, sponsor, newsletter, sitemap, robots, llms.txt, tools.json, og.png).

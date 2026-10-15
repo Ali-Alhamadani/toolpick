@@ -818,9 +818,7 @@
    "need": "Market, do SEO or post on social",
    "best": "Buffer",
    "free": [
-    "Buffer",
-    "Surfer",
-    "Writesonic"
+    "Buffer"
    ],
    "tools": [
     {
@@ -1194,7 +1192,6 @@
    "best": "Botpress",
    "free": [
     "Botpress",
-    "Lindy",
     "Zapier Agents"
    ],
    "tools": [
