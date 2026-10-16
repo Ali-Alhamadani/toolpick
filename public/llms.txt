@@ -202,4 +202,7 @@
 - [automating workflows](https://toolpick-ai.vercel.app/best-ai-tool-for-workflow-automation.html)
 - [email & inbox help](https://toolpick-ai.vercel.app/best-ai-tool-for-email-assistant.html)
 
+## Compare builder
+- [Compare builder](https://toolpick-ai.vercel.app/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen
+
 Data: https://toolpick-ai.vercel.app/tools.json
