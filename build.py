@@ -259,6 +259,8 @@ except Exception as ex:
 for old, new in REDIRECTS.items():
     fp = "public" + old; os.makedirs(os.path.dirname(fp), exist_ok=True)
     open(fp, "w").write(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title><link rel="canonical" href="{BASE}{new}"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0; url={new}"><script>location.replace("{new}")</script></head><body><p>This page moved to <a href="{new}">{BASE}{new}</a>.</p></body></html>')
+INDEXNOW_KEY = "9cee734b008a5ed647a1d3686a478337"
+open(f"public/{INDEXNOW_KEY}.txt", "w").write(INDEXNOW_KEY)
 open("public/robots.txt","w").write(f"User-agent: *\nAllow: /\nSitemap: {BASE}/sitemap.xml\n")
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc><lastmod>{CHECKED}</lastmod></url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))
