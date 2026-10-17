@@ -232,7 +232,7 @@ _BV = {
  "Perplexity": dict(price="Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15)", free="Free tier available"),
  "Gamma": dict(price="Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-15)", free="Free plan available"),
  "Canva": dict(price="Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person (checked 2026-10-15)", free="Free plan available"),
- "Kling AI": dict(pricing="https://kling.ai/app/membership/membership-plan", price="List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $92/mo ($728.64/yr); Ultra $180/mo ($1,429.99/yr). Promotional: Standard $6.99 first month, then discounted monthly rates (checked 2026-10-15)", free="Basic: free", about="Text/image-to-video generator."),
+ "Kling AI": dict(pricing="https://kling.ai/app/membership/membership-plan", price="List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $207/mo ($1,490/yr); Ultra+ $619/mo ($4,457/yr). Promotional: Standard $6.99 first month then $8.8/mo; Pro $25.99 first month then $32.56/mo; Premier $135 first month then $181.99/mo; Ultra+ $402 first month then $544.99/mo (checked 2026-10-17)", free="Basic: free", about="Text/image-to-video generator."),
 }
 for _c in CATEGORIES:
     for _t in _c["tools"]:
@@ -281,6 +281,7 @@ PRICE_TABLE["Elicit"] = (75, 49, None)
 for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in _BV or _t["name"] in _BV2 or _t["name"] == "Elicit": _t["checked"] = "2026-10-15"
+        if _t["name"] == "Kling AI": _t["checked"] = "2026-10-17"
         if _t["name"] == "ElevenLabs":
             _t["price"] = "List prices: Starter $6/mo; Creator $22/mo; Pro $99/mo; Scale $299/mo; Business $990/mo. Promotional: Starter $1 first month (83% off, until Oct 18); Creator $11 first month (50% off)"
 
