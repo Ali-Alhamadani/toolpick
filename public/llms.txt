@@ -202,6 +202,9 @@
 - [automating workflows](https://toolpick-ai.vercel.app/best-ai-tool-for-workflow-automation.html)
 - [email & inbox help](https://toolpick-ai.vercel.app/best-ai-tool-for-email-assistant.html)
 
+## Help me choose
+- [Help me choose wizard](https://toolpick-ai.vercel.app/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any
+
 ## Compare builder
 - [Compare builder](https://toolpick-ai.vercel.app/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen
 
