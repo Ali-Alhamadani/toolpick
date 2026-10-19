@@ -206,6 +206,11 @@
 - [automating workflows](https://toolpick-ai.vercel.app/best-ai-tool-for-workflow-automation.html)
 - [email & inbox help](https://toolpick-ai.vercel.app/best-ai-tool-for-email-assistant.html)
 
+## New SEO guides
+- [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)
+- [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)
+- [Best AI video tools under $20]({BASE}/best-ai-video-tools-under-20.html): verified entry under $20/mo, cheapest first
+
 ## Help me choose
 - [Help me choose wizard](https://toolpick-ai.vercel.app/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any
 
