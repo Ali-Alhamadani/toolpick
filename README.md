@@ -1,5 +1,5 @@
 # ToolPick
-Needs-based AI tool finder: 80 tools in 11 categories, prices copied from official pricing pages, a best-value pick and a free option.
+Needs-based AI tool finder: 83 tools in 11 categories, prices copied from official pricing pages, a best-value pick and a free option.
 Live: https://toolpick-ai.vercel.app
 
 - `tools.py`: all data. Tool fields: name/url/pricing/price/free/about/why/affiliate (empty = official link). `PRICE_TABLE` holds the entry-plan monthly/annual price and cost per output; also `COMPARISONS`, `JOBS`, `SPONSOR_TIERS`, `CHECKED` date. Never invent prices; write "check site" when unverified.
@@ -9,4 +9,4 @@ Live: https://toolpick-ai.vercel.app
 - `affiliates.md`, `growth.md`: monetization research and traffic plan.
 
 ## Deploy
-Vercel project `toolpick-ai` runs `python3 build.py` itself (install `echo skip`, output `public`). Deploy with the Vercel MCP `create_deployment`, target production, `files` = build.py, tools.py, og_data.py, price_history.json (the MCP allows 4 `$file:` files per call) (inline via `$file:`).
+Vercel project `toolpick-ai` runs `python3 build.py` itself (install `echo skip`, output `public`). Deploy with the Vercel MCP `create_deployment`, target production, `files` = build.py, tools.py, og_data.py, price_history.json (the MCP allows 4 `$file:` files per call) (inline via `$file:`). Always pass `projectSettings` {framework null, buildCommand `python3 build.py`, installCommand `echo skip`, outputDirectory `public`} plus `skipAutoDetectionConfirmation` 1: on 2026-10-19 a deploy without them skipped the build and served 404 until redeployed.

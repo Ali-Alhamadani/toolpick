@@ -1,7 +1,7 @@
 """ToolPick data. Edit this file, then run build.py.
 price: exactly what the official pricing page showed on `checked`; use "check site" if not verifiable.
 """
-CHECKED = "2026-10-14"
+CHECKED = "2026-10-19"
 CATEGORIES = [
  {"id":"video","name":"Video","need":"Make or edit videos","best":"Runway","free":["CapCut","HeyGen","Synthesia"],"tools":[
   {"name":"Runway","url":"https://runwayml.com","pricing":"https://runwayml.com/pricing","price":"Standard $15/mo ($12/mo billed yearly); Pro $35 ($28); Max $95 ($76)","free":"Free plan: one-time 125 credits","about":"Gen-4.5 text/image-to-video plus image and audio models in one app.","why":"Lowest-priced entry plan among the big generative video studios, with a free credit deposit to test first."},
@@ -343,3 +343,28 @@ COMPARISONS += [
  ("rytr-vs-copy-ai","Rytr vs Copy.ai","Rytr","Copy.ai","writing"),
  ("botpress-vs-voiceflow","Botpress vs Voiceflow","Botpress","Voiceflow","agents"),
 ]
+
+# Weekly price pass 2026-10-19 (official pricing pages; static HTML or rendered page text)
+CATEGORIES[2]["tools"].append(T("Replit","https://replit.com","https://replit.com/pricing","Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom",CK,"Build and deploy apps by describing them to Replit's AI agent, all in the browser."))
+_W1019 = {
+ "ElevenLabs": dict(price="Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Creator $11 first month (50% off)"),
+ "Rytr": dict(price="Lite $9/mo; Personal $19/mo; Pro $49/mo (monthly prices; yearly billing saves 20%)", free="Free forever: 10,000 characters/mo", about="AI writing in your own voice, plus relationship and follow-up tools."),
+ "Qodo": dict(price="Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits)", free="14-day free trial, no card; free for open source projects"),
+ "Surfer": dict(price="Discovery $49/mo; AI Search Analytics $82/mo; Standard $99/mo; Pro $182/mo; Peace of Mind $299/mo (all billed yearly)"),
+ "n8n": dict(price="Starter $20/mo; Pro $50/mo; Business $800/mo (billed annually, USD)"),
+}
+PRICE_TABLE.update({"ElevenLabs":(6,5,None),"Rytr":(9,None,None),"Qodo":(30,None,"$0.012 per credit"),"Surfer":(None,49,None),"n8n":(None,20,None),"Replit":(20,18,None)})
+_V1019 = {"Runway","Pika","Luma Dream Machine","HeyGen","InVideo","Opus Clip","Captions","Claude","Claude (Pro)","Grammarly","Notion AI","Copy.ai","Jasper","Wordtune",
+ "GitHub Copilot","Cursor","Windsurf","Bolt","v0","Warp","Krea","Suno","Speechify","Riverside","Krisp","Pitch","Beautiful.ai","Plus AI","SlidesAI","Le Chat (Mistral)",
+ "Writesonic","Frase","Predis.ai","Ocoya","Scite","You.com API","ResearchRabbit","Fireflies","Fathom","Reclaim","ClickUp","Taskade","Superhuman","Zapier","Zapier Agents",
+ "Botpress","Chatbase","Lindy","Descript","Magnific","Otter","Buffer","Humata","Midjourney","Ideogram","Udio","SciSpace","Motion","Replit"} | set(_W1019)
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _W1019: _t.update(_W1019[_t["name"]])
+        _t["checked"] = "2026-10-19" if _t["name"] in _V1019 else _t.get("checked", "2026-10-14")
+COMPARISONS += [
+ ("replit-vs-lovable","Replit vs Lovable","Replit","Lovable","coding"),
+ ("replit-vs-bolt","Replit vs Bolt","Replit","Bolt","coding"),
+ ("replit-vs-cursor","Replit vs Cursor","Replit","Cursor","coding"),
+]
+FREE_ALT_FOR += [n for n in ["Replit","ElevenLabs","Surfer","n8n","Otter"] if n not in FREE_ALT_FOR]

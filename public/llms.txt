@@ -1,5 +1,5 @@
 # ToolPick
-> Needs-based AI tool finder. 82 tools, prices copied from official pricing pages on 2026-10-14. 'check site' means unverified.
+> Needs-based AI tool finder. 83 tools, prices copied from official pricing pages on 2026-10-19. 'check site' means unverified.
 
 ## Categories
 - [Video](https://toolpick-ai.vercel.app/best-ai-video-tools.html): best value Runway; free options CapCut, HeyGen, Synthesia
@@ -34,7 +34,7 @@
 - [Copy.ai](https://toolpick-ai.vercel.app/tools/copy-ai.html): Chat $29/mo ($24 yearly); team plans from $1,000/mo | free: Free trial available
 - [Jasper](https://toolpick-ai.vercel.app/tools/jasper.html): Pro $59/seat/mo | free: No free plan; 7-day free trial
 - [Wordtune](https://toolpick-ai.vercel.app/tools/wordtune.html): From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99) | free: Basic $0 (limited)
-- [Rytr](https://toolpick-ai.vercel.app/tools/rytr.html): $7.50/mo; $24.16/mo for multiple brands | free: Free forever, no card
+- [Rytr](https://toolpick-ai.vercel.app/tools/rytr.html): Lite $9/mo; Personal $19/mo; Pro $49/mo (monthly prices; yearly billing saves 20%) | free: Free forever: 10,000 characters/mo
 - [GitHub Copilot](https://toolpick-ai.vercel.app/tools/github-copilot.html): Pro $10/mo; Pro+ $39/mo; Max $100/mo | free: Free plan: $0
 - [Cursor](https://toolpick-ai.vercel.app/tools/cursor.html): Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user | free: Free: $0 with limited agent requests
 - [Windsurf](https://toolpick-ai.vercel.app/tools/windsurf.html): Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat | free: Free: $0
@@ -43,7 +43,8 @@
 - [v0](https://toolpick-ai.vercel.app/tools/v0.html): Team $30/user/mo; Business $100/user/mo | free: Free: $0 with daily credits
 - [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually) | free: Free: $0 (5 build credits/day, up to 30/mo)
 - [Warp](https://toolpick-ai.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
-- [Qodo](https://toolpick-ai.vercel.app/tools/qodo.html): Credit-based: $0.012 per credit (packs of 2,500, 5,000, 20,000) | free: No free plan; 14-day trial
+- [Qodo](https://toolpick-ai.vercel.app/tools/qodo.html): Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits) | free: 14-day free trial, no card; free for open source projects
+- [Replit](https://toolpick-ai.vercel.app/tools/replit.html): Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom | free: check site
 - [Leonardo](https://toolpick-ai.vercel.app/tools/leonardo.html): Essential $12/mo; Premium $30; Ultimate $60 | free: Free: 150 fast tokens/day
 - [Midjourney](https://toolpick-ai.vercel.app/tools/midjourney.html): Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96) | free: No free plan (subscription only)
 - [Ideogram](https://toolpick-ai.vercel.app/tools/ideogram.html): Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20) | free: Free weekly credits for eligible accounts
@@ -52,7 +53,7 @@
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
-- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): List prices: Starter $6/mo; Creator $22/mo; Pro $99/mo; Scale $299/mo; Business $990/mo. Promotional: Starter $1 first month (83% off, until Oct 18); Creator $11 first month (50% off) | free: Free: $0
+- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Creator $11 first month (50% off) | free: Free: $0
 - [Suno](https://toolpick-ai.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
 - [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
@@ -69,7 +70,7 @@
 - [Perplexity](https://toolpick-ai.vercel.app/tools/perplexity.html): Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15) | free: Free tier available
 - [Microsoft Copilot](https://toolpick-ai.vercel.app/tools/microsoft-copilot.html): Copilot Pro appears discontinued; Microsoft 365 Personal $9.99/mo; Microsoft 365 Premium $19.99/mo ($199.99/yr) | free: Free Copilot available
 - [Buffer](https://toolpick-ai.vercel.app/tools/buffer.html): Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel | free: Free plan available
-- [Surfer](https://toolpick-ai.vercel.app/tools/surfer.html): AI visibility tracking from $82/mo billed yearly; Standard $99/mo billed yearly | free: Start for free
+- [Surfer](https://toolpick-ai.vercel.app/tools/surfer.html): Discovery $49/mo; AI Search Analytics $82/mo; Standard $99/mo; Pro $182/mo; Peace of Mind $299/mo (all billed yearly) | free: Start for free
 - [Writesonic](https://toolpick-ai.vercel.app/tools/writesonic.html): Starter $79/mo billed annually; $199; $399 | free: Start free
 - [Frase](https://toolpick-ai.vercel.app/tools/frase.html): $49/mo month-to-month ($39 billed yearly); team $129 ($103) | free: 7-day free trial, no card
 - [Predis.ai](https://toolpick-ai.vercel.app/tools/predis-ai.html): Rise $79/mo ($474/yr billed yearly) | free: 3-day trial
@@ -96,7 +97,7 @@
 - [Zapier Agents](https://toolpick-ai.vercel.app/tools/zapier-agents.html): Professional from $19.99/mo; Team from $69/mo | free: Free forever: 100 tasks/mo
 - [Relevance AI](https://toolpick-ai.vercel.app/tools/relevance-ai.html): Enterprise only (custom pricing) | free: No free plan shown
 - [Voiceflow](https://toolpick-ai.vercel.app/tools/voiceflow.html): Usage-based; businesses request pricing | free: Free trial, no credit card
-- [n8n](https://toolpick-ai.vercel.app/tools/n8n.html): Starter €20/mo, Pro €50/mo, Business €667/mo (billed annually) | free: Free self-hosted Community Edition; cloud trial, no card
+- [n8n](https://toolpick-ai.vercel.app/tools/n8n.html): Starter $20/mo; Pro $50/mo; Business $800/mo (billed annually, USD) | free: Free self-hosted Community Edition; cloud trial, no card
 
 ## Comparisons
 - [Runway vs Kling AI](https://toolpick-ai.vercel.app/compare/runway-vs-kling.html)
@@ -164,6 +165,9 @@
 - [Ideogram vs Recraft](https://toolpick-ai.vercel.app/compare/ideogram-vs-recraft.html)
 - [Rytr vs Copy.ai](https://toolpick-ai.vercel.app/compare/rytr-vs-copy-ai.html)
 - [Botpress vs Voiceflow](https://toolpick-ai.vercel.app/compare/botpress-vs-voiceflow.html)
+- [Replit vs Lovable](https://toolpick-ai.vercel.app/compare/replit-vs-lovable.html)
+- [Replit vs Bolt](https://toolpick-ai.vercel.app/compare/replit-vs-bolt.html)
+- [Replit vs Cursor](https://toolpick-ai.vercel.app/compare/replit-vs-cursor.html)
 
 ## Best tool for a job
 - [making YouTube Shorts & TikToks](https://toolpick-ai.vercel.app/best-ai-tool-for-youtube-shorts.html)
@@ -210,5 +214,8 @@
 
 ## Cost calculator
 - [Cost calculator](https://toolpick-ai.vercel.app/cost-calculator.html): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly
+
+## Browse all tools
+- [Browse all tools directory](https://toolpick-ai.vercel.app/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price
 
 Data: https://toolpick-ai.vercel.app/tools.json
