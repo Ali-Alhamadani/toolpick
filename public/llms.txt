@@ -206,6 +206,9 @@
 - [automating workflows](https://toolpick-ai.vercel.app/best-ai-tool-for-workflow-automation.html)
 - [email & inbox help](https://toolpick-ai.vercel.app/best-ai-tool-for-email-assistant.html)
 
+## Subscription Audit
+- [AI Subscription Audit](https://toolpick-ai.vercel.app/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly
+
 ## New SEO guides
 - [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)
 - [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)
