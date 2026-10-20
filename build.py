@@ -48,7 +48,7 @@ def page(path, title, desc, body, ld=None):
     full = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{e(title)}</title><meta name="description" content="{e(desc)}"><link rel="canonical" href="{BASE}{path}">
 <meta property="og:title" content="{e(title)}"><meta property="og:description" content="{e(desc)}"><meta property="og:url" content="{BASE}{path}"><meta property="og:type" content="website"><meta property="og:image" content="{BASE}/og.png"><meta name="twitter:card" content="summary_large_image">
-<style>{CSS}</style>{lds}<script>window.va=window.va||function(){{(window.vaq=window.vaq||[]).push(arguments)}};</script><script defer src="/_vercel/insights/script.js"></script></head><body><a class="skip" href="#main">Skip to content</a><header class="site"><div class="wrap"><a class="brand" href="/"><i aria-hidden="true">T</i>ToolPick</a><nav class="top" aria-label="Main"><details><summary>Categories</summary><div class="menu">{''.join(f'<a href="/best-ai-{c["id"]}-tools.html">{e(c["name"])}</a>' for c in CATEGORIES)}</div></details><a href="/tools.html">Browse all tools</a><a href="/free.html">Free tools</a><a href="/price-changes.html">Price changes</a><a href="/guides.html">Guides</a><a href="/compare-builder.html">Compare builder</a></nav></div></header>
+<style>{CSS}</style>{lds}<script>window.va=window.va||function(){{(window.vaq=window.vaq||[]).push(arguments)}};</script><script defer src="/_vercel/insights/script.js"></script></head><body><a class="skip" href="#main">Skip to content</a><header class="site"><div class="wrap"><a class="brand" href="/"><i aria-hidden="true">T</i>ToolPick</a><nav class="top" aria-label="Main"><details><summary>Categories</summary><div class="menu">{''.join(f'<a href="/best-ai-{c["id"]}-tools.html">{e(c["name"])}</a>' for c in CATEGORIES)}</div></details><a href="/tools.html">Browse all tools</a><a href="/free.html">Free tools</a><a href="/price-changes.html">Price changes</a><a href="/guides.html">Guides</a><a href="/compare-builder.html">Compare builder</a><a href="/stacks.html">Starter stacks</a></nav></div></header>
 <main id="main">{body}</main>{FOOT}</body></html>"""
     fp = "public" + (path if not path.endswith("/") else path + "index.html")
     os.makedirs(os.path.dirname(fp), exist_ok=True); open(fp, "w").write(full); URLS.append(path)
@@ -109,6 +109,139 @@ def picks(c):
 def comps_for(names): return [x for x in COMPARISONS if set(x[2] if isinstance(x[2], list) else [x[2], x[3]]) & set(names)]
 def complinks(lst): return ("<h2>Comparisons</h2><ul>" + "".join(f'<li><a href="/compare/{s}.html">{e(ti)}</a></li>' for s,ti,*_ in lst) + "</ul>") if lst else ""
 total_tools = len(tool_pages)
+
+# --- v16: AI starter stacks by role (hub /stacks.html + one page per role) ---
+# Only verified tools.py data. Rules (stated on page):
+#  rate = per-month price billed yearly when PRICE_TABLE has a numeric annual rate, else numeric monthly rate.
+#  Tools whose price text is "check site" or whose rate is non-USD/non-numeric never enter a priced stack.
+#  Free = realfree() only ($0). Under $30 = cheapest verified entry per job, total strictly < $30/mo.
+#  Pro = the category's Best Value pick at its verified entry rate (PRICE_TABLE holds entry tiers only,
+#  so no higher tier is ever invented); if that pick is unpriced, the highest verified entry rate in the category.
+STACK_LIMIT = 30
+STACK_BUILD_DATE = "2026-10-20"
+ROLES = [
+ ("students","student","Students",["writing","research","presentations","productivity"],"write essays, research sources, build class slides and stay organised"),
+ ("marketers","marketer","Marketers",["writing","images","video","marketing"],"write copy, make images and short videos, and schedule or optimise content"),
+ ("developers","developer","Developers",["coding","assistants","productivity","agents"],"write code, ask an assistant, run meetings and tasks, and automate workflows"),
+ ("content-creators","content creator","Content creators & YouTubers",["video","audio","images","writing"],"edit videos, record and clean audio, design thumbnails and write scripts"),
+ ("small-business","small business or online seller","Small businesses & online sellers",["marketing","images","agents","productivity"],"post on social, make product images, answer customers and keep work on track"),
+ ("researchers","researcher","Researchers",["research","writing","productivity","assistants"],"find and read papers, write up results, take meeting notes and ask an assistant"),
+]
+BUDGETS = [("free","Free","$0 — only tools with a verified real free plan (no trials, no one-time credits)"),
+           ("under30","Under $30/mo",f"cheapest verified entry plan per job, total strictly under ${STACK_LIMIT}/mo"),
+           ("pro","Pro","each category's Best Value pick at its verified entry plan")]
+_CATBY = {c["id"]: c for c in CATEGORIES}
+def st_rate(t):
+    if t["price"] == "check site": return None
+    a, m = t.get("annual"), t.get("monthly")
+    if isinstance(a, (int, float)): return (a, "annual")
+    if isinstance(m, (int, float)): return (m, "monthly")
+    return None
+def st_money(v): return f"${v:,.2f}".replace(".00", "")
+def st_pick(role_cats, budget):
+    used, out = set(), []
+    total = 0.0
+    for cid in role_cats:
+        c = _CATBY[cid]
+        if budget == "free":
+            cands = [t for t in sorted(c["tools"], key=lambda t: (t["name"] not in c["free"], c["tools"].index(t))) if realfree(t)]
+            alts = cands
+        else:
+            cands = [t for t in c["tools"] if st_rate(t)]
+            alts = sorted(cands, key=lambda t: (st_rate(t)[0], t["name"]))
+            if budget == "under30": cands = alts
+            else:
+                b = next((t for t in c["tools"] if t["name"] == c["best"] and st_rate(t)), None)
+                cands = ([b] if b else []) + sorted(cands, key=lambda t: -st_rate(t)[0])
+        ch = None
+        for t in cands:
+            if t["name"] in used: continue
+            if budget == "under30" and total + st_rate(t)[0] >= STACK_LIMIT: continue
+            ch = t; break
+        if not ch: continue
+        used.add(ch["name"]); total += st_rate(ch)[0] if budget != "free" else 0
+        out.append((c, ch, alts))
+    return out
+def st_reason(t, c, budget):
+    if budget == "free": return f"Verified free plan: {t['free']}."
+    r, b = st_rate(t)
+    s = f"Entry plan {st_money(r)}/mo {'billed yearly' if b == 'annual' else 'billed monthly'}"
+    if budget == "under30":
+        cheaper = [x for x in c["tools"] if st_rate(x) and st_rate(x)[0] < r]
+        if not cheaper: s += " — lowest verified entry price in " + c["name"]
+    elif t["name"] == c["best"]: s += f" — ToolPick's Best Value pick in {c['name']}"
+    else: s += f" — the {c['name']} Best Value pick has no verified price, so this is the highest verified entry plan"
+    if t.get("per_output"): s += f" ({t['per_output']})"
+    return s + "."
+ROLE_DATA = {}
+for _rs, _rn, _rt, _rc, _rj in ROLES:
+    ROLE_DATA[_rs] = {b: st_pick(_rc, b) for b, *_ in BUDGETS}
+def st_total(lst, budget): return 0.0 if budget == "free" else round(sum(st_rate(t)[0] for c, t, a in lst), 2)
+def role_path(rs): return f"/best-ai-tools-for-{rs}.html"
+STACK_URLS = ["/stacks.html"] + [role_path(r[0]) for r in ROLES]
+_ST_CSS = "<style>.stabs{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s4) 0}.stabs button{min-height:44px;padding:0 var(--s4);border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font-weight:600;cursor:pointer}.stabs button[aria-pressed=true]{background:var(--ac);color:var(--sf);border-color:var(--ac)}.spick{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:var(--s4);margin:var(--s3) 0}.spick h3{margin:.2em 0}.spick label{font-weight:600;display:block;margin-top:var(--s3)}.spick select{width:100%;max-width:420px;min-height:48px;margin-top:var(--s2);border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3)}.stot{background:var(--sf2);border-radius:10px;padding:var(--s3) var(--s4);margin:var(--s4) 0;font-size:1.1rem}.swarn{border-left:4px solid var(--warn);padding:var(--s3) var(--s4);background:var(--sf2);border-radius:10px;margin:var(--s3) 0}.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--s4)}</style>"
+def st_tooljs(t, c, budget):
+    r = st_rate(t) if budget != "free" else None
+    return dict(n=t["name"], s=slug(t["name"]), u=turl(t["name"]), r=(r[0] if r else 0), b=(r[1] if r else "free"), k=t.get("checked", CHECKED), pr=t["pricing"], why=st_reason(t, c, budget))
+def st_static(lst, budget):
+    rows = "".join(f"<li><b>{e(c['name'])}:</b> <a href='{turl(t['name'])}'>{e(t['name'])}</a> — {e(st_reason(t, c, budget))} <span class='small'>checked {t.get('checked', CHECKED)}</span></li>" for c, t, a in lst)
+    tot = st_total(lst, budget)
+    return f"<ul>{rows}</ul><p><b>Total: {st_money(tot)}/mo · {st_money(round(tot*12,2))}/yr</b></p>"
+for _rs, _rn, _rt, _rc, _rj in ROLES:
+    path = role_path(_rs); D = ROLE_DATA[_rs]
+    data = {}
+    for b, bl, bd in BUDGETS:
+        data[b] = [dict(job=c["id"], jn=c["name"], pick=slug(t["name"]), alts=[st_tooljs(x, c, b) for x in a]) for c, t, a in D[b]]
+    missing = {b: [cid for cid in _rc if cid not in [c["id"] for c, t, a in D[b]]] for b, *_ in BUDGETS}
+    tots = {b: st_total(D[b], b) for b, *_ in BUDGETS}
+    names = lambda b: ", ".join(t["name"] for c, t, a in D[b])
+    title = f"Best AI Tools for {_rt} ({CHECKED[:4]}): Free, Under $30 & Pro Starter Stacks"
+    desc = f"AI starter stacks for {_rt.lower()}: a free stack ({names('free')}), an under-$30 stack at {st_money(tots['under30'])}/mo and a pro stack at {st_money(tots['pro'])}/mo, from verified prices."[:300]
+    qas = [(f"What is the best free AI stack for {_rt.lower()}?", f"{names('free')} — every pick has a verified real free plan on its official pricing page, so the stack costs $0."),
+           (f"How much does the under-$30 AI stack for {_rt.lower()} cost?", f"{st_money(tots['under30'])}/mo ({st_money(round(tots['under30']*12,2))}/yr) for {names('under30')}, using each tool's verified entry rate (yearly billing where a yearly rate is verified)."),
+           (f"Which tools are in the pro AI stack for {_rt.lower()}?", f"{names('pro')}, totalling {st_money(tots['pro'])}/mo ({st_money(round(tots['pro']*12,2))}/yr) at verified entry plans."),
+           ("Where do these prices come from?", f"Each price was copied from the tool's official pricing page (checked dates shown per pick, latest {max(t.get('checked', CHECKED) for b in D for c,t,a in D[b])}). Tools marked 'check site' are never counted in a total.")]
+    tabs = "".join(f'<button type="button" data-b="{b}" aria-pressed="{"true" if b=="free" else "false"}">{e(bl)}</button>' for b, bl, bd in BUDGETS)
+    statics = "".join(f"<h3>{e(bl)} stack</h3><p class='small'>{e(bd)}.{(' Left out (no verified tool fits): ' + ', '.join(_CATBY[m]['name'] for m in missing[b])) if missing[b] else ''}</p>{st_static(D[b], b)}" for b, bl, bd in BUDGETS)
+    other = "".join(f'<li><a href="{role_path(r[0])}">AI tools for {e(r[2].lower())}</a></li>' for r in ROLES if r[0] != _rs)
+    catlinks = " · ".join(f'<a href="/best-ai-{cid}-tools.html">AI {e(_CATBY[cid]["name"].lower())} tools</a>' for cid in _rc)
+    body = f"""{_ST_CSS}<p class="small"><a href="/stacks.html">All starter stacks</a> › {e(_rt)}</p><h1>Best AI tools for {e(_rt.lower())}</h1><p class="tag">Starter stacks to {e(_rj)}. Pick a budget, swap any tool for an alternative in the same category, and the total updates. Prices only from official pricing pages.</p>
+<h2>Your stack</h2><div class="builder"><div class="stabs" role="group" aria-label="Budget">{tabs}</div><p class="small" id="sDesc"></p><div id="sPicks"></div><div class="stot" id="sTotal" aria-live="polite" aria-atomic="true"></div>
+<div class="bactions"><button type="button" class="bbtn primary" id="sCopy">Copy share link</button><button type="button" class="bbtn" id="sReset">Reset swaps</button><span class="small bstatus" id="sStatus" role="status"></span></div></div>
+<noscript>{statics}</noscript><h2>All three stacks at a glance</h2><div id="sStatic">{statics}</div>
+<p class="small">How totals work: per-month rate billed yearly where a yearly rate is verified, otherwise billed monthly; 1 person; prices in USD. "Under $30" means the total is strictly below ${STACK_LIMIT}/mo. Pro uses each category's Best Value pick at its verified entry plan — we only list tiers we've verified, so no higher tier is assumed. Prices change; confirm on the official pricing page.</p>
+<h2>FAQ</h2>{''.join(f'<h3>{e(q)}</h3><p>{e(a)}</p>' for q, a in qas)}
+<h2>Related</h2><p>{catlinks} · <a href="/tools.html">Browse all tools</a> · <a href="/subscription-audit.html">Audit what you already pay for</a></p><h2>Stacks for other roles</h2><ul>{other}</ul>
+<script>const SD={json.dumps(data)},BUD={json.dumps({b:[bl,bd] for b,bl,bd in BUDGETS})},LIM={STACK_LIMIT},PATH={json.dumps(path)};
+const X=v=>String(v).replace(/[&<>"]/g,ch=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[ch]));const M=v=>'$'+(Math.round(v*100)/100).toFixed(2).replace(/\\.00$/,'');
+let bud='free',sw={{}};function readURL(){{const p=new URLSearchParams(location.search);const b=p.get('budget');if(BUD[b])bud=b;sw={{}};(p.get('swap')||'').split(',').forEach(x=>{{const[j,s]=x.split(':');const row=(SD[bud]||[]).find(r=>r.job==j);if(row&&row.alts.some(a=>a.s==s))sw[j]=s}})}}
+function cur(row){{const s=sw[row.job]||row.pick;return row.alts.find(a=>a.s==s)}}
+function sharePath(){{const q=new URLSearchParams();q.set('role',{json.dumps(_rs)});q.set('budget',bud);const s=Object.entries(sw).filter(([j,v])=>{{const r=SD[bud].find(x=>x.job==j);return r&&r.pick!=v}}).map(([j,v])=>j+':'+v).join(',');if(s)q.set('swap',s);return PATH+'?'+q.toString().replace(/%3A/g,':').replace(/%2C/g,',')}}
+function render(push){{document.querySelectorAll('.stabs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.b==bud?'true':'false'));document.getElementById('sDesc').textContent=BUD[bud][0]+': '+BUD[bud][1]+'.';
+const rows=SD[bud];let tot=0;document.getElementById('sPicks').innerHTML=rows.map(r=>{{const t=cur(r);tot+=t.r;const others=r.alts.filter(a=>a.s!=t.s).slice(0,2).map(a=>a.s);const opts=r.alts.map(a=>`<option value="${{a.s}}"${{a.s==t.s?' selected':''}}>${{X(a.n)}} — ${{a.b=='free'?'$0 free plan':M(a.r)+'/mo '+(a.b=='annual'?'yearly':'monthly')}}</option>`).join('');
+return `<article class="spick"><p class="small" style="margin:0">${{X(r.jn)}}</p><h3><a href="${{t.u}}">${{X(t.n)}}</a> <span class="badge ${{t.b=='free'?'b-free':'b-rank'}}">${{t.b=='free'?'$0':M(t.r)+'/mo'}}</span></h3><p class="small">${{X(t.why)}} Checked ${{t.k}} · <a href="${{X(t.pr)}}" rel="noopener" target="_blank">Official pricing</a></p><label for="sw-${{r.job}}">Swap ${{X(r.jn)}} tool</label><select id="sw-${{r.job}}" data-job="${{r.job}}">${{opts}}</select><p class="small"><a href="${{t.u}}">Tool page</a> · ${{others.length?`<a href="/compare-builder.html?tools=${{[t.s].concat(others).join(',')}}">Compare with alternatives</a> · `:''}}<a href="/cost-calculator.html?tool=${{t.s}}&amp;seats=1&amp;billing=${{t.b=='monthly'?'monthly':'annual'}}">Cost calculator</a></p></article>`}}).join('')||'<p>No verified tools fit this budget.</p>';
+tot=Math.round(tot*100)/100;const over=bud=='under30'&&tot>=LIM;const anyA=rows.some(r=>cur(r).b=='annual'),anyM=rows.some(r=>cur(r).b=='monthly');
+document.getElementById('sTotal').innerHTML=`<b>Total: ${{M(tot)}}/mo · ${{M(tot*12)}}/yr</b> <span class="small">for ${{rows.length}} tool${{rows.length==1?'':'s'}}, 1 person${{bud=='free'?'':' · '+(anyA&&anyM?'mix of yearly and monthly billing (shown per tool)':anyA?'billed yearly':'billed monthly')}}</span>`+(over?`<div class="swarn" role="alert"><b>Over budget:</b> these swaps total ${{M(tot)}}/mo, which is not under $${{LIM}}. Swap a pick back or choose the Pro stack.</div>`:'');
+document.querySelectorAll('#sPicks select').forEach(s=>s.addEventListener('change',ev=>{{sw[s.dataset.job]=s.value;render(true);document.getElementById('sw-'+s.dataset.job).focus()}}));
+if(push)history.replaceState(null,'',sharePath())}}
+document.querySelectorAll('.stabs button').forEach(b=>b.addEventListener('click',()=>{{bud=b.dataset.b;sw={{}};render(true)}}));
+document.getElementById('sReset').addEventListener('click',()=>{{sw={{}};render(true);document.getElementById('sStatus').textContent='Swaps reset.'}});
+document.getElementById('sCopy').addEventListener('click',async()=>{{const url=location.origin+sharePath();const st=document.getElementById('sStatus');try{{await navigator.clipboard.writeText(url);st.textContent='Share link copied: '+url}}catch(err){{st.textContent='Copy this share link: '+url}}}});
+readURL();render(false);</script>"""
+    allt = [t for b in D for c, t, a in D[b]]
+    il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(n),"name":n} for i, n in enumerate(dict.fromkeys(t["name"] for t in allt))]}
+    fl = {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q, a in qas]}
+    page(path, title, desc, body, [il, crumbs([("ToolPick","/"),("AI starter stacks","/stacks.html"),(f"AI tools for {_rt.lower()}",path)]), fl])
+# hub
+_cards = "".join(f'<article class="card"><h3><a href="{role_path(rs)}">AI tools for {e(rt.lower())}</a></h3><p>{e(rj[0].upper()+rj[1:])}.</p>' + "".join(f"<p class='small'><b>{e(bl)}:</b> {st_money(st_total(ROLE_DATA[rs][b], b))}/mo — {e(', '.join(t['name'] for c,t,a in ROLE_DATA[rs][b]))}</p>" for b, bl, bd in BUDGETS) + f'<p><a href="{role_path(rs)}">Open the {e(rt.lower())} stack →</a></p></article>' for rs, rn, rt, rc, rj in ROLES)
+_hq = [("What is an AI starter stack?", "A small set of AI tools, one per job a role usually needs (for example writing, images, video and marketing for a marketer), with a total monthly and yearly cost from verified prices."),
+       ("How are the three budgets built?", f"Free uses only tools with a verified real free plan. Under $30 picks the cheapest verified entry plan per job while keeping the total strictly under ${STACK_LIMIT}/mo. Pro uses each category's Best Value pick at its verified entry plan.")]
+_hub = f"""{_ST_CSS}<section class="hero"><h1>AI starter stacks by role</h1><p class="tag">Ready-made AI tool stacks for {len(ROLES)} roles, each at three budgets — Free, Under $30/mo and Pro — with totals from verified prices. Open a role to swap any pick and share your stack.</p></section><h2>Choose a role</h2><div class="sgrid">{_cards}</div>
+<p class="small">Totals are per person per month (yearly billing where a yearly rate is verified). Tools without a verified price are never counted. Prices change — confirm on each official pricing page.</p><h2>FAQ</h2>{''.join(f'<h3>{e(q)}</h3><p>{e(a)}</p>' for q,a in _hq)}<p><a href="/tools.html">Browse all tools</a> · <a href="/help-me-choose.html">Help me choose</a> · <a href="/cost-calculator.html">Cost calculator</a></p>
+<script>(function(){{const r=new URLSearchParams(location.search).get('role');const ok={json.dumps([r[0] for r in ROLES])};if(ok.includes(r))location.replace('/best-ai-tools-for-'+r+'.html'+location.search)}})()</script>"""
+page("/stacks.html", "AI Starter Stacks by Role: Free, Under $30 & Pro Tool Bundles | ToolPick", f"AI tool starter stacks for students, marketers, developers, creators, small businesses and researchers — Free, Under $30/mo and Pro, with verified monthly and yearly totals.", _hub,
+     [{"@context":"https://schema.org","@type":"ItemList","name":"AI starter stacks by role","itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+role_path(r[0]),"name":f"AI tools for {r[2].lower()}"} for i, r in enumerate(ROLES)]}, crumbs([("ToolPick","/"),("AI starter stacks","/stacks.html")]),
+      {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":q,"acceptedAnswer":{"@type":"Answer","text":a}} for q,a in _hq]}])
 # v13 SEO pages (preview): free alternatives that do not already exist + video under $20.
 # 'free alternative to Cursor' already exists at /free-alternative-to-cursor.html, so it is not rebuilt.
 SEO_FREE_ALT = ["Recraft", "Rytr"]
@@ -154,7 +287,7 @@ out.innerHTML=`<h2>Top matches</h2><div class="res">${top.map((t,i)=>card(t,'#'+
 ['q','cat','budget','skill','pf-all','pf-free','pf-paid'].forEach(i=>{const el=document.getElementById(i);el.addEventListener('input',run);el.addEventListener('change',run)});document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const q=document.getElementById('q');q.value=b.dataset.q;run();q.focus()}));document.getElementById('out').addEventListener('click',ev=>{const ex=ev.target.closest('[data-ex]'),ct=ev.target.closest('[data-cat]');if(ex){const q=document.getElementById('q');q.value=ex.dataset.ex;run();q.focus()}else if(ct){document.getElementById('q').value='';document.getElementById('cat').value=ct.dataset.cat;run();document.getElementById('out').scrollIntoView({behavior:'smooth'})}});run();</script>
 ''')
 desc = f"Tell us what you need and compare {total_tools} AI tools across {len(CATEGORIES)} categories — prices checked on official pages, a best-value pick and a free option."
-body = f"""<section class="hero"><h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p></section>{FINDER}<div class="pick"><span class="badge b-best">NEW</span> <b>Compare any 2–3 tools side by side</b> — pick tools from different categories, see verified prices and free plans, then share the link. <a href="/compare-builder.html">Open the compare builder →</a> · <a href="/compare-builder.html?tools=elevenlabs,descript,heygen">Try ElevenLabs vs Descript vs HeyGen</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Help me choose in 5 quick steps</b> — answer questions about your task, budget, billing, seats and must-haves and get a ranked shortlist with verified prices. <a href="/help-me-choose.html">Start the wizard →</a> · <a href="/help-me-choose.html?category=audio&amp;budget=10&amp;billing=monthly&amp;seats=1&amp;free=any&amp;annual=any">Try Audio under $10</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>What will it really cost?</b> — pick a tool or category, seats and monthly or annual billing to see the true monthly and yearly cost from verified entry prices. <a href="/cost-calculator.html">Open the cost calculator →</a> · <a href="/cost-calculator.html?tool=elevenlabs&seats=1&billing=monthly">Try ElevenLabs</a> · <a href="/cost-calculator.html?category=audio&seats=5&billing=annual">Audio tools for 5 seats, annual</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI Subscription Audit (60 seconds)</b> — list the AI tools you pay for, and get a keep / consider cancelling / try the free tier checklist with a potential saving from verified prices only. Runs in your browser. <a href="/subscription-audit.html">Audit my subscriptions →</a> · <a href="/subscription-audit.html?tools=elevenlabs:6:monthly,descript:16:monthly">Try ElevenLabs + Descript</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Browse all AI tools in one directory</b> — filter all {total_tools} tools by category, free plan, verified starting price, billing availability and per-seat pricing, sort them, and add up to 3 to compare. <a href="/tools.html">Browse the full directory →</a> · <a href="/tools.html?category=audio&amp;free=yes&amp;sort=price">Try Audio tools with a free plan</a></div><h2>Browse by category</h2>
+body = f"""<section class="hero"><h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p></section>{FINDER}<div class="pick"><span class="badge b-best">NEW</span> <b>Compare any 2–3 tools side by side</b> — pick tools from different categories, see verified prices and free plans, then share the link. <a href="/compare-builder.html">Open the compare builder →</a> · <a href="/compare-builder.html?tools=elevenlabs,descript,heygen">Try ElevenLabs vs Descript vs HeyGen</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Help me choose in 5 quick steps</b> — answer questions about your task, budget, billing, seats and must-haves and get a ranked shortlist with verified prices. <a href="/help-me-choose.html">Start the wizard →</a> · <a href="/help-me-choose.html?category=audio&amp;budget=10&amp;billing=monthly&amp;seats=1&amp;free=any&amp;annual=any">Try Audio under $10</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>What will it really cost?</b> — pick a tool or category, seats and monthly or annual billing to see the true monthly and yearly cost from verified entry prices. <a href="/cost-calculator.html">Open the cost calculator →</a> · <a href="/cost-calculator.html?tool=elevenlabs&seats=1&billing=monthly">Try ElevenLabs</a> · <a href="/cost-calculator.html?category=audio&seats=5&billing=annual">Audio tools for 5 seats, annual</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI Subscription Audit (60 seconds)</b> — list the AI tools you pay for, and get a keep / consider cancelling / try the free tier checklist with a potential saving from verified prices only. Runs in your browser. <a href="/subscription-audit.html">Audit my subscriptions →</a> · <a href="/subscription-audit.html?tools=elevenlabs:6:monthly,descript:16:monthly">Try ElevenLabs + Descript</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Browse all AI tools in one directory</b> — filter all {total_tools} tools by category, free plan, verified starting price, billing availability and per-seat pricing, sort them, and add up to 3 to compare. <a href="/tools.html">Browse the full directory →</a> · <a href="/tools.html?category=audio&amp;free=yes&amp;sort=price">Try Audio tools with a free plan</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI starter stacks by role</b> — ready-made Free, Under $30 and Pro tool stacks for students, marketers, developers, creators, small businesses and researchers, with verified totals and one-tap swaps. <a href="/stacks.html">See the starter stacks →</a> · <a href="/best-ai-tools-for-marketers.html">Try the marketer stack</a></div><h2>Browse by category</h2>
 <div class="needs">{''.join(f'<button data-id="{c["id"]}" class="{"on" if i==0 else ""}">{e(c["name"])}</button>' for i,c in enumerate(CATEGORIES))}</div><div class="tabs">
 {''.join(f'<section id="{c["id"]}" class="{"on" if i==0 else ""}"><h2>{e(c["need"])}</h2>{picks(c)}<div class="grid">{"".join(card(t,c) for t in c["tools"])}</div><p><a href="/best-ai-{c["id"]}-tools.html">Full guide: best AI {e(c["name"].lower())} tools →</a></p></section>' for i,c in enumerate(CATEGORIES))}</div>
 {complinks(COMPARISONS)}<p><a href="/guides.html">All guides →</a> · <a href="/price-changes.html">Price changes log</a></p><h2>Best AI tool for…</h2><ul>{"".join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS)}</ul>
@@ -172,7 +305,7 @@ for c in CATEGORIES:
 <div class="sponsor">Sponsored slot available for this category — <a href="/sponsor.html">sponsor ToolPick</a></div>
 <h2>Price table</h2><p class="small">Entry paid plan. Monthly = billed monthly; Annual = per-month cost when billed yearly. "—" = not shown/verified on the official page.</p>
 <div class="tw"><table><tr><th>Tool</th><th>Monthly</th><th>Annual (per mo)</th><th>Cost per output</th><th>All plans</th><th>Free tier</th><th>Checked</th></tr>{rows}</table></div><h2>All tools</h2><div class="grid">{''.join(card(t,c) for t in c['tools'])}</div>
-{complinks(comps_for([t['name'] for t in c['tools']]))}<p><a href="/compare-builder.html">Build your own comparison →</a> Pick any 2–3 tools and share the result.</p><p><a href="/tools.html?category={c['id']}">Browse {e(n.lower())} tools in the full directory →</a> Filter by free plan, verified price, billing and seat pricing.</p><p><a href="/help-me-choose.html?category={c['id']}">Help me choose {e(n.lower())} tools →</a> Answer 5 quick questions and get a ranked shortlist for this category.</p>{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> Every video tool with a verified entry price under $20/mo, ranked cheapest first.</p>' if c['id']=='video' else ''}{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Images tools with a verified real free plan.</p>' if c['id']=='images' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Writing tools with a verified real free plan.</p>' if c['id']=='writing' else ''}"""
+{complinks(comps_for([t['name'] for t in c['tools']]))}<p><a href="/compare-builder.html">Build your own comparison →</a> Pick any 2–3 tools and share the result.</p>{"".join(f'<p><a href="{role_path(r[0])}">Starter stack for {e(r[2].lower())} →</a> Free, Under $30 and Pro stacks that include {e(n.lower())} tools.</p>' for r in ROLES if c["id"] in r[3])}<p><a href="/tools.html?category={c['id']}">Browse {e(n.lower())} tools in the full directory →</a> Filter by free plan, verified price, billing and seat pricing.</p><p><a href="/help-me-choose.html?category={c['id']}">Help me choose {e(n.lower())} tools →</a> Answer 5 quick questions and get a ranked shortlist for this category.</p>{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> Every video tool with a verified entry price under $20/mo, ranked cheapest first.</p>' if c['id']=='video' else ''}{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Images tools with a verified real free plan.</p>' if c['id']=='images' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Writing tools with a verified real free plan.</p>' if c['id']=='writing' else ''}"""
     il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(t["name"]),"name":t["name"]} for i,t in enumerate(c["tools"])]}
     page(path, title, d, body, [il, crumbs([("ToolPick","/"),(f"Best AI {n} tools",path)])])
 # tool pages
@@ -544,7 +677,7 @@ directory_body = f"""<h1>Browse all AI tools</h1><p class="tag">Every tool on To
 <h2>Results</h2><p id="dir-count" role="status" aria-live="polite"></p>
 <div class="tray" id="dir-tray"><span id="tray-count"><b>Compare tray: 0 of 3 selected</b></span><span id="tray-list" class="small">Add up to 3 tools from the cards below.</span><a class="bbtn primary" id="dir-go" href="/compare-builder.html">Compare these tools →</a><button type="button" class="bbtn" id="tray-clear">Clear compare tray</button></div>
 <div id="dir-out"></div>
-<p class="small">Already paying for some of these? <a href="/subscription-audit.html">Run the Subscription Audit →</a> · Found a shortlist? <a href="/help-me-choose.html">Help me choose in 5 steps →</a> · <a href="/cost-calculator.html">What will it really cost? →</a> Prices change — always confirm on the official pricing page linked on every card.</p>
+<p class="small">Want a ready-made set? <a href="/stacks.html">AI starter stacks by role →</a> <a href="/best-ai-tools-for-students.html">Students</a> · <a href="/best-ai-tools-for-marketers.html">Marketers</a> · <a href="/best-ai-tools-for-developers.html">Developers</a> · <a href="/best-ai-tools-for-content-creators.html">Content creators</a> · <a href="/best-ai-tools-for-small-business.html">Small business</a> · <a href="/best-ai-tools-for-researchers.html">Researchers</a></p><p class="small">Already paying for some of these? <a href="/subscription-audit.html">Run the Subscription Audit →</a> · Found a shortlist? <a href="/help-me-choose.html">Help me choose in 5 steps →</a> · <a href="/cost-calculator.html">What will it really cost? →</a> Prices change — always confirm on the official pricing page linked on every card.</p>
 <script>const DD={DDATA};
 const byS={{}};DD.forEach(t=>byS[t.s]=t);
 const X=v=>String(v==null?'':v).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]));
@@ -825,6 +958,9 @@ for _sp in SEO_URLS:
             _cs = tool_pages[_tn]; _as = list(dict.fromkeys(x["name"] for cc in _cs for x in cc["tools"] if x["name"] != _tn and hasfree(x, cc)))
             _lm[_sp] = max(find(_a).get("checked", CHECKED) for _a in [_tn] + _as)
 _lm["/tools.html"] = "2026-10-19"
+_lm["/stacks.html"] = STACK_BUILD_DATE
+for _r in ROLES:
+    _lm[role_path(_r[0])] = max(x.get("checked", CHECKED) for b in ROLE_DATA[_r[0]] for c, t, al in ROLE_DATA[_r[0]][b] for x in [t] + al)
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))
 print("pages:", len(URLS), "unique tools:", total_tools, {c["id"]:len(c["tools"]) for c in CATEGORIES})
