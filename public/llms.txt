@@ -226,6 +226,9 @@
 - [Browse all tools directory](https://toolpick-ai.vercel.app/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price
 
 
+## Renewal reminders
+- [Renewal reminders](https://toolpick-ai.vercel.app/renewal-reminders.html): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20
+
 ## Embed price cards
 - [Embed live price cards](https://toolpick-ai.vercel.app/embed.html): free iframe price cards per tool (https://toolpick-ai.vercel.app/embed/claude.html) and per comparison (https://toolpick-ai.vercel.app/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating
 Data: https://toolpick-ai.vercel.app/tools.json
