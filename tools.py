@@ -4,7 +4,7 @@ price: exactly what the official pricing page showed on `checked`; use "check si
 CHECKED = "2026-10-19"
 CATEGORIES = [
  {"id":"video","name":"Video","need":"Make or edit videos","best":"Runway","free":["CapCut","HeyGen","Synthesia"],"tools":[
-  {"name":"Runway","url":"https://runwayml.com","pricing":"https://runwayml.com/pricing","price":"Standard $15/mo ($12/mo billed yearly); Pro $35 ($28); Max $95 ($76)","free":"Free plan: one-time 125 credits","about":"Gen-4.5 text/image-to-video plus image and audio models in one app.","why":"Lowest-priced entry plan among the big generative video studios, with a free credit deposit to test first."},
+  {"name":"Runway","url":"https://runwayml.com","pricing":"https://runwayml.com/pricing","price":"Standard $15/mo ($12/mo billed yearly); Pro $35 ($28); Max $95 ($76)","free":"Free plan: one-time 125 credits","about":"Gen-4.5 text/image-to-video plus image and audio models in one app.","why":"A full generative video studio, with one-time free credits to test it first."},
   {"name":"Pika","url":"https://pika.art","pricing":"https://pika.art/pricing","price":"Starter $10/mo ($8 yearly); Creator $35 ($28); Fancy $95-$880","free":"Free plan: $0, credit packs only, no commercial license","about":"Short AI video clips from text or images."},
   {"name":"Luma Dream Machine","url":"https://lumalabs.ai","pricing":"https://lumalabs.ai/pricing","price":"Plus $30/mo ($25 yearly); Pro $90 ($75); Ultra $300 ($250)","free":"No free plan listed on pricing page","about":"Ray models plus third-party video/image models, commercial use on Plus."},
   {"name":"Kling AI","url":"https://klingai.com","pricing":"https://klingai.com/global/membership/membership-plan","price":"check site","free":"check site","about":"Text/image-to-video generator (pricing page loads via app, could not verify)."},
@@ -24,7 +24,7 @@ CATEGORIES = [
   {"name":"Jasper","url":"https://www.jasper.ai","pricing":"https://www.jasper.ai/pricing","price":"check site","free":"7-day free trial of Pro","about":"On-brand marketing content for teams."},
  ]},
  {"id":"coding","name":"Coding","need":"Write code or build an app","best":"GitHub Copilot","free":["GitHub Copilot","Windsurf","v0"],"tools":[
-  {"name":"GitHub Copilot","url":"https://github.com/features/copilot","pricing":"https://github.com/features/copilot/plans","price":"Pro $10/mo; Pro+ $39/mo; Max $100/mo","free":"Free plan: $0","about":"AI pair programmer in VS Code, JetBrains and GitHub.","why":"Cheapest serious paid plan ($10/mo) and a real free tier, works in the editor you already use."},
+  {"name":"GitHub Copilot","url":"https://github.com/features/copilot","pricing":"https://github.com/features/copilot/plans","price":"Pro $10/mo; Pro+ $39/mo; Max $100/mo","free":"Free plan: $0","about":"AI pair programmer in VS Code, JetBrains and GitHub.","why":"Paid plan from $10/mo and a real free tier, and it works in the editor you already use."},
   {"name":"Cursor","url":"https://cursor.com","pricing":"https://cursor.com/pricing","price":"Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user","free":"Free: $0 with limited agent requests","about":"AI-first code editor with agents."},
   {"name":"Windsurf","url":"https://windsurf.com","pricing":"https://windsurf.com/pricing","price":"Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat","free":"Free: $0","about":"Agentic AI IDE."},
   {"name":"Claude (Pro)","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17 yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong coding model for chat-based and agentic coding."},
@@ -53,7 +53,7 @@ CATEGORIES = [
 
 CATEGORIES += [
  {"id":"presentations","name":"Presentations","need":"Make slides and pitch decks","best":"Pitch","free":["Pitch","SlidesAI","Canva"],"tools":[
-  {"name":"Pitch","url":"https://pitch.com","pricing":"https://pitch.com/pricing","price":"Plus €10/mo; Team €15/mo; Business €20/mo","free":"Free forever: unlimited presentations","about":"Collaborative presentation software with AI credits on paid plans.","why":"Free plan with unlimited presentations, and the cheapest paid tier at €10/mo."},
+  {"name":"Pitch","url":"https://pitch.com","pricing":"https://pitch.com/pricing","price":"Plus €10/mo; Team €15/mo; Business €20/mo","free":"Free forever: unlimited presentations","about":"Collaborative presentation software with AI credits on paid plans.","why":"Free plan with unlimited presentations, and a paid tier at €10/mo."},
   {"name":"Beautiful.ai","url":"https://www.beautiful.ai","pricing":"https://www.beautiful.ai/pricing","price":"Pro $14.50/mo (billed annually); Team $40/user/mo yearly ($50 monthly)","free":"14-day free trial","about":"Smart Slide layouts that auto-format as you type; PowerPoint import/export."},
   {"name":"Plus AI","url":"https://plusai.com","pricing":"https://plusai.com/pricing","price":"Basic $10/user/mo yearly ($15 monthly); Pro $20 ($25); Team $30 ($40); Max $200 ($240)","free":"7-day free trial (card required)","about":"AI slide generation inside Google Slides and PowerPoint."},
   {"name":"SlidesAI","url":"https://www.slidesai.io","pricing":"https://www.slidesai.io/pricing","price":"$10/mo (billed $120/yr); $20.83/mo (billed $250/yr)","free":"Basic $0: 12 presentations/year","about":"Turns text into Google Slides presentations."},
@@ -61,7 +61,7 @@ CATEGORIES += [
   {"name":"Canva","url":"https://www.canva.com","pricing":"https://www.canva.com/pricing/","price":"check site","free":"Free plan available","about":"Design tool with presentation templates and AI features."},
  ]},
  {"id":"assistants","name":"AI Assistants","need":"Chat with an AI assistant","best":"Le Chat (Mistral)","free":["ChatGPT","Claude","Google Gemini"],"tools":[
-  {"name":"Le Chat (Mistral)","url":"https://chat.mistral.ai","pricing":"https://mistral.ai/pricing","price":"Pro $14.99/mo; Team $24.99/user/mo (excl. tax)","free":"Free plan with limited access","about":"Mistral's assistant with web search, image generation and the Vibe coding agent.","why":"Lowest-priced pro tier among the major assistants ($14.99/mo), plus a free plan."},
+  {"name":"Le Chat (Mistral)","url":"https://chat.mistral.ai","pricing":"https://mistral.ai/pricing","price":"Pro $14.99/mo; Team $24.99/user/mo (excl. tax)","free":"Free plan with limited access","about":"Mistral's assistant with web search, image generation and the Vibe coding agent.","why":"Pro at $14.99/mo, plus a free plan."},
   {"name":"ChatGPT","url":"https://chatgpt.com","pricing":"https://chatgpt.com/pricing","price":"check site","free":"Free plan with unlimited text chats on GPT-6 (limits on tools)","about":"General-purpose AI assistant: writing, research, images, voice."},
   {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Assistant known for long-form writing, analysis and coding."},
   {"name":"Google Gemini","url":"https://gemini.google.com","pricing":"https://one.google.com/about/ai-premium","price":"Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo","free":"Gemini app is free to use","about":"Google's assistant, integrated with Gmail, Docs and Drive."},
@@ -102,7 +102,7 @@ for c in CATEGORIES:
 
 CATEGORIES += [
  {"id":"marketing","name":"Marketing & SEO","need":"Market, do SEO or post on social","best":"Buffer","free":["Buffer","Surfer","Writesonic"],"tools":[
-  T("Buffer","https://buffer.com","https://buffer.com/pricing","Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel","Free plan available","Schedule social posts with an AI assistant.","Real social scheduling from $5/mo, the cheapest entry in this category."),
+  T("Buffer","https://buffer.com","https://buffer.com/pricing","Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel","Free plan available","Schedule social posts with an AI assistant.","Real social scheduling from $5/mo per channel, plus a free plan."),
   T("Surfer","https://surferseo.com","https://surferseo.com/pricing/","AI visibility tracking from $82/mo billed yearly; Standard $99/mo billed yearly","Start for free","SEO content optimization and AI-search visibility tracking."),
   T("Writesonic","https://writesonic.com","https://writesonic.com/pricing","Starter $79/mo billed annually; $199; $399","Start free","AI-search visibility (GEO) and SEO content platform."),
   T("Frase","https://www.frase.io","https://www.frase.io/pricing","$49/mo month-to-month ($39 billed yearly); team $129 ($103)","7-day free trial, no card","SEO briefs and content optimization."),
@@ -123,7 +123,7 @@ CATEGORIES += [
   T("Scholarcy","https://www.scholarcy.com","https://www.scholarcy.com/pricing",CK,"Free Article Summarizer: $0 (1 summary/day); 7-day trial of full app","Summarizes research articles into flashcards."),
  ]},
  {"id":"productivity","name":"Productivity & Meetings","need":"Save time on meetings, tasks and email","best":"Fireflies","free":["Fireflies","Zapier","Superhuman"],"tools":[
-  T("Fireflies","https://fireflies.ai","https://fireflies.ai/pricing","Pro $18/seat/mo ($10 billed annually); Business $29 ($19)","Free forever: $0","AI meeting notes and transcription.","Free-forever tier plus a $10/mo (yearly) Pro, the cheapest full-featured meeting assistant here."),
+  T("Fireflies","https://fireflies.ai","https://fireflies.ai/pricing","Pro $18/seat/mo ($10 billed annually); Business $29 ($19)","Free forever: $0","AI meeting notes and transcription.","Free-forever tier plus a $10/mo (billed yearly) Pro with full meeting-assistant features."),
   T("Fathom","https://www.fathom.ai","https://www.fathom.ai/pricing","From $15/user/mo; Business $25-$34/user/mo","Free plan","AI meeting recorder and summaries."),
   T("Otter","https://otter.ai","https://otter.ai/pricing","Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly)","Basic: free forever","Meeting transcription and notes."),
   T("Motion","https://www.usemotion.com","https://www.usemotion.com/pricing","Pro AI $19/seat/mo; Business AI $29/seat/mo","Free trial","AI calendar that auto-schedules your tasks."),

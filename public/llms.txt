@@ -18,7 +18,7 @@
 - [Runway](https://toolpick-ai.vercel.app/tools/runway.html): Standard $15/mo ($12/mo billed yearly); Pro $35 ($28); Max $95 ($76) | free: Free plan: one-time 125 credits
 - [Pika](https://toolpick-ai.vercel.app/tools/pika.html): Starter $10/mo ($8 yearly); Creator $35 ($28); Fancy $95-$880 | free: Free plan: $0, credit packs only, no commercial license
 - [Luma Dream Machine](https://toolpick-ai.vercel.app/tools/luma-dream-machine.html): Plus $30/mo ($25 yearly); Pro $90 ($75); Ultra $300 ($250) | free: No free plan listed on pricing page
-- [Kling AI](https://toolpick-ai.vercel.app/tools/kling-ai.html): List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $207/mo ($1,490/yr); Ultra+ $619/mo ($4,457/yr). Promotional: Standard $6.99 first month then $8.8/mo; Pro $25.99 first month then $32.56/mo; Premier $135 first month then $181.99/mo; Ultra+ $402 first month then $544.99/mo (checked 2026-10-17) | free: Basic: free
+- [Kling AI](https://toolpick-ai.vercel.app/tools/kling-ai.html): List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $207/mo ($1,490/yr); Ultra+ $619/mo ($4,457/yr). Promotional: Standard $6.99 first month then $8.8/mo; Pro $25.99 first month then $32.56/mo; Premier $135 first month then $181.99/mo; Ultra+ $402 first month then $544.99/mo | free: Basic: free
 - [HeyGen](https://toolpick-ai.vercel.app/tools/heygen.html): Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat | free: Free: 3 videos/mo, up to 1 min each
 - [Synthesia](https://toolpick-ai.vercel.app/tools/synthesia.html): Starter $29/mo (yearly from $18/mo); Pro $89/mo ($64 yearly) | free: Basic free: 10 min video/mo + 500 credits, watermarked
 - [Descript](https://toolpick-ai.vercel.app/tools/descript.html): Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50) | free: Free: 1 media hour/mo, 720p export
@@ -27,7 +27,7 @@
 - [Opus Clip](https://toolpick-ai.vercel.app/tools/opus-clip.html): Paid from $15/mo billed monthly | free: Free forever plan ($0)
 - [Captions](https://toolpick-ai.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
 - [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
-- [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing (checked 2026-10-15) | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
+- [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
 - [Google Gemini](https://toolpick-ai.vercel.app/tools/google-gemini.html): Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo | free: Gemini app is free to use
 - [Grammarly](https://toolpick-ai.vercel.app/tools/grammarly.html): Pro $12/mo | free: Free: $0 spelling & grammar checks
 - [Notion AI](https://toolpick-ai.vercel.app/tools/notion-ai.html): Plus $10/member/mo; Business $20/member/mo | free: Free plan: $0 (AI trial only)
@@ -48,7 +48,7 @@
 - [Midjourney](https://toolpick-ai.vercel.app/tools/midjourney.html): Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96) | free: No free plan (subscription only)
 - [Ideogram](https://toolpick-ai.vercel.app/tools/ideogram.html): Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20) | free: Free weekly credits for eligible accounts
 - [Krea](https://toolpick-ai.vercel.app/tools/krea.html): From $35/mo ($21 yearly); $105 ($63); $200 ($160) | free: Free: 100 units/day
-- [Canva](https://toolpick-ai.vercel.app/tools/canva.html): Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person (checked 2026-10-15) | free: Free plan available
+- [Canva](https://toolpick-ai.vercel.app/tools/canva.html): Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person | free: Free plan available
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
@@ -64,9 +64,9 @@
 - [Beautiful.ai](https://toolpick-ai.vercel.app/tools/beautiful-ai.html): Pro $14.50/mo (billed annually); Team $40/user/mo yearly ($50 monthly) | free: 14-day free trial
 - [Plus AI](https://toolpick-ai.vercel.app/tools/plus-ai.html): Basic $10/user/mo yearly ($15 monthly); Pro $20 ($25); Team $30 ($40); Max $200 ($240) | free: 7-day free trial (card required)
 - [SlidesAI](https://toolpick-ai.vercel.app/tools/slidesai.html): $10/mo (billed $120/yr); $20.83/mo (billed $250/yr) | free: Basic $0: 12 presentations/year
-- [Gamma](https://toolpick-ai.vercel.app/tools/gamma.html): Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-15) | free: Free plan available
+- [Gamma](https://toolpick-ai.vercel.app/tools/gamma.html): Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat | free: Free plan available
 - [Le Chat (Mistral)](https://toolpick-ai.vercel.app/tools/le-chat-mistral.html): Pro $14.99/mo; Team $24.99/user/mo (excl. tax) | free: Free plan with limited access
-- [Perplexity](https://toolpick-ai.vercel.app/tools/perplexity.html): Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15) | free: Free tier available
+- [Perplexity](https://toolpick-ai.vercel.app/tools/perplexity.html): Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown | free: Free tier available
 - [Microsoft Copilot](https://toolpick-ai.vercel.app/tools/microsoft-copilot.html): Copilot Pro appears discontinued; Microsoft 365 Personal $9.99/mo; Microsoft 365 Premium $19.99/mo ($199.99/yr) | free: Free Copilot available
 - [Buffer](https://toolpick-ai.vercel.app/tools/buffer.html): Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel | free: Free plan available
 - [Surfer](https://toolpick-ai.vercel.app/tools/surfer.html): Discovery $49/mo; AI Search Analytics $82/mo; Standard $99/mo; Pro $182/mo; Peace of Mind $299/mo (all billed yearly) | free: Start for free
@@ -209,9 +209,9 @@
 - [AI Subscription Audit](https://toolpick-ai.vercel.app/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly
 
 ## New SEO guides
-- [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)
-- [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)
-- [Best AI video tools under $20]({BASE}/best-ai-video-tools-under-20.html): verified entry under $20/mo, cheapest first
+- [Free alternatives to Recraft](https://toolpick-ai.vercel.app/free-alternative-to-recraft.html)
+- [Free alternatives to Rytr](https://toolpick-ai.vercel.app/free-alternative-to-rytr.html)
+- [Best AI video tools under $20](https://toolpick-ai.vercel.app/best-ai-video-tools-under-20.html): verified entry under $20/mo, each tool's main job shown; cheapest only compared within a job
 
 ## Help me choose
 - [Help me choose wizard](https://toolpick-ai.vercel.app/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any
