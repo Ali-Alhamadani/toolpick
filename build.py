@@ -43,6 +43,8 @@ input,select,button{font:inherit}th{white-space:nowrap}td,th{vertical-align:midd
 @media(prefers-reduced-motion:no-preference){.card{transition:box-shadow .15s,transform .15s}.card:hover{transform:translateY(-1px)}}
 .builder{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:var(--s5);margin:var(--s4) 0}#calc-out .tw table{min-width:640px}.cform{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--s4)}.cform label{font-weight:600;display:block}.cform select,.cform input[type=number]{width:100%;min-height:48px;margin-top:var(--s2);border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3)}.cform fieldset{border:0;padding:0;margin:0}.cform legend{font-weight:600;margin-bottom:var(--s2)}@media(max-width:760px){.cform{grid-template-columns:1fr}}.bform{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}.bform label{font-weight:600;display:block}.bform select{width:100%;min-height:48px;margin-top:var(--s2);border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3);max-width:100%}.bactions{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4);align-items:center}.bbtn{display:inline-flex;align-items:center;min-height:48px;padding:0 var(--s5);border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font-weight:600;cursor:pointer}.bbtn.primary{background:var(--ac);color:var(--sf);border-color:var(--ac)}.bstatus{min-height:1.5em}.bnote{background:var(--sf2);border-radius:10px;padding:var(--s3) var(--s4);margin:var(--s4) 0}@media(max-width:760px){.bform{grid-template-columns:1fr}.builder{padding:var(--s4)}}.dform{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}.dform label{font-weight:600;display:block}.dform select{width:100%;min-height:48px;margin-top:var(--s2);border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3);max-width:100%}@media(max-width:760px){.dform{grid-template-columns:1fr}}.tray{position:sticky;bottom:12px;z-index:10;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:var(--s3) var(--s4);display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin:var(--s4) 0}.tray .bbtn{min-height:44px}.addbtn{margin-top:auto}.aform{display:grid;grid-template-columns:1fr auto;gap:var(--s3);align-items:end}.aform label{font-weight:600;display:block}.aform select,.aform input[type=search]{width:100%;min-height:48px;margin-top:var(--s2);border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3);max-width:100%}@media(max-width:760px){.aform{grid-template-columns:1fr}}.arow{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:var(--s4);margin:var(--s3) 0}.arow .rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s3);margin-top:var(--s3)}.arow label{font-weight:600;display:block}.arow input,.arow select{width:100%;min-height:48px;margin-top:var(--s2);border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3)}@media(max-width:760px){.arow .rgrid{grid-template-columns:1fr}}.ares{border-left:4px solid var(--ac)}.ares.save{border-left-color:var(--ok)}.atotal{background:var(--sf2);border-radius:10px;padding:var(--s3) var(--s4);margin:var(--s4) 0}.wizprog{height:10px;background:var(--sf2);border-radius:999px;overflow:hidden;margin:var(--s4) 0}.wizprog i{display:block;height:100%;background:var(--ac)}.opts{display:grid;gap:var(--s2);margin:var(--s4) 0}.opts label{display:flex;gap:var(--s3);align-items:flex-start;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:var(--s4);cursor:pointer;min-height:44px}.opts label:hover{border-color:var(--ac)}.opts input{margin-top:4px;flex:none}.opts input:focus-visible+span{outline:3px solid var(--ac);outline-offset:2px}.wstep fieldset{border:0;padding:0;margin:0}.wstep legend{font-size:1.25rem;font-weight:700;line-height:1.3}.wnav{display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s4);align-items:center}
 """
+CSS += ".verdict{margin:12px 0 20px}.vline{font-size:1.1rem;margin:0 0 8px}.vgrid{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:6px 14px;margin:0}.vgrid dt{color:var(--mu);font-weight:600}.vgrid dd{margin:0}@media(max-width:640px){.vgrid{grid-template-columns:1fr}.vgrid dd{margin-bottom:6px}}"
+
 CSS += ".fpick{border-width:2px}.factions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.factions .bbtn{text-decoration:none;display:inline-flex;align-items:center;min-height:44px}.fru{list-style:none;padding:0;margin:0;display:grid;gap:8px}.fru li{display:flex;gap:10px;align-items:flex-start;background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:10px 12px}.fmore{margin-top:10px}.fmore summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:500}"
 
 CSS += ".mnav{display:none}nav.top{flex-wrap:nowrap}nav.top>a,nav.top summary{white-space:nowrap}.hstick{position:static!important}@media(max-width:760px){nav.top .dn{display:none}.mnav{display:block;margin-left:auto}nav.top{width:auto!important;margin-left:auto!important}.mnav .menu{right:0;left:auto!important;max-height:75vh;overflow:auto}}.pcba{display:grid;gap:8px;margin:8px 0}.pcba div{background:var(--sf2);border-radius:10px;padding:10px 12px;font-size:1rem;line-height:1.5;color:var(--tx)}.pcba b{display:block;font-size:.85rem;color:var(--mu);text-transform:uppercase;letter-spacing:.02em}"
@@ -356,21 +358,72 @@ def change_card(c, h="h3"):
             f'<p class="small">Recorded {_nicedate(c["date"])} · <a href="{e(c["pricing"])}" rel="noopener" target="_blank">Official pricing page</a> · <a href="{turl(c["name"])}">{e(c["name"])} page</a> · <a href="/pay-less.html?tool={c["s"]}">Pay less than {e(c["name"])}? →</a></p></article>')
 CHANGES_BY_TOOL = {}
 for _c in CHANGES: CHANGES_BY_TOOL.setdefault(_c["name"], []).append(_c)
+# --- v23 "Is X worth it?" verdict block for tool pages (verified facts only) ---
+# Rule: 1) Best Value pick for one of its categories -> "Best value for <cat>".
+# 2) else a same-category tool (different product) is cheaper on the same billing (monthly vs monthly; yearly vs yearly
+#    if the tool has no monthly price) -> "Cheaper option: X at $Y/mo". 3) else no checked USD price -> "Price not checked".
+# 4) else "No cheaper checked option". Free alternative: category Best Value if real-free, else first of c["free"], else first real-free.
+def _num(v): return v if isinstance(v, (int, float)) else None
+def _usd(v): r = round(v, 2); return "$" + (str(int(r)) if r == int(r) else f"{r:.2f}")
+def tool_verdict(name, cats, t):
+    alts = []; seen = {dom(t["url"])}
+    for cc in cats:
+        for x in cc["tools"]:
+            if x["name"] != name and dom(x["url"]) not in seen: seen.add(dom(x["url"])); alts.append((x, cc))
+    m, a = _num(t["monthly"]), _num(t["annual"])
+    def cheapest(key):
+        L = sorted([(x[key], x["name"], x) for x, cc in alts if _num(x[key]) is not None], key=lambda z: (z[0], z[1].lower()))
+        return L[0][2] if L else None
+    cm, ca = cheapest("monthly"), cheapest("annual")
+    fa = None
+    for cc in cats:
+        L = [x for x in cc["tools"] if x["name"] != name and dom(x["url"]) != dom(t["url"]) and realfree(x)]
+        if not L: continue
+        fa = next((x for x in L if x["name"] == cc["best"]), None) or next((x for n in cc["free"] for x in L if x["name"] == n), None) or L[0]
+        break
+    bestc = [cc for cc in cats if cc["best"] == name]
+    if bestc: verdict = f"Best value for {bestc[0]['name'].lower()}" + (" — and it has a real free plan" if realfree(t) else "")
+    elif m is not None and cm is not None and cm["monthly"] < m: verdict = f"Cheaper option: {cm['name']} at {_usd(cm['monthly'])}/mo (monthly prices)"
+    elif m is None and a is not None and ca is not None and ca["annual"] < a: verdict = f"Cheaper option: {ca['name']} at {_usd(ca['annual'])}/mo (yearly prices)"
+    elif m is None and a is None: verdict = "Price not checked — see the official pricing page"
+    else: verdict = "No cheaper checked option" + (f" — {name} has the lowest checked price for this job" if (m is not None and cm is not None) or (a is not None and ca is not None) else "")
+    s = slug(name); rows = []
+    rows.append(("Cheapest plan we checked", " · ".join(x for x in [f"{_usd(m)}/mo monthly" if m is not None else "", f"{_usd(a)}/mo paid yearly" if a is not None else ""] if x) or "Not checked in US dollars — see the official page"))
+    rows.append(("All plans we listed", e(t["price"])))
+    rows.append(("Real free plan", ("Yes — " + e(t["free"])) if realfree(t) else "No (" + e(t["free"]) + ")"))
+    rows.append(("ToolPick Best Value pick", f"Yes, for {e(bestc[0]['name'].lower())}" if bestc else "No"))
+    def cmp(x, key, own):
+        if x is None: return "none checked"
+        d = (f" — {_usd(own - x[key])}/mo less" if x[key] < own else f" — {_usd(x[key] - own)}/mo more" if x[key] > own else " — same price") if own is not None else ""
+        return f'<a href="{turl(x["name"])}">{e(x["name"])}</a> {_usd(x[key])}/mo{d}'
+    alt_parts = []
+    if m is not None or cm is not None: alt_parts.append("Monthly: " + cmp(cm, "monthly", m))
+    if a is not None: alt_parts.append("Yearly: " + cmp(ca, "annual", a))
+    rows.append(("Cheapest same-job alternative", " · ".join(alt_parts) or "none checked"))
+    rows.append(("Best real-free alternative", f'<a href="{turl(fa["name"])}">{e(fa["name"])}</a> — {e(fa["free"])}' if fa else "None in our list"))
+    rows.append(("Categories", ", ".join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)))
+    ch = CHANGES_BY_TOOL.get(name, [])
+    if ch: rows.append(("Recent price change", f'{e(ch[0]["label"])}, {ch[0]["date"]}: {e(ch[0]["summary"])} <a href="/price-changes.html#{ch[0]["date"]}-{ch[0]["s"]}">Details</a>'))
+    btns = f'<a class="bbtn primary" href="/pay-less.html?tool={s}">Can I pay less?</a>'
+    if realfree(t) or fa: btns += f'<a class="bbtn" href="/free.html?job={cats[0]["id"]}">Free options</a>'
+    if m is not None and a is not None: btns += f'<a class="bbtn" href="/monthly-or-yearly.html?tool={s}">Monthly or yearly?</a>'
+    html_ = (f'<section class="verdict card best" aria-labelledby="vh"><h2 id="vh" style="margin:0 0 6px;font-size:1.15rem">Is {e(name)} worth it?</h2><p class="vline"><b>{e(verdict)}.</b></p>'
+             '<dl class="vgrid">' + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + '</dl>'
+             f'<div class="factions">{btns}</div><p class="small" style="margin:8px 0 0">Prices checked {t.get("checked", CHECKED)} on the <a href="{e(t["pricing"])}" rel="noopener" target="_blank">official pricing page</a> · <a href="/cost-calculator.html?tool={s}&amp;seats=1&amp;billing=monthly">Full cost calculator</a>. Verdict rule: Best Value pick first; otherwise a cheaper same-job tool on the same billing; otherwise “no cheaper checked option”. No ratings or reviews.</p></section>')
+    return html_, verdict
 for name, cats in tool_pages.items():
     c = cats[0]; t = next(x for x in c["tools"] if x["name"] == name); path = turl(name)
     pros, cons = proscons(t, c)
     title = f"{name} Pricing & Free Plan ({CHECKED[:7]}) — Pros, Cons, Alternatives"
     d = f"{name} pricing checked {t.get('checked', CHECKED)}: {t['price']}. Free tier: {t['free']}. Pros, cons and alternatives."[:300]
     alts = [x["name"] for cc in cats for x in cc["tools"] if x["name"] != name]
-    body = f"""<h1>{e(name)} pricing &amp; review</h1><p class="tag">{e(t['about'])}</p>
-<table><tr><th>Price</th><td class="{'check' if t['price']=='check site' else ''}">{e(t['price'])}</td></tr><tr><th>Free tier</th><td>{e(t['free'])}</td></tr>
-<tr><th>Categories</th><td>{', '.join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)}</td></tr><tr><th>Checked</th><td>{t.get('checked', CHECKED)} on the <a href="{e(t['pricing'])}" rel="noopener">official pricing page</a></td></tr></table>
-<h2>Pros</h2><ul>{''.join(f'<li>{e(x)}</li>' for x in pros)}</ul><h2>Cons</h2><ul>{''.join(f'<li>{e(x)}</li>' for x in cons) or '<li>Paid features require a subscription — compare plans on the official page</li>'}</ul>
+    vhtml, vtxt = tool_verdict(name, cats, t)
+    body = f"""<h1>{e(name)} pricing &amp; review</h1><p class="tag">{e(t['about'])}</p>{vhtml}
 <p><a class="btn" href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Visit {e(name)} official site</a></p>{DISCLOSURE if t.get('affiliate') else ''}
-{f'<p><a href="/monthly-or-yearly.html?tool={slug(name)}">Monthly or yearly for {e(name)}? →</a> See the yearly saving, upfront cost and break-even month.</p>' if isinstance(t['monthly'],(int,float)) and isinstance(t['annual'],(int,float)) else ''}<p><a href="/pay-less.html?tool={slug(name)}">Pay less than {e(name)}? →</a> See the cheapest plan we checked and the best free option for the same job.</p><p><a href="/cost-calculator.html?tool={slug(name)}&amp;seats=1&amp;billing=monthly">What will {e(name)} really cost? →</a> See its true monthly and yearly cost by seats and billing period in the cost calculator.</p>{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Compare Images tools with a verified real free plan.</p>' if name=='Recraft' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Compare Writing tools with a verified real free plan.</p>' if name=='Rytr' else ''}{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> This tool is in our verified under-$20 video list.</p>' if (cats[0]['id']=='video' and _entry_num(t) is not None and _entry_num(t) < 20) else ''}
-{('<section class="bnote" aria-labelledby="rpc"><h2 id="rpc" style="margin-top:0">Recent price changes</h2>' + ''.join(change_card(x, 'h3') for x in CHANGES_BY_TOOL.get(name, [])) + '<p class="small" style="margin:0"><a href="/price-changes.html">All AI price changes →</a></p></section>') if name in CHANGES_BY_TOOL else ''}<h2>Alternatives</h2><ul>{''.join(f'<li><a href="{turl(a)}">{e(a)}</a></li>' for a in dict.fromkeys(alts))}</ul>{complinks(comps_for([name]))}"""
+{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Compare Images tools with a verified real free plan.</p>' if name=='Recraft' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Compare Writing tools with a verified real free plan.</p>' if name=='Rytr' else ''}{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> This tool is in our verified under-$20 video list.</p>' if (cats[0]['id']=='video' and _entry_num(t) is not None and _entry_num(t) < 20) else ''}
+<h2>Alternatives</h2><p>{' · '.join(f'<a href="{turl(a)}">{e(a)}</a>' for a in dict.fromkeys(alts))}</p>{complinks(comps_for([name]))}"""
     sw = {"@context":"https://schema.org","@type":"SoftwareApplication","name":name,"applicationCategory":"BusinessApplication","operatingSystem":"Web","url":t["url"],"description":t["about"]}
-    fh, fl = faq(tool_qas(t)); body += fh
+    fh, fl = faq(tool_qas(t) + [(f"Is there a cheaper alternative to {name}?", vtxt + " (ToolPick verdict from prices checked on official pricing pages).")]); body += fh
     page(path, title, d, body, [sw, fl, crumbs([("ToolPick","/"),(f"Best AI {c['name']} tools",f"/best-ai-{c['id']}-tools.html"),(name,path)])])
 # comparison pages
 def find(n): return next(x for c in CATEGORIES for x in c["tools"] if x["name"] == n)
