@@ -503,6 +503,7 @@ def tool_verdict(name, cats, t):
     ch = CHANGES_BY_TOOL.get(name, [])
     if ch: rows.append(("Recent price change", f'{e(ch[0]["label"])}, {ch[0]["date"]}: {e(ch[0]["summary"])} <a href="/price-changes.html#{ch[0]["date"]}-{ch[0]["s"]}">Details</a>'))
     btns = f'<a class="bbtn primary" href="/pay-less.html?tool={s}">Can I pay less?</a>'
+    btns += f'<a class="bbtn" href="/watchlist.html?add={s}">Watch this price</a>'
     if realfree(t) or fa: btns += f'<a class="bbtn" href="/free.html?job={cats[0]["id"]}">Free options</a>'
     if m is not None and a is not None: btns += f'<a class="bbtn" href="/monthly-or-yearly.html?tool={s}">Monthly or yearly?</a>'
     html_ = (f'<section class="verdict card best" aria-labelledby="vh"><h2 id="vh" style="margin:0 0 6px;font-size:1.15rem">Is {e(name)} worth it?</h2><p class="vline"><b>{e(verdict)}.</b></p>'
@@ -978,6 +979,72 @@ page("/subscription-audit.html", "AI Subscription Audit — Keep, Cancel or Try 
      [{"@context":"https://schema.org","@type":"WebPage","name":"ToolPick AI Subscription Audit","url":BASE+"/subscription-audit.html","description":"60-second audit of paid AI subscriptions using verified prices, returning one action per tool with potential savings counted once."}, crumbs([("ToolPick","/"),("Subscription Audit","/subscription-audit.html")])])
 
 
+
+# --- v30: Price watchlist (localStorage + share link; verified prices only) ---
+WL_JS = r'''const WD=__WDATA__;const byS={};WD.forEach(t=>byS[t.s]=t);const K='tp_watch_v1',MAX=20;
+const X=v=>String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const M=v=>{const r=Math.round(v*100)/100;return '$'+(Number.isInteger(r)?String(r):r.toFixed(2))};
+const snap=t=>({m:t.m,a:t.a,k:t.k});
+function load(){try{const w=JSON.parse(localStorage.getItem(K));if(w&&Array.isArray(w.t))return{t:w.t.filter(s=>byS[s]).slice(0,MAX),seen:w.seen||{},last:w.last||null}}catch(e){}return{t:[],seen:{},last:null}}
+function save(w){try{localStorage.setItem(K,JSON.stringify(w));return true}catch(e){return false}}
+let W=load(),shared=false,note='';
+const okN=v=>v===''||v==null?null:(/^\d+(\.\d{1,2})?$/.test(v)&&parseFloat(v)<=10000?parseFloat(v):undefined);
+(function fromURL(){const q=new URLSearchParams(location.search).get('w');if(q==null)return;const parts=q.split(',').map(x=>x.trim()).filter(Boolean);let bad=0;const t=[],seen={};
+parts.forEach(p=>{const b=p.split(':');const tool=byS[b[0]];if(!tool||t.includes(tool.s)||t.length>=MAX){bad++;return}t.push(tool.s);const m=okN(b[1]),a=okN(b[2]);const k=/^\d{4}-\d{2}-\d{2}$/.test(b[3]||'')?b[3]:null;seen[tool.s]=(m===undefined||a===undefined||!k)?snap(tool):{m:m,a:a,k:k}});
+if(!t.length){note='<b>This watchlist link is invalid.</b> None of its tools could be loaded. Add tools below to start your own.';return}
+if(bad)note='<b>This link was incomplete: '+bad+' tool'+(bad==1?'':'s')+' couldn\u2019t load.</b> The rest are shown below.';shared=true;W={t:t,seen:seen,last:null}})();
+function cheaper(t,key){let best=null;(t.al||[]).forEach(s=>{const o=byS[s];if(!o||o[key]==null||t[key]==null||o[key]>=t[key])return;if(!best||o[key]<best[key]||(o[key]==best[key]&&o.n<best.n))best=o});return best}
+function priceTxt(m,a){return [m!=null?M(m)+'/mo monthly':'',a!=null?M(a)+'/mo billed yearly':''].filter(Boolean).join(' · ')||'no checked US-dollar price'}
+function status(t){const s=W.seen[t.s];if(!s)return{kind:'new',html:'Just added.'};
+const ch=(s.m!==t.m)||(s.a!==t.a);if(ch)return{kind:'changed',html:'<b>Price changed since you last looked.</b> Was '+X(priceTxt(s.m,s.a))+' (checked '+X(s.k)+'), now '+X(priceTxt(t.m,t.a))+' (checked '+X(t.k)+').'};
+if(s.k!==t.k)return{kind:'rechecked',html:'Re-checked on '+X(t.k)+': same price as when you last looked ('+X(s.k)+').'};return{kind:'same',html:'No change since you last looked (checked '+X(t.k)+').'}}
+function card(t){const st=status(t);const cm=cheaper(t,'m'),ca=cheaper(t,'a');const last=t.ch&&t.ch[0];
+const alt=[cm?'Monthly: <a href="'+cm.u+'">'+X(cm.n)+'</a> at '+M(cm.m)+'/mo, '+M(t.m-cm.m)+'/mo less':'',ca?'Billed yearly: <a href="'+ca.u+'">'+X(ca.n)+'</a> at '+M(ca.a)+'/mo, '+M(t.a-ca.a)+'/mo less':''].filter(Boolean);
+return `<article class="card wl-card${st.kind=='changed'?' wl-chg':''}"><div class="badges">${st.kind=='changed'?'<span class="badge b-best">PRICE CHANGED</span>':''}${t.fr?'<span class="badge b-free">FREE PLAN</span>':''}</div><h3 style="margin:4px 0"><a href="${t.u}">${X(t.n)}</a></h3><p class="small" style="margin:0">Main job: ${X(t.cl)}</p>
+<p class="wl-price"><b>${X(priceTxt(t.m,t.a))}</b></p><p class="small">${X(t.p)}<br>Checked ${X(t.k)} · <a href="${X(t.pr)}" rel="noopener" target="_blank">Official pricing page</a></p>
+<p class="wl-st" role="status">${st.html}</p>${last?`<p class="small">Last change we recorded: ${X(last.label)} on ${X(last.d)} — <a href="/price-changes.html#${last.d}-${t.s}">before and after</a></p>`:'<p class="small">No price change recorded since we started tracking.</p>'}
+<p class="small"><b>Cheaper for the same job, same billing:</b> ${alt.length?alt.join(' · '):'none checked'}</p>
+<p class="small"><a href="/pay-less.html?tool=${t.s}">Can I pay less?</a> · <button type="button" class="linkbtn" data-rm="${t.s}">Stop watching ${X(t.n)}</button></p></article>`}
+function shareURL(){return location.origin+'/watchlist.html?w='+W.t.map(s=>{const v=W.seen[s]||snap(byS[s]);return s+':'+(v.m==null?'':v.m)+':'+(v.a==null?'':v.a)+':'+v.k}).join(',')}
+function render(){const out=document.getElementById('wl-out');const msg=document.getElementById('wl-msg');
+let banner=note;if(shared)banner+=(banner?'<br>':'')+'You opened a watchlist link. Prices are re-checked against our latest data. <button type="button" class="bbtn" id="wl-keep">Keep this list in my browser</button>';
+msg.innerHTML=banner;msg.hidden=!banner;const k=document.getElementById('wl-keep');if(k)k.onclick=()=>{shared=false;note='';save(W);history.replaceState(null,'','/watchlist.html');say('Saved in this browser.');render()};
+document.querySelectorAll('[data-needs]').forEach(b=>b.disabled=!W.t.length);
+if(!W.t.length){out.innerHTML='<div class="pick"><b>Your watchlist is empty.</b><p class="small" style="margin-bottom:0">Add the AI tools you pay for or are thinking about. Come back any time: we show which prices changed since you last looked, using the prices we check on official pricing pages.</p></div>';document.getElementById('wl-sum').textContent='';return}
+const items=W.t.map(s=>byS[s]);const nC=items.filter(t=>status(t).kind=='changed').length;
+document.getElementById('wl-sum').innerHTML='<b>'+items.length+' tool'+(items.length==1?'':'s')+' watched · '+(nC?nC+' price change'+(nC==1?'':'s')+' since you last looked':'no price changes since you last looked')+'</b>'+(W.last&&!shared?' <span class="small">(last marked as seen '+X(W.last)+')</span>':'');
+out.innerHTML=items.sort((a,b)=>(status(b).kind=='changed')-(status(a).kind=='changed')||a.n.localeCompare(b.n)).map(card).join('');
+out.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{W.t=W.t.filter(x=>x!=b.dataset.rm);delete W.seen[b.dataset.rm];persist();say(byS[b.dataset.rm].n+' removed.');render();document.getElementById('wl-sel').focus()})}
+function persist(){if(!shared)save(W);else history.replaceState(null,'',shareURL().replace(location.origin,''))}
+function say(m){document.getElementById('wl-status').textContent=m}
+document.getElementById('wl-add').onclick=()=>{const s=document.getElementById('wl-sel').value;if(!s){say('Choose a tool first.');document.getElementById('wl-sel').focus();return}if(W.t.includes(s)){say(byS[s].n+' is already on your watchlist.');return}if(W.t.length>=MAX){say('That is the limit of '+MAX+' tools. Remove one first.');return}W.t.push(s);W.seen[s]=snap(byS[s]);persist();say(byS[s].n+' added at '+priceTxt(byS[s].m,byS[s].a)+'.');render()};
+document.getElementById('wl-seen').onclick=()=>{W.t.forEach(s=>W.seen[s]=snap(byS[s]));W.last=new Date().toLocaleDateString('en-CA');persist();say('Marked as seen. Next time, we will flag anything that changes from today\u2019s prices.');render()};
+document.getElementById('wl-copy').onclick=async()=>{const u=shareURL();try{await navigator.clipboard.writeText(u);say('Link copied. Bookmark it or share it: it re-checks these tools against our latest prices when opened.')}catch(e){say('Copy this link: '+u);window.prompt('Copy this link',u)}};
+document.getElementById('wl-clear').onclick=()=>{W={t:[],seen:{},last:null};shared=false;note='';save(W);history.replaceState(null,'','/watchlist.html');say('Watchlist cleared.');render()};
+const pre=new URLSearchParams(location.search).get('add');if(pre&&byS[pre]&&!shared&&!W.t.includes(pre)&&W.t.length<MAX){W.t.push(pre);W.seen[pre]=snap(byS[pre]);save(W);history.replaceState(null,'','/watchlist.html');say(byS[pre].n+' added to your watchlist.')}
+render();
+'''
+
+_wl = []
+for _v in sorted(_amap.values(), key=lambda x: x["n"].lower()):
+    _wl.append(dict(s=_v["s"], n=_v["n"], u=_v["u"], pr=_v["pr"], p=_v["p"], k=_v["k"], m=_v["mm"], a=_v["ma"], cl=_v["cl"], al=_v["al"], fr=_v["fr"],
+                    ch=[dict(d=c["date"], label=c["label"]) for c in CHANGES_BY_TOOL.get(_v["n"], [])]))
+_WLDATA = json.dumps(_wl).replace("</", "<\\/")
+_WLOPTS = "".join(f'<option value="{e(v["s"])}">{e(v["n"])}</option>' for v in _wl)
+_wl_body = f"""<style>.wl-grid{{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}}.wl-card.wl-chg{{border-color:var(--warn);border-width:2px}}.wl-price{{margin:8px 0 4px}}.wl-st{{background:var(--sf2);border-radius:8px;padding:8px 10px;margin:8px 0}}.linkbtn{{background:none;border:0;padding:0;color:var(--ac);text-decoration:underline;cursor:pointer;font:inherit;min-height:24px}}</style>
+<p class="small"><a href="/save-money.html">Save money</a> › Price watchlist</p><h1>My AI price watchlist</h1><p class="tag">Watch the AI tools you pay for. Come back any time and see which prices changed since you last looked, plus any cheaper tool for the same job on the same billing. Prices come only from official pricing pages, each with its checked date.</p>
+<div class="bnote"><p class="small" style="margin:0"><b>No account, no email.</b> Your list is saved only in this browser (local storage) and in the link if you copy one. Want updates in a feed reader? Follow <a href="/price-changes.xml">our price-changes feed</a> (Atom) or the <a href="/price-changes.html">price changes log</a>.</p></div>
+<div class="pick" id="wl-msg" role="alert" hidden></div>
+<div class="builder"><div class="aform"><div><label for="wl-sel">Add a tool</label><select id="wl-sel"><option value="">Choose a tool…</option>{_WLOPTS}</select></div><button type="button" class="bbtn primary" id="wl-add">Watch this tool</button></div>
+<div class="bactions"><button type="button" class="bbtn" id="wl-seen" data-needs>Mark all as seen</button><button type="button" class="bbtn" id="wl-copy" data-needs>Copy watchlist link</button><button type="button" class="bbtn" id="wl-clear" data-needs>Clear list</button><span class="small bstatus" id="wl-status" role="status"></span></div>
+<p id="wl-sum" aria-live="polite"></p></div>
+<h2>Your watched tools</h2><div id="wl-out" class="wl-grid" aria-live="polite"></div>
+<div class="bnote"><h2 style="margin-top:0;font-size:1.05rem">How the watchlist works</h2><p class="small" style="margin:0">When you add a tool we remember the price we had checked at that moment. Each visit compares that with our latest checked price and flags any change; “Mark all as seen” resets the comparison to today’s prices. “Cheaper for the same job” only compares tools that do the same main job, monthly with monthly and billed-yearly with billed-yearly. We never guess a price: tools without a checked US-dollar price say so.</p></div>
+<script>""" + WL_JS.replace("__WDATA__", _WLDATA) + """</script>"""
+page("/watchlist.html", "AI Price Watchlist — See Which AI Tool Prices Changed | ToolPick",
+     "Watch the AI tools you pay for and see which prices changed since you last looked, plus cheaper tools for the same job on the same billing. Verified prices, no account, no email.",
+     _wl_body, [{"@context":"https://schema.org","@type":"WebPage","name":"ToolPick AI price watchlist","url":BASE+"/watchlist.html"}, crumbs([("ToolPick","/"),("Save money","/save-money.html"),("Price watchlist","/watchlist.html")])])
+
 # --- Pay less for the same job (v17) ---
 # One tool in -> cheapest verified same-category plan, best real free option, saving vs what you pay.
 # Only verified PRICE_TABLE USD numbers are ranked/summed; 'check site' and non-USD are never ranked.
@@ -1375,6 +1442,7 @@ else:
 _SM = [("/pay-less.html","Pay less for a tool you use","Pick the one tool you pay for and see the cheapest plan we checked for the same job, plus your saving."),
        ("/monthly-or-yearly.html","Monthly or yearly?","See how much paying yearly saves, what you pay upfront, and how many months you need to keep it."),
        ("/price-changes.html","Recent price changes","Which AI tools raised or cut prices, newest first, with old and new prices."),
+       ("/watchlist.html","Price watchlist","Watch the tools you pay for and see which prices changed since you last looked. No account or email."),
        ("/subscription-audit.html#my-stack","My AI stack card","Add the tools you pay for and get a card with your monthly and yearly total, what you could save, and a link to re-check when prices change.")]
 if FREE_V21: _SM.insert(2, ("/free.html","Can I do it for free?","Pick a job and see every tool with a real free plan, and the cheapest upgrade if you outgrow it."))
 _sm_tools = "".join(f'<option value="{slug(n)}">{e(n)}</option>' for n in sorted(tool_pages, key=str.lower))
