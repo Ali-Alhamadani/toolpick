@@ -287,7 +287,7 @@ out.innerHTML=`<h2>Top matches</h2><div class="res">${top.map((t,i)=>card(t,'#'+
 ['q','cat','budget','skill','pf-all','pf-free','pf-paid'].forEach(i=>{const el=document.getElementById(i);el.addEventListener('input',run);el.addEventListener('change',run)});document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const q=document.getElementById('q');q.value=b.dataset.q;run();q.focus()}));document.getElementById('out').addEventListener('click',ev=>{const ex=ev.target.closest('[data-ex]'),ct=ev.target.closest('[data-cat]');if(ex){const q=document.getElementById('q');q.value=ex.dataset.ex;run();q.focus()}else if(ct){document.getElementById('q').value='';document.getElementById('cat').value=ct.dataset.cat;run();document.getElementById('out').scrollIntoView({behavior:'smooth'})}});run();</script>
 ''')
 desc = f"Tell us what you need and compare {total_tools} AI tools across {len(CATEGORIES)} categories — prices checked on official pages, a best-value pick and a free option."
-body = f"""<section class="hero"><h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p></section>{FINDER}<div class="pick"><span class="badge b-best">NEW</span> <b>Compare any 2–3 tools side by side</b> — pick tools from different categories, see verified prices and free plans, then share the link. <a href="/compare-builder.html">Open the compare builder →</a> · <a href="/compare-builder.html?tools=elevenlabs,descript,heygen">Try ElevenLabs vs Descript vs HeyGen</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Help me choose in 5 quick steps</b> — answer questions about your task, budget, billing, seats and must-haves and get a ranked shortlist with verified prices. <a href="/help-me-choose.html">Start the wizard →</a> · <a href="/help-me-choose.html?category=audio&amp;budget=10&amp;billing=monthly&amp;seats=1&amp;free=any&amp;annual=any">Try Audio under $10</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>What will it really cost?</b> — pick a tool or category, seats and monthly or annual billing to see the true monthly and yearly cost from verified entry prices. <a href="/cost-calculator.html">Open the cost calculator →</a> · <a href="/cost-calculator.html?tool=elevenlabs&seats=1&billing=monthly">Try ElevenLabs</a> · <a href="/cost-calculator.html?category=audio&seats=5&billing=annual">Audio tools for 5 seats, annual</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI Subscription Audit (60 seconds)</b> — list the AI tools you pay for, and get a keep / consider cancelling / try the free tier checklist with a potential saving from verified prices only. Runs in your browser. <a href="/subscription-audit.html">Audit my subscriptions →</a> · <a href="/subscription-audit.html?tools=elevenlabs:6:monthly,descript:16:monthly">Try ElevenLabs + Descript</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Browse all AI tools in one directory</b> — filter all {total_tools} tools by category, free plan, verified starting price, billing availability and per-seat pricing, sort them, and add up to 3 to compare. <a href="/tools.html">Browse the full directory →</a> · <a href="/tools.html?category=audio&amp;free=yes&amp;sort=price">Try Audio tools with a free plan</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI starter stacks by role</b> — ready-made Free, Under $30 and Pro tool stacks for students, marketers, developers, creators, small businesses and researchers, with verified totals and one-tap swaps. <a href="/stacks.html">See the starter stacks →</a> · <a href="/best-ai-tools-for-marketers.html">Try the marketer stack</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Pay less for the same job</b> — pick the one AI tool you pay for and see the cheapest plan we checked, the best free option, and your saving. <a href="/pay-less.html">Check my tool →</a> · <a href="/pay-less.html?tool=descript&amp;pay=24">Try Descript at $24</a></div><h2>Browse by category</h2>
+body = f"""<section class="hero"><h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p></section>{FINDER}<div class="pick"><span class="badge b-best">NEW</span> <b>Compare any 2–3 tools side by side</b> — pick tools from different categories, see verified prices and free plans, then share the link. <a href="/compare-builder.html">Open the compare builder →</a> · <a href="/compare-builder.html?tools=elevenlabs,descript,heygen">Try ElevenLabs vs Descript vs HeyGen</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Help me choose in 5 quick steps</b> — answer questions about your task, budget, billing, seats and must-haves and get a ranked shortlist with verified prices. <a href="/help-me-choose.html">Start the wizard →</a> · <a href="/help-me-choose.html?category=audio&amp;budget=10&amp;billing=monthly&amp;seats=1&amp;free=any&amp;annual=any">Try Audio under $10</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>What will it really cost?</b> — pick a tool or category, seats and monthly or annual billing to see the true monthly and yearly cost from verified entry prices. <a href="/cost-calculator.html">Open the cost calculator →</a> · <a href="/cost-calculator.html?tool=elevenlabs&seats=1&billing=monthly">Try ElevenLabs</a> · <a href="/cost-calculator.html?category=audio&seats=5&billing=annual">Audio tools for 5 seats, annual</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI Subscription Audit (60 seconds)</b> — list the AI tools you pay for, and get a keep / consider cancelling / try the free tier checklist with a potential saving from verified prices only. Runs in your browser. <a href="/subscription-audit.html">Audit my subscriptions →</a> · <a href="/subscription-audit.html?tools=elevenlabs:6:monthly,descript:16:monthly">Try ElevenLabs + Descript</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Browse all AI tools in one directory</b> — filter all {total_tools} tools by category, free plan, verified starting price, billing availability and per-seat pricing, sort them, and add up to 3 to compare. <a href="/tools.html">Browse the full directory →</a> · <a href="/tools.html?category=audio&amp;free=yes&amp;sort=price">Try Audio tools with a free plan</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI starter stacks by role</b> — ready-made Free, Under $30 and Pro tool stacks for students, marketers, developers, creators, small businesses and researchers, with verified totals and one-tap swaps. <a href="/stacks.html">See the starter stacks →</a> · <a href="/best-ai-tools-for-marketers.html">Try the marketer stack</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>AI price changes</b> — see which AI tools raised or cut prices, newest first, with old and new prices from the official pages. <a href="/price-changes.html">See price changes →</a></div><div class="pick"><span class="badge b-best">NEW</span> <b>Pay less for the same job</b> — pick the one AI tool you pay for and see the cheapest plan we checked, the best free option, and your saving. <a href="/pay-less.html">Check my tool →</a> · <a href="/pay-less.html?tool=descript&amp;pay=24">Try Descript at $24</a></div><h2>Browse by category</h2>
 <div class="needs">{''.join(f'<button data-id="{c["id"]}" class="{"on" if i==0 else ""}">{e(c["name"])}</button>' for i,c in enumerate(CATEGORIES))}</div><div class="tabs">
 {''.join(f'<section id="{c["id"]}" class="{"on" if i==0 else ""}"><h2>{e(c["need"])}</h2>{picks(c)}<div class="grid">{"".join(card(t,c) for t in c["tools"])}</div><p><a href="/best-ai-{c["id"]}-tools.html">Full guide: best AI {e(c["name"].lower())} tools →</a></p></section>' for i,c in enumerate(CATEGORIES))}</div>
 {complinks(COMPARISONS)}<p><a href="/guides.html">All guides →</a> · <a href="/price-changes.html">Price changes log</a></p><h2>Best AI tool for…</h2><ul>{"".join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS)}</ul>
@@ -309,6 +309,41 @@ for c in CATEGORIES:
     il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(t["name"]),"name":t["name"]} for i,t in enumerate(c["tools"])]}
     page(path, title, d, body, [il, crumbs([("ToolPick","/"),(f"Best AI {n} tools",path)])])
 # tool pages
+
+# --- AI price changes tracker (v18): auto-generated from price_history.json snapshot diffs ---
+# Add a new snapshot (snapshot.py) after a price edit; any tool whose price text differs from the
+# previous snapshot appears automatically. Optional plain-English note/tag: PRICE_NOTES in tools.py.
+import re as _pre
+_ph = json.load(open("price_history.json")) if os.path.exists("price_history.json") else {}
+_pd = sorted(_ph)
+import tools as _tm; _PN = getattr(_tm, "PRICE_NOTES", {}); _PS = getattr(_tm, "PRICE_SKIP", {})
+_TAGL = {"up":"Went up","down":"Went down","newplan":"New plan","correction":"Correction","currency":"Now in USD","changed":"Changed"}
+def _dollars(x): return [float(v.replace(",","")) for v in _pre.findall(r"\$([\d,]+(?:\.\d+)?)", x or "")]
+CHANGES = []
+for _a, _b in zip(_pd, _pd[1:]):
+    for _n in sorted(set(_ph[_a]) & set(_ph[_b])):
+        _o, _w = _ph[_a][_n], _ph[_b][_n]
+        if _o.get("price") == _w.get("price") or f"{_b}|{_n}" in _PS or _n not in tool_pages: continue
+        if f"{_b}|{_n}" in _PN: _tag, _sum = _PN[f"{_b}|{_n}"]
+        else:
+            _od, _nd = _dollars(_o.get("price")), _dollars(_w.get("price"))
+            _tag = ("up" if max(_nd) > max(_od) else "down" if max(_nd) < max(_od) else "changed") if _od and _nd else "changed"
+            _sum = f"{_n}'s listed prices changed. See the before and after below."
+        _t = next(x for x in tool_pages[_n][0]["tools"] if x["name"] == _n)
+        CHANGES.append(dict(date=_b, prev=_a, name=_n, s=slug(_n), tag=_tag, label=_TAGL.get(_tag, "Changed"), summary=_sum, old=_o["price"], new=_w["price"],
+                            oldf=_o.get("free"), newf=_w.get("free"), pricing=_t["pricing"], cats=[c["id"] for c in tool_pages[_n]]))
+CHANGES.sort(key=lambda x: (x["date"], x["name"].lower()), reverse=True)
+def _nicedate(d):
+    import datetime as _dt; x = _dt.date.fromisoformat(d); return x.strftime("%b ") + str(x.day) + x.strftime(", %Y")
+def change_card(c, h="h3"):
+    fr = f'<p class="small">Free plan before: {e(c["oldf"])}<br>Free plan now: {e(c["newf"])}</p>' if c["oldf"] != c["newf"] and c["newf"] else ""
+    cls = "b-best" if c["tag"] in ("down","newplan") else ("b-free" if c["tag"]=="currency" else "b-rank")
+    return (f'<article class="card pcc" id="{c["date"]}-{c["s"]}" data-cats="{" ".join(c["cats"])}" style="margin:12px 0"><div class="badges"><span class="badge {cls}">{e(c["label"].upper())}</span></div>'
+            f'<{h} style="margin:4px 0"><a href="{turl(c["name"])}">{e(c["name"])}</a></{h}><p>{e(c["summary"])}</p>'
+            f'<p class="small"><b>Before</b> ({c["prev"]}): {e(c["old"])}<br><b>Now</b> (checked {c["date"]}): {e(c["new"])}</p>{fr}'
+            f'<p class="small">Recorded {_nicedate(c["date"])} · <a href="{e(c["pricing"])}" rel="noopener" target="_blank">Official pricing page</a> · <a href="{turl(c["name"])}">{e(c["name"])} page</a> · <a href="/pay-less.html?tool={c["s"]}">Pay less than {e(c["name"])}? →</a></p></article>')
+CHANGES_BY_TOOL = {}
+for _c in CHANGES: CHANGES_BY_TOOL.setdefault(_c["name"], []).append(_c)
 for name, cats in tool_pages.items():
     c = cats[0]; t = next(x for x in c["tools"] if x["name"] == name); path = turl(name)
     pros, cons = proscons(t, c)
@@ -321,7 +356,7 @@ for name, cats in tool_pages.items():
 <h2>Pros</h2><ul>{''.join(f'<li>{e(x)}</li>' for x in pros)}</ul><h2>Cons</h2><ul>{''.join(f'<li>{e(x)}</li>' for x in cons) or '<li>Paid features require a subscription — compare plans on the official page</li>'}</ul>
 <p><a class="btn" href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Visit {e(name)} official site</a></p>{DISCLOSURE if t.get('affiliate') else ''}
 <p><a href="/pay-less.html?tool={slug(name)}">Pay less than {e(name)}? →</a> See the cheapest plan we checked and the best free option for the same job.</p><p><a href="/cost-calculator.html?tool={slug(name)}&amp;seats=1&amp;billing=monthly">What will {e(name)} really cost? →</a> See its true monthly and yearly cost by seats and billing period in the cost calculator.</p>{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Compare Images tools with a verified real free plan.</p>' if name=='Recraft' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Compare Writing tools with a verified real free plan.</p>' if name=='Rytr' else ''}{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> This tool is in our verified under-$20 video list.</p>' if (cats[0]['id']=='video' and _entry_num(t) is not None and _entry_num(t) < 20) else ''}
-<h2>Alternatives</h2><ul>{''.join(f'<li><a href="{turl(a)}">{e(a)}</a></li>' for a in dict.fromkeys(alts))}</ul>{complinks(comps_for([name]))}"""
+{('<section class="bnote" aria-labelledby="rpc"><h2 id="rpc" style="margin-top:0">Recent price changes</h2>' + ''.join(change_card(x, 'h3') for x in CHANGES_BY_TOOL.get(name, [])) + '<p class="small" style="margin:0"><a href="/price-changes.html">All AI price changes →</a></p></section>') if name in CHANGES_BY_TOOL else ''}<h2>Alternatives</h2><ul>{''.join(f'<li><a href="{turl(a)}">{e(a)}</a></li>' for a in dict.fromkeys(alts))}</ul>{complinks(comps_for([name]))}"""
     sw = {"@context":"https://schema.org","@type":"SoftwareApplication","name":name,"applicationCategory":"BusinessApplication","operatingSystem":"Web","url":t["url"],"description":t["about"]}
     fh, fl = faq(tool_qas(t)); body += fh
     page(path, title, d, body, [sw, fl, crumbs([("ToolPick","/"),(f"Best AI {c['name']} tools",f"/best-ai-{c['id']}-tools.html"),(name,path)])])
@@ -937,25 +972,27 @@ for c in CATEGORIES:
 page("/guides.html", "AI tool guides: best tool for every job & free alternatives", "Every ToolPick guide: best AI tool for a job, free alternatives and head-to-head comparisons.",
   "<h1>Guides</h1><h2>New guides</h2><ul><li><a href='/free-alternative-to-recraft.html'>Free alternative to Recraft</a></li><li><a href='/free-alternative-to-rytr.html'>Free alternative to Rytr</a></li><li><a href='/best-ai-video-tools-under-20.html'>Best AI video tools under $20</a></li></ul><h2>Best AI tool for…</h2><ul>" + "".join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS) + "</ul><h2>Free tools</h2><ul>" + "".join(f'<li><a href="/best-free-ai-{c["id"]}-tools.html">Best free AI {e(c["name"].lower())} tools</a></li>' for c in CATEGORIES) + "</ul><h2>Free alternatives</h2><ul>" +
   "".join(f'<li><a href="{p}">Free alternative to {e(n)}</a></li>' for n,p in FREE_ALT_URLS) + "</ul>" + complinks(COMPARISONS))
-# price changes log
-hist = json.load(open("price_history.json")) if os.path.exists("price_history.json") else {}
-dates = sorted(hist); rows = []
-for a, b in zip(dates, dates[1:]):
-    for n in sorted(set(hist[a]) | set(hist[b])):
-        o, nw = hist[a].get(n), hist[b].get(n)
-        if o == nw: continue
-        what = "added" if o is None else "removed" if nw is None else "changed"
-        rows.append(f"<tr><td>{b}</td><td>{e(n)}</td><td>{what}</td><td>{e((o or {}).get('price','—'))}</td><td>{e((nw or {}).get('price','—'))}</td></tr>")
-def difftable(rs): return "<div class='tw'><table><tr><th>Date</th><th>Tool</th><th>Change</th><th>Before</th><th>After</th></tr>" + "".join(rs) + "</table></div>"
-latest = ""
-if len(dates) >= 2:
-    lr = [r for r in rows if r.startswith(f"<tr><td>{dates[-1]}")]
-    latest = f"<div class='pick'><h2 style='margin-top:0'>Latest check: {dates[-2]} → {dates[-1]}</h2>" + (f"<p><b>{len(lr)}</b> change(s).</p>" + difftable(lr) if lr else "<p>No price changes in the latest check.</p>") + "</div>"
-elif dates:
-    latest = f"<div class='pick'><h2 style='margin-top:0'>Latest check: {dates[-1]}</h2><p>Baseline snapshot of {len(hist[dates[-1]])} tools. The first weekly diff will appear here after the next re-check.</p></div>"
-full = "<h2>Full history</h2>" + (difftable(list(reversed(rows))) if rows else "<p>No changes recorded yet.</p>")
-page("/price-changes.html", "AI tool price changes log — weekly updates", "Weekly log of AI tool price changes, based on snapshots of official pricing pages.",
-  f"<h1>AI tool price changes</h1><p class='tag'>We re-check official pricing pages weekly and log every change here. Snapshots: {len(dates)} ({', '.join(dates)}).</p>{latest}{full}")
+# price changes tracker page (v18) — data from CHANGES above
+_PCO = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES if any(c["id"] in x["cats"] for x in CHANGES))
+_pc_latest = CHANGES[0]["date"] if CHANGES else CHECKED
+_pc_cards = "".join(change_card(c, "h2") for c in CHANGES) or "<p>No changes recorded yet.</p>"
+_pc_body = f"""<section class="hero"><h1>AI price changes</h1><p class="tag">When an AI tool changes its prices, it shows up here — newest first, in plain words, with the old and new prices from the official pricing page. {len(CHANGES)} changes recorded across {len(_pd)} price checks ({', '.join(_pd)}).</p></section>
+<div class="builder"><label for="pc-cat">Show changes for</label> <select id="pc-cat"><option value="">All categories</option>{_PCO}</select> <span id="pc-count" class="small" role="status" aria-live="polite"></span></div>
+<div id="pc-list">{_pc_cards}</div>
+<div class="pick" id="pc-none" hidden><b>No price changes in this category yet.</b> <button type="button" class="bbtn" id="pc-all">Show all changes</button></div>
+<div class="bnote"><h2 style="margin-top:0;font-size:1.05rem">How this list is made</h2><p class="small" style="margin:0">We save a snapshot of every tool's official pricing text at each price check and compare it with the one before. A change appears here only when both the old and the new price were recorded. “Correction” means we fixed our own listing, not that the tool changed its price. “Now in USD” means the tool switched currency, so the numbers are not a like-for-like change. Tools we only started tracking are not listed as changes. Follow along: <a href="/price-changes.xml">price changes feed (Atom)</a>.</p><p class="small" style="margin:12px 0 0"><a href="/pay-less.html">Pay less for the same job →</a> · <a href="/tools.html">Browse all tools</a> · <a href="/subscription-audit.html">Subscription Audit</a></p></div>
+<script>(function(){{const s=document.getElementById('pc-cat'),cards=[...document.querySelectorAll('.pcc')],none=document.getElementById('pc-none'),cnt=document.getElementById('pc-count');
+function run(){{const v=s.value;let n=0;cards.forEach(c=>{{const ok=!v||c.dataset.cats.split(' ').includes(v);c.hidden=!ok;if(ok)n++}});none.hidden=n>0;cnt.textContent=n+' change'+(n==1?'':'s')+' shown';history.replaceState(null,'','/price-changes.html'+(v?'?category='+v:''))}}
+const q=new URLSearchParams(location.search).get('category');if(q&&[...s.options].some(o=>o.value==q))s.value=q;s.addEventListener('change',run);document.getElementById('pc-all').addEventListener('click',()=>{{s.value='';run();s.focus()}});run()}})();</script>"""
+page("/price-changes.html", "AI Price Changes Tracker — Which AI Tools Raised or Cut Prices | ToolPick",
+     f"Newest-first tracker of AI tool price changes: old vs new price, date checked and official pricing link for each. {len(CHANGES)} changes recorded, latest {_pc_latest}.", _pc_body,
+     [{"@context":"https://schema.org","@type":"ItemList","name":"AI tool price changes","itemListOrder":"https://schema.org/ItemListOrderDescending","numberOfItems":len(CHANGES),
+       "itemListElement":[{"@type":"ListItem","position":i+1,"url":f"{BASE}/price-changes.html#{c['date']}-{c['s']}","name":f"{c['name']}: {c['summary']}"} for i, c in enumerate(CHANGES)]},
+      crumbs([("ToolPick","/"),("Price changes","/price-changes.html")])])
+from xml.sax.saxutils import escape as _xe
+open("public/price-changes.xml","w").write('<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><title>ToolPick — AI price changes</title>'
+  + f'<link href="{BASE}/price-changes.html"/><link rel="self" href="{BASE}/price-changes.xml"/><id>{BASE}/price-changes.xml</id><updated>{_pc_latest}T00:00:00Z</updated>'
+  + "".join(f'<entry><title>{_xe(c["name"] + " — " + c["label"])}</title><link href="{BASE}/price-changes.html#{c["date"]}-{c["s"]}"/><id>{BASE}/price-changes.html#{c["date"]}-{c["s"]}</id><updated>{c["date"]}T00:00:00Z</updated><summary>{_xe(c["summary"] + " Before: " + c["old"] + " Now: " + c["new"])}</summary><author><name>ToolPick</name></author></entry>' for c in CHANGES) + "</feed>")
 # sponsor + newsletter
 tiers = "".join(f"<div class='card'><h3>{e(a)}</h3><p>{e(b)}</p><p class='price'>{e(p)}</p></div>" for a,b,p in SPONSOR_TIERS)
 page("/sponsor.html", "Sponsor ToolPick — reach people choosing AI tools", "Sponsorship options on ToolPick: category spotlight, sitewide banner and newsletter feature. Sponsored placements are always labelled.",
@@ -1024,6 +1061,9 @@ for _sp in SEO_URLS:
 _lm["/tools.html"] = "2026-10-19"
 _lm["/stacks.html"] = STACK_BUILD_DATE
 _lm[PAYLESS_PATH] = PAYLESS_DATE
+PC_BUILD_DATE = "2026-10-20"  # tracker page + its tool-page boxes redesigned (v18)
+_lm["/price-changes.html"] = max(_pc_latest, PC_BUILD_DATE)
+for _n in CHANGES_BY_TOOL: _lm[turl(_n)] = max(_lm.get(turl(_n), CHECKED), PC_BUILD_DATE)
 for _r in ROLES:
     _lm[role_path(_r[0])] = max(x.get("checked", CHECKED) for b in ROLE_DATA[_r[0]] for c, t, al in ROLE_DATA[_r[0]][b] for x in [t] + al)
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")

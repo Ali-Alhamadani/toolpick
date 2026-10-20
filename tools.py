@@ -368,3 +368,20 @@ COMPARISONS += [
  ("replit-vs-cursor","Replit vs Cursor","Replit","Cursor","coding"),
 ]
 FREE_ALT_FOR += [n for n in ["Replit","ElevenLabs","Surfer","n8n","Otter"] if n not in FREE_ALT_FOR]
+
+# Price-change notes for /price-changes.html (build.py diffs price_history.json snapshots automatically).
+# Key "YYYY-MM-DD|Tool" = snapshot date the change was first recorded. Value = (tag, plain-English summary).
+# Tags: up, down, newplan, correction, currency, changed. Un-noted diffs still appear with an automatic tag/summary.
+# Every note must restate only the documented before/after text in price_history.json (and git history).
+PRICE_NOTES = {
+ "2026-10-17|Kling AI": ("correction", "We corrected Kling AI's top plans: Premier is $207/mo and Ultra+ is $619/mo. We had listed Premier at $92/mo and Ultra at $180/mo."),
+ "2026-10-19|ElevenLabs": ("up", "ElevenLabs' $1 first-month Starter offer has ended. Starter is now $6/mo, or $5/mo billed yearly."),
+ "2026-10-19|Rytr": ("up", "Rytr's top plan is now $49/mo (Pro), with Lite at $9/mo and Personal at $19/mo. Before, it listed $7.50/mo and $24.16/mo for multiple brands."),
+ "2026-10-19|Qodo": ("newplan", "Qodo now has a Pro Team plan at $30 (up to 30 users). Before, it only sold credit packs at $0.012 per credit."),
+ "2026-10-19|Surfer": ("newplan", "Surfer now has a Discovery plan at $49/mo billed yearly. Before, its cheapest listed plan was $82/mo billed yearly."),
+ "2026-10-19|n8n": ("currency", "n8n now shows US dollar prices: Starter $20/mo, Pro $50/mo, Business $800/mo, billed yearly. Before, we listed euro prices (€20, €50, €667), so this is not a like-for-like price change."),
+}
+# Snapshot diffs known to be artifacts, not real changes (never shown).
+PRICE_SKIP = {
+ "2026-10-15|Kling AI": "The 2026-10-14 snapshot was rewritten with text from the 2026-10-17 check, so this diff runs backwards in time.",
+}
