@@ -402,7 +402,7 @@ PLANS_SHORT = {
 
 # --- v24-fix: capability tags. FIRST tag = the tool's PRIMARY capability (what "same job" means sitewide).
 # Each tag comes only from what the tool's own site says (homepage title/description fetched 2026-10-20,
-# or — where the site blocked our fetch — the description we copied from the official site earlier, noted as "recorded").
+# or, where the homepage blocked our fetch, the tool's own docs/help pages on its domain, re-checked 2026-10-20). All 82 confirmed; none rely on a saved description.
 CAPS = {
  "Runway": ["video-generation", "image-generation"],          # runwayml.com: text/image-to-video (Gen-4.5) plus image models
  "Pika": ["video-generation"],                                 # pika.art: AI video clips from text or images
@@ -415,7 +415,7 @@ CAPS = {
  "InVideo": ["video-generation", "video-editing"],             # invideo.io: "Create & edit AI videos"
  "Opus Clip": ["video-clipping", "video-editing"],             # opus.pro: "turns long videos into ... viral clips"
  "Captions": ["video-editing", "video-generation"],            # captions.ai: "AI video generator and editor"
- "Claude": ["general-chatbot", "writing-assistant", "code-assistant"],  # claude.ai (recorded): writing, editing, analysis and coding assistant
+ "Claude": ["general-chatbot", "writing-assistant", "code-assistant"],  # anthropic.com/claude (fetched 2026-10-20): "the AI assistant for work"; "reasoning, coding, and writing"; Claude Code writes code
  "ChatGPT": ["general-chatbot", "writing-assistant", "image-generation", "code-assistant"],  # chatgpt.com: "answer questions, write, create images ... and code"
  "Google Gemini": ["general-chatbot"],                         # gemini.google.com: "Google's AI assistant ... writing, planning, brainstorming"
  "Grammarly": ["writing-assistant"],                           # grammarly.com: "AI Writing Assistance"
@@ -429,17 +429,17 @@ CAPS = {
  "Windsurf": ["code-assistant"],                               # windsurf.com (now Devin Desktop): local/cloud coding agents in your editor
  "Bolt": ["app-builder", "website-builder"],                   # bolt.new: "AI builder: Websites, apps & prototypes"
  "v0": ["app-builder", "website-builder"],                     # v0.app: "Build Full-Stack Web Apps with AI"
- "Lovable": ["app-builder", "website-builder"],                # lovable.dev (recorded): prompt-to-app builder
+ "Lovable": ["app-builder", "website-builder"],                # docs.lovable.dev (fetched 2026-10-20): "full-stack AI development platform for building ... web applications using natural language"
  "Warp": ["code-assistant"],                                   # warp.dev: agentic software development platform / AI terminal
  "Qodo": ["code-review"],                                      # qodo.ai: "AI Code Review"
- "Replit": ["app-builder", "website-builder"],                 # replit.com (recorded): build and deploy apps by describing them
- "Leonardo": ["image-generation"],                             # leonardo.ai (recorded): image and video generation
- "Midjourney": ["image-generation"],                           # midjourney.com (recorded): artistic image generation
- "Ideogram": ["image-generation", "logo-design"],              # ideogram.ai (recorded): text rendering in images — logos, posters
- "Krea": ["image-generation"],                                 # krea.ai (recorded): real-time image generation, upscaling
+ "Replit": ["app-builder", "website-builder"],                 # docs.replit.com/features/agent (2026-10-20): Agent "turns your ideas into apps"; Design for "polished websites"
+ "Leonardo": ["image-generation"],                             # docs.leonardo.ai (fetched 2026-10-20): "generating your first images" with the Leonardo.Ai API
+ "Midjourney": ["image-generation"],                           # docs.midjourney.com Getting Started (2026-10-20): "transforming text into amazing images and videos"
+ "Ideogram": ["image-generation", "logo-design"],              # docs.ideogram.ai (fetched 2026-10-20): "create and edit AI images and videos ... text and logo workflows"
+ "Krea": ["image-generation"],                                 # krea.ai (fetched 2026-10-20): "Generate, edit, and enhance images and videos"
  "Canva": ["graphic-design", "logo-design", "presentations", "image-generation"],  # canva.com: "create social media posts, presentations, posters, videos, logos"
  "Recraft": ["image-generation", "vector-design"],             # recraft.ai: "text-to-image model and design platform ... vector generation"
- "Magnific": ["image-generation", "image-upscaling"],          # magnific.com (recorded): AI image/video generation and upscaling
+ "Magnific": ["image-generation", "image-upscaling"],          # magnific.com/ai and /ai/docs/image-upscaler (2026-10-20): Image Generator, Image Editor, Image Upscaler up to 16x
  "Photoroom": ["photo-editing"],                               # photoroom.com: "AI-Powered Photo Editor" for product photos
  "ElevenLabs": ["text-to-speech", "voice-cloning", "voice-agents"],  # elevenlabs.io: "AI Voice Generator & Voice Agents"
  "Suno": ["music-generation"],                                 # suno.com: "AI Music Generator"
@@ -454,8 +454,8 @@ CAPS = {
  "Plus AI": ["presentations"],                                 # plusai.com: AI presentation maker for PowerPoint and Slides
  "SlidesAI": ["presentations"],                                # slidesai.io: turn text into presentations
  "Gamma": ["presentations", "website-builder"],                # gamma.app: "creating effortless presentations, websites, and more"
- "Le Chat (Mistral)": ["general-chatbot"],                     # chat.mistral.ai (recorded): Mistral's assistant with web search and images
- "Perplexity": ["answer-engine", "general-chatbot"],           # perplexity.ai (recorded): answer engine that cites web sources
+ "Le Chat (Mistral)": ["general-chatbot", "code-assistant"],                     # mistral.ai/products/le-chat (fetched 2026-10-20): "Mistral Vibe (formerly Le Chat) - AI chat and coding agent"
+ "Perplexity": ["answer-engine", "general-chatbot"],           # perplexity.ai help center (2026-10-20): "answers your questions with cited sources"; "an answer engine"
  "Microsoft Copilot": ["general-chatbot"],                     # copilot.microsoft.com: "AI chat that works across your day"
  "Buffer": ["social-scheduling"],                              # buffer.com: social media management
  "Surfer": ["seo-content"],                                    # surferseo.com: brand visibility across Google and AI search
@@ -466,12 +466,12 @@ CAPS = {
  "Elicit": ["research-assistant"],                             # elicit.com: "AI for research & decision-making"
  "Scite": ["citation-check", "paper-search"],                  # scite.ai: citation-backed answers, supported or disputed
  "Consensus": ["paper-search"],                                # consensus.app: "AI academic search engine for peer-reviewed literature"
- "SciSpace": ["paper-reader", "paper-search"],                 # scispace.com (recorded): read, explain and search research papers
+ "SciSpace": ["paper-reader", "paper-search"],                 # scispace.com/pricing FAQ (2026-10-20): "discovering, analyzing, and writing scientific literature"; Literature Review, Chat with PDF
  "Humata": ["doc-chat"],                                       # humata.ai: turns your documents into an AI knowledge base
  "You.com API": ["search-api"],                                # you.com: "Web Search APIs for AI"
  "ResearchRabbit": ["literature-mapping", "paper-search"],      # researchrabbit.ai: related papers, citation maps
  "Scholarcy": ["paper-summaries"],                             # scholarcy.com: "Summarize anything, understand complex research"
- "Fireflies": ["meeting-notes", "transcription"],              # fireflies.ai: takes meeting notes; recorded description: AI meeting notes and transcription
+ "Fireflies": ["meeting-notes", "transcription"],              # fireflies.ai (2026-10-20): "AI Note Taker to Transcribe, Summarize, Analyze Meetings"
  "Fathom": ["meeting-notes", "transcription"],                 # fathom.ai: "captures, transcribes, and summarizes" calls
  "Motion": ["ai-calendar", "project-management"],              # usemotion.com: AI calendar, projects, tasks
  "Reclaim": ["ai-calendar"],                                   # reclaim.ai: "AI Calendar"
@@ -488,7 +488,7 @@ CAPS = {
  "Voiceflow": ["support-chatbot", "ai-agents"],                # voiceflow.com: chat and voice AI agents for customer support
 }
 CAP_LABEL = {k: k.replace("-", " ") for v in CAPS.values() for k in v}
-CAP_LABEL.update({"edit-by-transcript": "edit by transcript", "text-to-speech": "text to speech", "general-chatbot": "general AI chatbot", "code-assistant": "AI coding assistant", "app-builder": "app builder", "website-builder": "website builder"})
+CAP_LABEL.update({"edit-by-transcript": "edit by transcript", "text-to-speech": "text to speech", "general-chatbot": "general AI chatbot", "code-assistant": "AI coding assistant", "app-builder": "app builder", "website-builder": "website builder", "ai-agents": "AI agents", "gtm-automation": "go-to-market automation", "seo-content": "SEO content", "ai-calendar": "AI calendar"})
 # Entry plans that are a LOWER tier than the usual paid plan (from the plan names on the official pricing pages):
 LOWER_TIER = {
  "Google Gemini": "$4.99/mo is Google's entry AI tier, below its $19.99/mo Pro tier",

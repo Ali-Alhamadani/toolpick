@@ -255,7 +255,7 @@ page("/stacks.html", "AI Starter Stacks by Role: Free, Under $30 & Pro Tool Bund
 SEO_FREE_ALT = ["Recraft", "Rytr"]
 SEO_VIDEO_PATH = "/best-ai-video-tools-under-20.html"
 def _num(v): return v if isinstance(v, (int, float)) else None
-def _usd(v): r = round(v, 2); return "$" + (str(int(r)) if r == int(r) else f"{r:.2f}")
+def _usd(v): r = round(v, 2); return "$" + (f"{int(r):,}" if r == int(r) else f"{r:,.2f}")
 # --- v24-fix: ONE same-job rule + ONE free-alternative function, used by tool pages, pay-less, /free.html and search ---
 # Same job = both tools have the same PRIMARY capability (first CAPS tag). Broad categories or secondary tags are not enough.
 import tools as _tm
@@ -425,7 +425,7 @@ for _c in CHANGES: CHANGES_BY_TOOL.setdefault(_c["name"], []).append(_c)
 #    if the tool has no monthly price) -> "Cheaper option: X at $Y/mo". 3) else no checked USD price -> "Price not checked".
 # 4) else "No cheaper checked option". Free alternative: category Best Value if real-free, else first of c["free"], else first real-free.
 def _num(v): return v if isinstance(v, (int, float)) else None
-def _usd(v): r = round(v, 2); return "$" + (str(int(r)) if r == int(r) else f"{r:.2f}")
+def _usd(v): r = round(v, 2); return "$" + (f"{int(r):,}" if r == int(r) else f"{r:,.2f}")
 def tool_verdict(name, cats, t):
     m, a = _num(t["monthly"]), _num(t["annual"])
     cm, ca = cheaper_alt(name, "monthly"), cheaper_alt(name, "annual")
@@ -482,21 +482,90 @@ for name, cats in tool_pages.items():
 # comparison pages
 def find(n): return next(x for c in CATEGORIES for x in c["tools"] if x["name"] == n)
 def cnames(x): return x[2] if isinstance(x[2], list) else [x[2], x[3]]
+def compare_verdict(N, TT, c):
+    """v25: like-for-like compare verdict. Same main job (cap1) -> same-billing price comparison; else 'different jobs', no price pick."""
+    def nm(t): return f'<a href="{turl(t["name"])}">{e(t["name"])}</a>'
+    caps = {t["name"]: cap1(t["name"]) for t in TT}
+    same = len(set(caps.values())) == 1
+    free = [t for t in TT if realfree(t)]
+    rows = []; tnote = ""; ranked = []; basis = None; win = None
+    BL = {"monthly": "monthly", "annual": "billed-yearly"}
+    if not same:
+        verdict = "These do different jobs: " + ", ".join(f"{t['name']} is for {cap_label(t['name'])}" for t in TT) + " — so we make no price-based pick"
+        rows.append(("Main job", " · ".join(f'{nm(t)}: {e(cap_label(t["name"]))}' for t in TT)))
+    else:
+        basis = "monthly" if all(_num(t["monthly"]) is not None for t in TT) else ("annual" if all(_num(t["annual"]) is not None for t in TT) else None)
+        if basis:
+            ranked = sorted(TT, key=lambda t: (t[basis], t["name"].lower()))
+            win = ranked[0] if ranked[0][basis] < ranked[1][basis] else None
+            lo = ranked[0][basis]
+            rows.append((f"Price on {BL[basis]} billing", " · ".join(f'{nm(t)} {_usd(t[basis])}/mo' + (f' (+{_usd(t[basis]-lo)}/mo, +{_usd((t[basis]-lo)*12)}/yr)' if t[basis] > lo else '') for t in ranked)))
+            ob = "annual" if basis == "monthly" else "monthly"
+            if all(_num(t[ob]) is not None for t in TT):
+                r2 = sorted(TT, key=lambda t: (t[ob], t["name"].lower())); lo2 = r2[0][ob]
+                rows.append((f"On {BL[ob]} billing", " · ".join(f'{nm(t)} {_usd(t[ob])}/mo' + (f' (+{_usd(t[ob]-lo2)}/mo, +{_usd((t[ob]-lo2)*12)}/yr)' if t[ob] > lo2 else '') for t in r2)))
+            if win: tnote = next((tier_note(win["name"], t["name"]) for t in ranked[1:] if tier_note(win["name"], t["name"])), "")
+        else:
+            nop = [t for t in TT if _num(t["monthly"]) is None and _num(t["annual"]) is None]
+            S = {b: sorted([t for t in TT if _num(t[b]) is not None], key=lambda t: (t[b], t["name"].lower())) for b in ("monthly", "annual")}
+            S = {b: L for b, L in S.items() if len(L) >= 2}
+            for b, L in S.items():
+                lo = L[0][b]
+                rows.append((f"Price on {BL[b]} billing", " · ".join(f'{nm(t)} {_usd(t[b])}/mo' + (f' (+{_usd(t[b]-lo)}/mo, +{_usd((t[b]-lo)*12)}/yr)' if t[b] > lo else '') for t in L) + (" · not listed: " + ", ".join(e(t["name"]) for t in TT if t not in L) + " (no checked price on this billing)" if len(L) < len(TT) else "")))
+            for t in nop: rows.append(("Price", f'{nm(t)}: {e(t["price"])} — not in a form we can compare, so it is not ranked'))
+            mixed_win = None
+            cov = set(t["name"] for L in S.values() for t in L)
+            if S and not nop and cov == set(t["name"] for t in TT):
+                cands = [t for t in TT if all(t in L and L[0] is t and L[1][b] > t[b] for b, L in S.items())]
+                if cands: mixed_win = cands[0]
+            if mixed_win:
+                verdict_mixed = f"Pick {mixed_win['name']} if price matters: it is cheapest on each billing we can compare like for like — " + "; ".join(f"{_usd(L[1][b]-L[0][b])}/mo ({_usd((L[1][b]-L[0][b])*12)}/yr) less than {L[1]['name']} on {BL[b]} billing" for b, L in S.items())
+            else:
+                verdict_mixed = "No price pick: " + (", ".join(t["name"] for t in nop) + " has no comparable checked price" if nop else "their prices are not all checked on the same billing") + " — compare the plans on the official pages"
+        if len(free) == 1:
+            o = [t for t in TT if t is not free[0]]
+            verdict = f"Start free with {free[0]['name']}: only it has a real free plan" + (f"; if you will pay, {win['name']} is {_usd(ranked[1][basis]-win[basis])}/mo ({_usd((ranked[1][basis]-win[basis])*12)}/yr) less on {BL[basis]} billing" if win and len(TT) == 2 else "")
+        elif win:
+            nxt = ranked[1]; d = nxt[basis] - win[basis]
+            verdict = f"Pick {win['name']} if price matters: {_usd(d)}/mo ({_usd(d*12)}/yr) less than {nxt['name']} on {BL[basis]} billing"
+        elif basis: verdict = f"Same {BL[basis]} price — pick on features"
+        else: verdict = verdict_mixed
+        if tnote: verdict += ". " + tnote.rstrip(".")
+        if tnote: rows.append(("Plan tier", " · ".join(f'{nm(t)}: {e(LOWER_TIER[t["name"]])}' for t in TT if t["name"] in LOWER_TIER) + " — compare features before switching"))
+    rows.append(("Real free plan", " · ".join(f'{nm(t)}: {"yes" if realfree(t) else "no"}' for t in TT)))
+    fa_parts = []
+    for t in TT:
+        if realfree(t): continue
+        onpage = next((x for x in TT if same and realfree(x)), None)
+        f = onpage or free_alt(t["name"])
+        fa_parts.append(f'For {e(t["name"])}: ' + (f'{nm(f)}' + (' (on this page)' if f is onpage else '') + f' — {e(f["free"])}' if f else "none that does the same main job"))
+    if fa_parts: rows.append(("Free alternative (same main job)", " · ".join(fa_parts)))
+    bv = [t for t in TT if t["name"] in BEST_OF]
+    rows.append(("ToolPick Best Value pick", " · ".join(f'{nm(t)} (for {e(", ".join(cc["name"].lower() for cc in CATEGORIES if cc["best"]==t["name"]))})' for t in bv) or f'Neither — for {e(c["name"].lower())} it is <a href="{turl(c["best"])}">{e(c["best"])}</a>'))
+    btns = ""
+    for k, f0 in enumerate(free[:2]): btns += f'<a class="bbtn{" primary" if k == 0 else ""}" href="{turl(f0["name"])}">Start free with {e(f0["name"])}</a>'
+    if same and basis and ranked and ranked[-1][basis] > ranked[0][basis]:
+        ex = ranked[-1]; btns += f'<a class="bbtn" href="/pay-less.html?tool={slug(ex["name"])}&amp;pay={ex[basis]:g}' + ('&amp;bill=yearly' if basis == "annual" else '') + f'">Paying for {e(ex["name"])}? See your saving</a>'
+    btns += f'<a class="bbtn" href="/compare-builder.html?tools={",".join(slug(n) for n in N)}">Open in compare builder</a>'
+    html_ = (f'<section class="verdict card best" aria-labelledby="vh"><h2 id="vh" style="margin:0 0 6px;font-size:1.15rem">Which should you pick?</h2><p class="vline"><b>{e(verdict)}.</b></p><dl class="vgrid">'
+             + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + f'</dl><div class="factions">{btns}</div><p class="small" style="margin:8px 0 0">Rule: we only compare prices when the tools do the same main job (from what each official site says it does), and only on the same billing (monthly with monthly, billed-yearly with billed-yearly). A real free plan on only one tool comes first. Prices from official pricing pages, each with its own checked date below. No ratings or reviews.</p></section>')
+    return html_, verdict
+
 for x in COMPARISONS:
     s_, title0, cid = x[0], x[1], x[4]; N = cnames(x); TT = [find(n) for n in N]
     path = f"/compare/{s_}.html"; c = next(y for y in CATEGORIES if y["id"] == cid)
     title = f"{title0} ({CHECKED[:4]}): Price, Free Plan & Which to Pick"
     d = f"{' vs '.join(N)} compared with prices from official pricing pages (per-tool checked dates): plans, free tiers and which is better value."
-    verdict = f"ToolPick's best-value pick for {c['name'].lower()} is <a href='{turl(c['best'])}'>{e(c['best'])}</a>."
-    if c["best"] not in N: verdict += " Among these, compare the entry prices above and pick the one whose free tier lets you test your exact use case."
-    if any(t["price"] == "check site" for t in TT): verdict += " Some prices here could not be verified; check the official pricing pages."
+    vhtml, vtxt = compare_verdict(N, TT, c)
     row = lambda lab, f: f"<tr><th>{lab}</th>" + "".join(f"<td>{f(t)}</td>" for t in TT) + "</tr>"
-    body = (f'<h1>{e(title0)}</h1><p class="tag">{e(d)}</p><div class="tw"><table><tr><th></th>' + "".join(f'<th><a href="{turl(n)}">{e(n)}</a></th>' for n in N) + "</tr>"
-      + row("What it is", lambda t: e(t["about"])) + row("Price", lambda t: e(t["price"])) + row("Free tier", lambda t: e(t["free"]))
-      + row("Official", lambda t: f'<a href="{e(t["pricing"])}" rel="noopener">pricing page</a>') + "</table></div>"
-      + f'<h2>Verdict</h2><p>{verdict}</p><p>See all <a href="/best-ai-{cid}-tools.html">best AI {e(c["name"].lower())} tools</a>.</p><p><a href="/compare-builder.html?tools={",".join(slug(n) for n in N)}">Open these tools in the compare builder →</a> Add a third tool or swap one and share the link.</p><p><a href="/cost-calculator.html?category={cid}&amp;seats=1&amp;billing=monthly">What will these really cost? →</a> Compare true monthly and yearly costs for this category in the cost calculator.</p><p><a href="/tools.html?category={cid}">Browse all {e(c["name"].lower())} tools in the directory →</a></p>{complinks([y for y in COMPARISONS if y[0]!=s_])}')
+    _rel = [y for y in comps_for(N) if y[0] != s_][:8]
+    body = (f'<h1>{e(title0)}</h1><p class="tag">{e(d)}</p>{vhtml}<div class="tw"><table><tr><th></th>' + "".join(f'<th><a href="{turl(n)}">{e(n)}</a></th>' for n in N) + "</tr>"
+      + row("What it is", lambda t: e(t["about"])) + row("All plans", lambda t: e(t["price"])) + row("Free tier", lambda t: e(t["free"]))
+      + row("Checked", lambda t: f'{t.get("checked", CHECKED)} · <a href="{e(t["pricing"])}" rel="noopener">pricing page</a>') + "</table></div>"
+      + f'<p class="small">More: <a href="/best-ai-{cid}-tools.html">best AI {e(c["name"].lower())} tools</a> · <a href="/tools.html?category={cid}">all {e(c["name"].lower())} tools</a> · <a href="/cost-calculator.html?category={cid}&amp;seats=1&amp;billing=monthly">cost calculator</a></p>{complinks(_rel)}')
     il = {"@context":"https://schema.org","@type":"ItemList","name":title0,"itemListElement":[{"@type":"ListItem","position":k+1,"url":BASE+turl(n),"name":n} for k,n in enumerate(N)]}
     qas = [q for t in TT for q in tool_qas(t)] + [(f"What is ToolPick's best-value pick for {c['name'].lower()}?", f"{c['best']}: {find(c['best']).get('why','')}".strip())]
+    qas.append((f"Which should I pick, {' or '.join(N)}?", vtxt + " (ToolPick rule using prices checked on official pricing pages)."))
     fh, fl = faq(qas)
     page(path, title, d, body + fh, [il, fl, crumbs([("ToolPick","/"),(title0,path)])])
 
