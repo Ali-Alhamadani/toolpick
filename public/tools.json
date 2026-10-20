@@ -341,12 +341,13 @@
      "per_output": null
     },
     {
-     "name": "Claude (Pro)",
+     "name": "Claude",
      "url": "https://claude.ai",
      "pricing": "https://claude.com/pricing",
-     "price": "Pro $20/mo ($17 yearly); Max from $100/mo",
+     "price": "Pro $20/mo ($17/mo billed yearly); Max from $100/mo",
      "free": "Free plan: $0",
-     "about": "Strong coding model for chat-based and agentic coding.",
+     "about": "Strong long-form writing, editing and analysis assistant.",
+     "why": "Pro is $17-20/mo with a usable free tier, and is excellent at long, natural-sounding drafts.",
      "checked": "2026-10-19",
      "affiliate": "",
      "monthly": 20,

@@ -385,3 +385,112 @@ PRICE_NOTES = {
 PRICE_SKIP = {
  "2026-10-15|Kling AI": "The 2026-10-14 snapshot was rewritten with text from the 2026-10-17 check, so this diff runs backwards in time.",
 }
+
+# --- v24-fix: merge the "Claude (Pro)" duplicate into Claude (same product, same pricing page) ---
+_claude = next(t for c in CATEGORIES for t in c["tools"] if t["name"] == "Claude")
+for _c in CATEGORIES:
+    _c["tools"] = [(_claude if t["name"] == "Claude (Pro)" else t) for t in _c["tools"]]
+    _c["free"] = [("Claude" if n == "Claude (Pro)" else n) for n in _c["free"]]
+    if _c.get("best") == "Claude (Pro)": _c["best"] = "Claude"
+PRICE_TABLE.pop("Claude (Pro)", None)
+REDIRECTS["/tools/claude-pro.html"] = "/tools/claude.html"
+
+# --- v24-fix: short plan list for tool pages (same verified 2026-10-17 Kling list prices; yearly totals / 12) ---
+PLANS_SHORT = {
+ "Kling AI": "Standard $10/mo ($6.60/mo billed yearly) · Pro $37/mo ($24.42) · Premier $207/mo ($124.17) · Ultra+ $619/mo ($371.42). First-month discounts are offered on every plan — see the official page.",
+}
+
+# --- v24-fix: capability tags. FIRST tag = the tool's PRIMARY capability (what "same job" means sitewide).
+# Each tag comes only from what the tool's own site says (homepage title/description fetched 2026-10-20,
+# or — where the site blocked our fetch — the description we copied from the official site earlier, noted as "recorded").
+CAPS = {
+ "Runway": ["video-generation", "image-generation"],          # runwayml.com: text/image-to-video (Gen-4.5) plus image models
+ "Pika": ["video-generation"],                                 # pika.art: AI video clips from text or images
+ "Luma Dream Machine": ["video-generation", "image-generation"],# lumalabs.ai: "platform for video generation and image creation"
+ "Kling AI": ["video-generation", "image-generation"],         # klingai.com: "AI Video & Image Generator"
+ "HeyGen": ["avatar-video", "voice-cloning"],                  # heygen.com: "AI videos with your Personal Avatar — your face and voice"
+ "Synthesia": ["avatar-video"],                                # synthesia.io: AI video platform with AI presenters for business/training
+ "Descript": ["edit-by-transcript", "video-editing", "transcription", "podcast-recording"],  # descript.com: "editing as easy as editing text. Record, transcribe, edit"
+ "CapCut": ["video-editing"],                                  # capcut.com: "AI Video Editor"
+ "InVideo": ["video-generation", "video-editing"],             # invideo.io: "Create & edit AI videos"
+ "Opus Clip": ["video-clipping", "video-editing"],             # opus.pro: "turns long videos into ... viral clips"
+ "Captions": ["video-editing", "video-generation"],            # captions.ai: "AI video generator and editor"
+ "Claude": ["general-chatbot", "writing-assistant", "code-assistant"],  # claude.ai (recorded): writing, editing, analysis and coding assistant
+ "ChatGPT": ["general-chatbot", "writing-assistant", "image-generation", "code-assistant"],  # chatgpt.com: "answer questions, write, create images ... and code"
+ "Google Gemini": ["general-chatbot"],                         # gemini.google.com: "Google's AI assistant ... writing, planning, brainstorming"
+ "Grammarly": ["writing-assistant"],                           # grammarly.com: "AI Writing Assistance"
+ "Notion AI": ["docs-workspace", "ai-agents"],                 # notion.com: "The AI workspace" with custom agents
+ "Copy.ai": ["gtm-automation", "marketing-copy"],              # copy.ai: "GTM AI platform"
+ "Jasper": ["marketing-content", "ai-agents"],                 # jasper.ai: AI agents for marketing workflows
+ "Wordtune": ["writing-assistant"],                            # wordtune.com: "AI writer that can paraphrase, rewrite, correct your grammar"
+ "Rytr": ["writing-assistant", "follow-up-assistant"],         # rytr.me: drafts follow-ups "in your voice"; now pitches itself as an AI relationship manager
+ "GitHub Copilot": ["code-assistant"],                         # github.com/features/copilot: "Your AI coding agent" in editor/terminal/GitHub
+ "Cursor": ["code-assistant"],                                 # cursor.com: "AI Coding Agent"
+ "Windsurf": ["code-assistant"],                               # windsurf.com (now Devin Desktop): local/cloud coding agents in your editor
+ "Bolt": ["app-builder", "website-builder"],                   # bolt.new: "AI builder: Websites, apps & prototypes"
+ "v0": ["app-builder", "website-builder"],                     # v0.app: "Build Full-Stack Web Apps with AI"
+ "Lovable": ["app-builder", "website-builder"],                # lovable.dev (recorded): prompt-to-app builder
+ "Warp": ["code-assistant"],                                   # warp.dev: agentic software development platform / AI terminal
+ "Qodo": ["code-review"],                                      # qodo.ai: "AI Code Review"
+ "Replit": ["app-builder", "website-builder"],                 # replit.com (recorded): build and deploy apps by describing them
+ "Leonardo": ["image-generation"],                             # leonardo.ai (recorded): image and video generation
+ "Midjourney": ["image-generation"],                           # midjourney.com (recorded): artistic image generation
+ "Ideogram": ["image-generation", "logo-design"],              # ideogram.ai (recorded): text rendering in images — logos, posters
+ "Krea": ["image-generation"],                                 # krea.ai (recorded): real-time image generation, upscaling
+ "Canva": ["graphic-design", "logo-design", "presentations", "image-generation"],  # canva.com: "create social media posts, presentations, posters, videos, logos"
+ "Recraft": ["image-generation", "vector-design"],             # recraft.ai: "text-to-image model and design platform ... vector generation"
+ "Magnific": ["image-generation", "image-upscaling"],          # magnific.com (recorded): AI image/video generation and upscaling
+ "Photoroom": ["photo-editing"],                               # photoroom.com: "AI-Powered Photo Editor" for product photos
+ "ElevenLabs": ["text-to-speech", "voice-cloning", "voice-agents"],  # elevenlabs.io: "AI Voice Generator & Voice Agents"
+ "Suno": ["music-generation"],                                 # suno.com: "AI Music Generator"
+ "Murf": ["text-to-speech", "voice-agents"],                   # murf.ai: "Generate human-like speech and deploy conversational agents"
+ "Speechify": ["text-to-speech"],                              # speechify.com: "Text to Speech ... reads anything aloud"
+ "Otter": ["meeting-notes", "transcription"],                  # otter.ai: "AI Notetaker, Transcription"
+ "Udio": ["music-generation"],                                 # udio.com: "AI Music Generator"
+ "Riverside": ["podcast-recording", "video-editing"],          # riverside.com: "podcast and video recording and editing"
+ "Krisp": ["noise-cancellation", "meeting-notes"],             # krisp.ai: "Noise Cancellation & AI Note Taker"
+ "Pitch": ["presentations"],                                   # pitch.com: "AI presentation workspace"
+ "Beautiful.ai": ["presentations"],                            # beautiful.ai: "AI Presentation Software"
+ "Plus AI": ["presentations"],                                 # plusai.com: AI presentation maker for PowerPoint and Slides
+ "SlidesAI": ["presentations"],                                # slidesai.io: turn text into presentations
+ "Gamma": ["presentations", "website-builder"],                # gamma.app: "creating effortless presentations, websites, and more"
+ "Le Chat (Mistral)": ["general-chatbot"],                     # chat.mistral.ai (recorded): Mistral's assistant with web search and images
+ "Perplexity": ["answer-engine", "general-chatbot"],           # perplexity.ai (recorded): answer engine that cites web sources
+ "Microsoft Copilot": ["general-chatbot"],                     # copilot.microsoft.com: "AI chat that works across your day"
+ "Buffer": ["social-scheduling"],                              # buffer.com: social media management
+ "Surfer": ["seo-content"],                                    # surferseo.com: brand visibility across Google and AI search
+ "Writesonic": ["seo-content"],                                # writesonic.com: "AI Search Growth Engine" (GEO/AEO)
+ "Frase": ["seo-content"],                                     # frase.io: "SEO & GEO Content Platform"
+ "Predis.ai": ["ad-creative", "social-content"],               # predis.ai: "AI Ad Generator"
+ "Ocoya": ["social-scheduling", "social-content"],             # ocoya.com: social media scheduling and content creation
+ "Elicit": ["research-assistant"],                             # elicit.com: "AI for research & decision-making"
+ "Scite": ["citation-check", "paper-search"],                  # scite.ai: citation-backed answers, supported or disputed
+ "Consensus": ["paper-search"],                                # consensus.app: "AI academic search engine for peer-reviewed literature"
+ "SciSpace": ["paper-reader", "paper-search"],                 # scispace.com (recorded): read, explain and search research papers
+ "Humata": ["doc-chat"],                                       # humata.ai: turns your documents into an AI knowledge base
+ "You.com API": ["search-api"],                                # you.com: "Web Search APIs for AI"
+ "ResearchRabbit": ["literature-mapping", "paper-search"],      # researchrabbit.ai: related papers, citation maps
+ "Scholarcy": ["paper-summaries"],                             # scholarcy.com: "Summarize anything, understand complex research"
+ "Fireflies": ["meeting-notes", "transcription"],              # fireflies.ai: takes meeting notes; recorded description: AI meeting notes and transcription
+ "Fathom": ["meeting-notes", "transcription"],                 # fathom.ai: "captures, transcribes, and summarizes" calls
+ "Motion": ["ai-calendar", "project-management"],              # usemotion.com: AI calendar, projects, tasks
+ "Reclaim": ["ai-calendar"],                                   # reclaim.ai: "AI Calendar"
+ "ClickUp": ["project-management"],                            # clickup.com: tasks, docs, goals, chat
+ "Taskade": ["ai-agents", "project-management"],               # taskade.com: AI apps, agents and workflows
+ "Superhuman": ["productivity-suite", "writing-assistant"],    # superhuman.com: "Docs, Mail, and AI" (includes Grammarly)
+ "Zapier": ["workflow-automation", "ai-agents"],               # zapier.com: "Automate AI Workflows, Agents, and Apps"
+ "Zapier Agents": ["ai-agents", "workflow-automation"],        # zapier.com: AI agents across 9,000+ apps
+ "n8n": ["workflow-automation", "ai-agents"],                  # n8n.io: "AI Workflow Automation Platform"
+ "Botpress": ["support-chatbot", "ai-agents"],                 # botpress.com: AI agent platform for customer support
+ "Chatbase": ["support-chatbot", "ai-agents"],                 # chatbase.co: AI agents for customer support
+ "Lindy": ["ai-agents"],                                       # lindy.ai: "AI employee that connects to all your tools"
+ "Relevance AI": ["ai-agents"],                                # relevanceai.com: specialist AI agents
+ "Voiceflow": ["support-chatbot", "ai-agents"],                # voiceflow.com: chat and voice AI agents for customer support
+}
+CAP_LABEL = {k: k.replace("-", " ") for v in CAPS.values() for k in v}
+CAP_LABEL.update({"edit-by-transcript": "edit by transcript", "text-to-speech": "text to speech", "general-chatbot": "general AI chatbot", "code-assistant": "AI coding assistant", "app-builder": "app builder", "website-builder": "website builder"})
+# Entry plans that are a LOWER tier than the usual paid plan (from the plan names on the official pricing pages):
+LOWER_TIER = {
+ "Google Gemini": "$4.99/mo is Google's entry AI tier, below its $19.99/mo Pro tier",
+ "ChatGPT": "$8/mo is the Go tier, below the $20/mo Plus tier",
+}

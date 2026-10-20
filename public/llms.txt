@@ -1,5 +1,5 @@
 # ToolPick
-> Needs-based AI tool finder. 83 tools, prices copied from official pricing pages on 2026-10-19. 'check site' means unverified.
+> Needs-based AI tool finder. 82 tools, prices copied from official pricing pages; each tool has its own checked date (latest 2026-10-19). 'check site' means unverified.
 
 ## Categories
 - [Video](https://toolpick-ai.vercel.app/best-ai-video-tools.html): best value Runway; free options CapCut, HeyGen, Synthesia
@@ -38,7 +38,6 @@
 - [GitHub Copilot](https://toolpick-ai.vercel.app/tools/github-copilot.html): Pro $10/mo; Pro+ $39/mo; Max $100/mo | free: Free plan: $0
 - [Cursor](https://toolpick-ai.vercel.app/tools/cursor.html): Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user | free: Free: $0 with limited agent requests
 - [Windsurf](https://toolpick-ai.vercel.app/tools/windsurf.html): Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat | free: Free: $0
-- [Claude (Pro)](https://toolpick-ai.vercel.app/tools/claude-pro.html): Pro $20/mo ($17 yearly); Max from $100/mo | free: Free plan: $0
 - [Bolt](https://toolpick-ai.vercel.app/tools/bolt.html): Pro $25/mo; Teams $30/member/mo | free: Free: 300K tokens/day, 1M/month
 - [v0](https://toolpick-ai.vercel.app/tools/v0.html): Team $30/user/mo; Business $100/user/mo | free: Free: $0 with daily credits
 - [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually) | free: Free: $0 (5 build credits/day, up to 30/mo)

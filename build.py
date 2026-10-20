@@ -49,7 +49,7 @@ CSS += ".fpick{border-width:2px}.factions{display:flex;flex-wrap:wrap;gap:8px;ma
 
 CSS += ".mnav{display:none}nav.top{flex-wrap:nowrap}nav.top>a,nav.top summary{white-space:nowrap}.hstick{position:static!important}@media(max-width:760px){nav.top .dn{display:none}.mnav{display:block;margin-left:auto}nav.top{width:auto!important;margin-left:auto!important}.mnav .menu{right:0;left:auto!important;max-height:75vh;overflow:auto}}.pcba{display:grid;gap:8px;margin:8px 0}.pcba div{background:var(--sf2);border-radius:10px;padding:10px 12px;font-size:1rem;line-height:1.5;color:var(--tx)}.pcba b{display:block;font-size:.85rem;color:var(--mu);text-transform:uppercase;letter-spacing:.02em}"
 
-FOOT = f"""<footer class="site small"><div class="wrap"><p><a href="/sponsor.html">Sponsor ToolPick</a> · <a href="/newsletter.html">Newsletter</a> · <a href="/llms.txt">llms.txt</a></p>Some links may become affiliate links in future; that never changes our picks. Prices copied from each tool's official pricing page on {CHECKED} (USD unless shown; yearly-billing prices in parentheses). "check site" = we could not verify the price, so we don't guess. Prices change — always confirm on the official page.</div></footer>"""
+FOOT = f"""<footer class="site small"><div class="wrap"><p><a href="/sponsor.html">Sponsor ToolPick</a> · <a href="/newsletter.html">Newsletter</a> · <a href="/llms.txt">llms.txt</a></p>Some links may become affiliate links in future; that never changes our picks. Prices copied from each tool's official pricing page; every tool shows its own checked date and pricing link (USD unless shown; yearly-billing prices in parentheses). "check site" = we could not verify the price, so we don't guess. Prices change — always confirm on the official page.</div></footer>"""
 def page(path, title, desc, body, ld=None):
     lds = "".join(f'<script type="application/ld+json">{json.dumps(x)}</script>' for x in (ld or []))
     full = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -82,6 +82,7 @@ def tool_qas(t):
             (f"Does {t['name']} have a free plan?", f"{t['free']} (checked {ck}).")]
 import re as _re
 NOT_FREE = _re.compile(r"trial|one-time|free (api )?credit|in free credits|start (for )?free|^no free|^check site", _re.I)
+def _num(v): return v if isinstance(v, (int, float)) else None
 def realfree(t):
     f = t["free"]
     return bool(_re.search(r"free|\$0", f, _re.I)) and not NOT_FREE.search(f)
@@ -174,8 +175,8 @@ def st_reason(t, c, budget):
     r, b = st_rate(t)
     s = f"Entry plan {st_money(r)}/mo {'billed yearly' if b == 'annual' else 'billed monthly'}"
     if budget == "under30":
-        cheaper = [x for x in c["tools"] if st_rate(x) and st_rate(x)[0] < r]
-        if not cheaper: s += " — lowest verified entry price in " + c["name"]
+        cheaper = [x for x in c["tools"] if _num(x.get("annual" if b == "annual" else "monthly")) is not None and x.get("annual" if b == "annual" else "monthly") < r]
+        if not cheaper: s += f" — lowest {'billed-yearly' if b == 'annual' else 'monthly'} entry price we checked in " + c["name"]
     elif t["name"] == c["best"]: s += f" — ToolPick's Best Value pick in {c['name']}"
     else: s += f" — the {c['name']} Best Value pick has no verified price, so this is the highest verified entry plan"
     if t.get("per_output"): s += f" ({t['per_output']})"
@@ -253,12 +254,71 @@ page("/stacks.html", "AI Starter Stacks by Role: Free, Under $30 & Pro Tool Bund
 # 'free alternative to Cursor' already exists at /free-alternative-to-cursor.html, so it is not rebuilt.
 SEO_FREE_ALT = ["Recraft", "Rytr"]
 SEO_VIDEO_PATH = "/best-ai-video-tools-under-20.html"
+def _num(v): return v if isinstance(v, (int, float)) else None
+def _usd(v): r = round(v, 2); return "$" + (str(int(r)) if r == int(r) else f"{r:.2f}")
+# --- v24-fix: ONE same-job rule + ONE free-alternative function, used by tool pages, pay-less, /free.html and search ---
+# Same job = both tools have the same PRIMARY capability (first CAPS tag). Broad categories or secondary tags are not enough.
+import tools as _tm
+CAPS = _tm.CAPS; CAP_LABEL = _tm.CAP_LABEL; LOWER_TIER = _tm.LOWER_TIER; PLANS_SHORT = _tm.PLANS_SHORT
+TOOL = {}
+for _c in CATEGORIES:
+    for _t in _c["tools"]: TOOL.setdefault(_t["name"], _t)
+BEST_OF = {}
+for _c in CATEGORIES: BEST_OF.setdefault(_c["best"], []).append(_c["id"])
+def cap1(n): return CAPS[n][0]
+def cap_label(n): return CAP_LABEL.get(cap1(n), cap1(n))
+def samejob(n):
+    t = TOOL[n]; c = cap1(n)
+    return [x for k, x in TOOL.items() if k != n and dom(x["url"]) != dom(t["url"]) and CAPS[k][0] == c]
+def cheaper_alt(n, key):
+    L = sorted([x for x in samejob(n) if _num(x[key]) is not None], key=lambda x: (x[key], x["name"].lower()))
+    return L[0] if L else None
+def free_alt(n):
+    """Shared free alternative: a real-free tool sharing n's primary capability.
+    Order: a ToolPick Best Value pick first, then same PRIMARY capability, then lowest checked price, then name."""
+    L = [x for x in samejob(n) if realfree(x)]
+    if not L: return None
+    def k(x):
+        p = [v for v in (_num(x["monthly"]), _num(x["annual"])) if v is not None]
+        return (0 if x["name"] in BEST_OF else 1, 0 if cap1(x["name"]) == cap1(n) else 1, min(p) if p else 1e9, x["name"].lower())
+    return sorted(L, key=k)[0]
+def tier_note(a, b):
+    """'different tier' note when exactly one side's entry plan is a lower tier (LOWER_TIER in tools.py)."""
+    return "Different tier: compare features before switching." if (a in LOWER_TIER) != (b in LOWER_TIER) else ""
+NO_LIKE = "No like-for-like cheaper option checked"
 def _entry_num(t):
     vals = [v for v in (t.get("monthly"), t.get("annual")) if isinstance(v, (int, float))]
     return min(vals) if vals else None
 # index
 FDATA = json.dumps([dict(n=t["name"],c=c["id"],cn=c["name"],u=turl(t["name"]),p=t["price"],f=t["free"],k=t.get("checked",CHECKED),d=t["about"],dm=dom(t["url"]),a=t["about"]+" "+c["need"],
-    m=min([v for v in (t["monthly"],t["annual"]) if isinstance(v,(int,float))],default=None),b=t["name"]==c["best"],fr=realfree(t),sl=slug(t["name"]),pr=t["pricing"],mm=t["monthly"] if isinstance(t["monthly"],(int,float)) else None,ma=t["annual"] if isinstance(t["annual"],(int,float)) else None) for c in CATEGORIES for t in c["tools"]])
+    m=min([v for v in (t["monthly"],t["annual"]) if isinstance(v,(int,float))],default=None),b=t["name"]==c["best"],fr=realfree(t),sl=slug(t["name"]),pr=t["pricing"],mm=t["monthly"] if isinstance(t["monthly"],(int,float)) else None,ma=t["annual"] if isinstance(t["annual"],(int,float)) else None,
+    cap=cap1(t["name"]),caps=CAPS[t["name"]],fa=(lambda f: dict(n=f["name"],u=turl(f["name"]),f=f["free"]) if f else None)(free_alt(t["name"]))) for c in CATEGORIES for t in c["tools"]])
+# Query -> capability mapping for the search (first matching rule wins; "all" = every stem must appear, "any" = at least one).
+QCAP = [
+ ("video-clipping", [], ["short clip", "into clips", "shorts", "viral clip", "clip"]),
+ ("edit-by-transcript", ["edit"], ["transcri", "podcast", "by text", "text-based"]),
+ ("meeting-notes", [], ["meeting", "note taker", "notetaker", "call notes"]),
+ ("text-to-speech", [], ["text to speech", "text-to-speech", "voiceover", "voice over", "tts", "read aloud", "narrat", "voice generator"]),
+ ("transcription", [], ["transcri"]),
+ ("podcast-recording", ["record"], ["podcast", "interview"]),
+ ("logo-design", [], ["logo"]),
+ ("website-builder", [], ["website", "web site", "landing page"]),
+ ("app-builder", ["build"], ["app"]),
+ ("code-assistant", [], ["code", "coding", "programm", "debug", "developer"]),
+ ("music-generation", [], ["music", "song"]),
+ ("avatar-video", [], ["avatar", "presenter"]),
+ ("presentations", [], ["slide", "deck", "presentation"]),
+ ("photo-editing", [], ["product photo", "background remov", "photo edit", "edit photo"]),
+ ("image-generation", [], ["image", "picture", "illustrat", "artwork", "poster"]),
+ ("writing-assistant", [], ["grammar", "rewrite", "paraphras", "proofread"]),
+ ("support-chatbot", [], ["support bot", "customer support", "support chatbot", "chatbot for my"]),
+ ("paper-search", [], ["research paper", "papers", "literature", "peer-reviewed"]),
+ ("social-scheduling", [], ["schedule post", "social media post", "social posts"]),
+ ("seo-content", [], ["seo"]),
+ ("video-editing", [], ["edit video", "edit a video", "video edit", "edit my video"]),
+ ("video-generation", [], ["text to video", "generate video", "make a video", "ai video"]),
+ ("workflow-automation", [], ["automate", "workflow", "automation"]),
+]
 FOPTS = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES)
 FINDER = ('''<div class="finder" role="search"><form class="hstick" id="ff" onsubmit="event.preventDefault();run();document.getElementById('out').scrollIntoView({behavior:'smooth'})"><label for="q" class="skip">Describe what you need</label><div class="sbar"><input type="search" id="q" autocomplete="off" placeholder="What do you need help with?"><button type="submit">Find</button></div></form>
 <div class="chips" aria-label="Example searches"><button type="button" class="chip" data-q="turn my podcast into short clips">turn my podcast into short clips</button><button type="button" class="chip" data-q="cheap voiceover">cheap voiceover</button><button type="button" class="chip" data-q="pitch deck for investors">pitch deck for investors</button><button type="button" class="chip" data-q="AI coding assistant">AI coding assistant</button><button type="button" class="chip" data-q="meeting notes">meeting notes</button><button type="button" class="chip" data-q="logo with text">logo with text</button><button type="button" class="chip" data-q="research papers">research papers</button></div>
@@ -270,29 +330,30 @@ FINDER = ('''<div class="finder" role="search"><form class="hstick" id="ff" onsu
 const SW=new Set('the and for with into turn make want need some best good cheap free tool tools that this from your using use help a an my me i to'.split(' '));const hasFree=t=>t.fr;
 const INT={writing:'write writing writer emails email mail essay essays blog text copy copywriting grammar rewrite letter letters draft editing editor'.split(' '),coding:'code coding programmer programming developer develop app apps debug software website build builder'.split(' '),images:'logo logos image images design designer illustration illustrations poster posters photo photos picture pictures art generate generation brand vector'.split(' '),audio:'podcast podcasts audio voiceover voice voices music song songs sound transcribe transcription transcript recording'.split(' '),video:'video videos clip clips film movie movies youtube shorts avatar explainer'.split(' '),presentations:'pitch deck slides slide presentation presentations startup decks'.split(' '),productivity:'meeting meetings notes note tasks task calendar schedule organise organize productivity transcribe transcription transcript emails email'.split(' '),research:'research papers paper study studies summarise summarize literature academic sources articles citations'.split(' '),marketing:'marketing seo social campaign advertising ads content posts post'.split(' '),assistants:'chat assistant ask question questions answer answers'.split(' '),agents:'chatbot chatbots agent agents bot bots automate automation workflow workflows'.split(' ')};
 const SYN={logo:['logo','brand','vector','design','text','image'],logos:['logo','brand','vector','design','text','image'],podcast:['podcast','audio','transcript','editing','recording'],voiceover:['voice','speech'],transcribe:['transcription','transcript','notes'],meetings:['meeting','transcription','notes']};
+const QC=''' + json.dumps(QCAP) + r''';const CL=''' + json.dumps(CAP_LABEL) + r''';function qcapOf(raw){const r=' '+raw.toLowerCase()+' ';for(const [cap,all,any] of QC){if(all.every(w=>r.includes(w))&&(!any.length||any.some(w=>r.includes(w))))return cap}return null}
 const stem=w=>w.length>4?w.slice(0,5):w;const hit=(h,w)=>h.includes(w)||h.includes(stem(w));
 function intentCats(q){const sc={};Object.keys(INT).forEach(c=>{let n=0;q.forEach(w=>{if(INT[c].some(k=>k==w||stem(k)==stem(w)))n++});if(n)sc[c]=n});const mx=Math.max(0,...Object.values(sc));return Object.keys(sc).filter(c=>sc[c]==mx&&mx>0)}
 const CATS=[...new Map(D.map(t=>[t.c,t.cn])).entries()];
 function suggHTML(){return `<div class="fsugg" role="group" aria-label="Suggested categories">${CATS.map(([id,n])=>`<button type="button" data-cat="${id}">${n}</button>`).join('')}</div>`}
 function exHTML(){return `<div class="fsugg" role="group" aria-label="Example searches">${['write emails faster','design a logo','edit podcast audio','transcribe meetings','help me code'].map(x=>`<button type="button" data-ex="${x}">${x}</button>`).join('')}</div>`}
 function emptyState(raw){const out=document.getElementById('out');if(!raw){out.innerHTML=`<div class="fempty" role="status"><h2>Describe what you need</h2><p>Tell us the job you want done - for example, writing emails, making a logo, or editing a podcast - and we will match tools from the right category. Use plain words; you do not need a tool name.</p>${exHTML()}<p style="margin-top:12px">Or browse by category:</p>${suggHTML()}</div>`}else{out.innerHTML=`<div class="fempty" role="status"><h2>No match for "${raw}"</h2><p>We could not match those words to a job our tools do. Try describing the job in plain words - what you want to make, write, record or organise - or pick a category below.</p>${exHTML()}<p style="margin-top:12px">Browse by category:</p>${suggHTML()}</div>`}}
-function run(){const raw=document.getElementById('q').value.trim(),q=raw.toLowerCase().split(/\W+/).filter(w=>w.length>2&&!SW.has(w)),c=document.getElementById('cat').value,bu=document.getElementById('budget').value,sk=document.getElementById('skill').value,out=document.getElementById('out');
+function run(){{const bw=document.getElementById('browse');if(bw)bw.hidden=!!(document.getElementById('q').value.trim()||document.getElementById('cat').value)}const raw=document.getElementById('q').value.trim(),q=raw.toLowerCase().split(/\W+/).filter(w=>w.length>2&&!SW.has(w)),c=document.getElementById('cat').value,bu=document.getElementById('budget').value,sk=document.getElementById('skill').value,out=document.getElementById('out');
 if(!raw&&!c){emptyState('');return}
-const ic=c?[]:intentCats(q),primary=ic[0]||null;
+const qcap=c?null:qcapOf(raw);const ic=c||qcap?[]:intentCats(q),primary=ic[0]||null;
 let L=D.filter(t=>!c||t.c==c).map(t=>{const h=(t.n+' '+t.a+' '+t.cn).toLowerCase(),own=(t.n+' '+t.d).toLowerCase();let ms=0,ownHits=0;q.forEach(w=>{if(hit(h,w))ms++;if(hit(own,w))ownHits++;(SYN[w]||[]).forEach(sy=>{if(own.includes(sy))ms+=0.34})});let s=ms*3;const inIntent=primary&&t.c==primary;if(inIntent)s+=6;if(t.b)s+=2;if(hasFree(t)&&sk=='beginner')s+=1.5;if(t.m!=null&&sk=='pro')s+=0.5;return Object.assign({s,ms,ownHits,inIntent},t)});
-if(q.length&&!c){if(primary){L=L.filter(t=>t.inIntent||t.ownHits>=2)}else{const mx=Math.max(0,...L.map(t=>t.ms));if(mx>0)L=L.filter(t=>t.ms>0);else{emptyState(raw);return}}}
+if(qcap&&L.some(t=>t.caps.includes(qcap))){L=L.filter(t=>t.caps.includes(qcap));L.forEach(t=>{t.s+=t.cap==qcap?20:8})}else if(q.length&&!c){if(primary){L=L.filter(t=>t.inIntent||t.ownHits>=2)}else{const mx=Math.max(0,...L.map(t=>t.ms));if(mx>0)L=L.filter(t=>t.ms>0);else{emptyState(raw);return}}}
 else if(q.length&&c){const mx=Math.max(0,...L.map(t=>t.ms));if(mx==0){emptyState(raw);return}L=L.filter(t=>t.ms>0)}
 const pf=(document.querySelector('input[name=pf]:checked')||{}).value||'all';if(pf=='free')L=L.filter(hasFree);if(pf=='paid')L=L.filter(t=>!hasFree(t));if(bu=='0')L=L.filter(hasFree);else if(bu!='any')L=L.filter(t=>hasFree(t)||(t.m!=null&&t.m<=+bu));
 L.sort((x,y)=>y.s-x.s||String(x.n).localeCompare(String(y.n)));const seen=new Set();L=L.filter(t=>!seen.has(t.n)&&seen.add(t.n));
 if(!L.length){out.innerHTML=`<div class="fempty" role="status"><h2>No tools match those filters</h2><p>Try a broader budget, choose All for price, or describe the job in different words.</p>${exHTML()}${suggHTML()}</div>`;return}
 const X=v=>String(v).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));const $m=v=>{const r=Math.round(v*100)/100;return '$'+(Number.isInteger(r)?r:r.toFixed(2))};
-const top=L.slice(0,5);const pick=top.find(t=>t.b&&top[0]&&t.c==top[0].c)||top[0];const rest=top.filter(t=>t.n!=pick.n);const ru=rest.slice(0,2),more=rest.slice(2);
+const top=L.slice(0,5);const pick=top.find(t=>t.b&&top[0]&&t.c==top[0].c&&t.cap==top[0].cap)||top[0];const rest=top.filter(t=>t.n!=pick.n);const ru=rest.slice(0,2),more=rest.slice(2);
 const cheap=t=>t.mm!=null?{v:t.mm,b:'monthly'}:(t.ma!=null?{v:t.ma,b:'yearly'}:null);
-const ptxt=t=>{const c=cheap(t);return c?`from ${$m(c.v)}/mo${c.b=='yearly'?' (paid yearly)':''}`:'price not checked'};
-const reason=t=>{const r=[];if(t.b)r.push(`ToolPick’s Best Value pick for ${X(t.cn.toLowerCase())}`);if(t.fr)r.push('has a real free plan');const c=cheap(t);if(c)r.push(`cheapest plan we checked is ${$m(c.v)}/mo${c.b=='yearly'?' paid yearly':''}`);else r.push('we could not check its price');return r.join(', ')};
-const whyNot=t=>{const r=[];const B=pick.mm!=null&&t.mm!=null?'mm':(pick.ma!=null&&t.ma!=null?'ma':null);if(B){const d=Math.round((t[B]-pick[B])*100)/100;r.push(d>0?`${$m(d)}/mo more than ${X(pick.n)} (${B=='mm'?'monthly':'yearly'} prices)`:d<0?`${$m(-d)}/mo less than ${X(pick.n)} (${B=='mm'?'monthly':'yearly'} prices), but not our Best Value pick`:`same price as ${X(pick.n)}`)}else r.push(cheap(t)?'price not comparable on the same billing':'price not checked — see official page');if(!t.fr&&pick.fr)r.push('no real free plan');return r.join('; ')};
+const ptxt=t=>{const c=cheap(t);return c?`from ${$m(c.v)}/mo ${c.b=='yearly'?'billed yearly only':'monthly'}`:'price not checked'};
+const reason=t=>{const r=[];if(t.b)r.push(`ToolPick’s Best Value pick for ${X(t.cn.toLowerCase())}`);if(t.fr)r.push('has a real free plan');const c=cheap(t);if(c)r.push(`cheapest plan we checked is ${$m(c.v)}/mo ${c.b=='yearly'?'billed yearly only':'monthly'}`);else r.push('we could not check its price');return r.join(', ')};
+const whyNot=t=>{const r=[];const B=pick.mm!=null&&t.mm!=null?'mm':(pick.ma!=null&&t.ma!=null?'ma':null);if(B){const d=Math.round((t[B]-pick[B])*100)/100;r.push(d>0?`${$m(d)}/mo more than ${X(pick.n)} (${B=='mm'?'monthly':'yearly'} prices)`:d<0?`${$m(-d)}/mo less than ${X(pick.n)} (${B=='mm'?'monthly':'yearly'} prices), but not our Best Value pick`:`same price as ${X(pick.n)}`)}else r.push(cheap(t)?`price not compared: ${X(t.n)} is ${ptxt(t)}, ${X(pick.n)} is ${ptxt(pick)}`:'price not checked — see official page');if(!t.fr&&pick.fr)r.push('no real free plan');return r.join('; ')};
 const lg=t=>`<span class="logo"><img src="https://www.google.com/s2/favicons?domain=${t.dm}&amp;sz=64" alt="" width="28" height="28" loading="lazy" onerror="this.replaceWith(document.createTextNode('${X(t.n[0])}'))"></span>`;
-const job=pick.c;let h=`<h2 class="skip" id="res-h">Results</h2><article class="card best fpick"><div class="th">${lg(pick)}<div><div class="badges"><span class="badge b-best">OUR PICK</span>${pick.fr?'<span class="badge b-free">FREE PLAN</span>':''}</div><h3 style="margin:0"><a href="${pick.u}">${X(pick.n)}</a></h3></div></div><p style="margin:8px 0">${X(pick.d)}</p><p><b>Why:</b> ${reason(pick)}.</p><p class="small meta">${X(pick.cn)} · checked ${pick.k} · <a href="${X(pick.pr)}" rel="noopener" target="_blank">official pricing</a></p>
+const job=pick.c;let h=`<h2 class="skip" id="res-h">Results</h2><article class="card best fpick"><div class="th">${lg(pick)}<div><div class="badges"><span class="badge b-best">OUR PICK</span>${pick.fr?'<span class="badge b-free">FREE PLAN</span>':''}</div><h3 style="margin:0"><a href="${pick.u}">${X(pick.n)}</a></h3></div></div><p style="margin:8px 0">${X(pick.d)}</p><p><b>Why:</b> ${qcap?`it does the job you asked for (${X(CL[qcap]||qcap)})${pick.cap==qcap?' as its main job':''}, `:''}${reason(pick)}.</p>${!pick.fr&&pick.fa?`<p class="small"><b>Free alternative:</b> <a href="${pick.fa.u}">${X(pick.fa.n)}</a> — ${X(pick.fa.f)}</p>`:''}<p class="small meta">${X(pick.cn)} · checked ${pick.k} · <a href="${X(pick.pr)}" rel="noopener" target="_blank">official pricing</a></p>
 <div class="factions">${pick.fr?`<a class="bbtn primary" href="/free.html?job=${job}">Start free with ${X(pick.n)}</a>`:`<a class="bbtn primary" href="${pick.u}">See ${X(pick.n)} prices</a>`}<a class="bbtn" href="/pay-less.html?tool=${pick.sl}">Paying for one already? See if you can pay less</a></div></article>`;
 if(ru.length)h+=`<h3 style="margin:16px 0 8px;font-size:1rem">Runners-up</h3><ul class="fru">${ru.map(t=>`<li>${lg(t)}<div><a href="${t.u}"><b>${X(t.n)}</b></a> <span class="small">· ${ptxt(t)}${t.fr?' · free plan':''}</span><br><span class="small"><b>Why not this one:</b> ${whyNot(t)}.</span></div></li>`).join('')}</ul>`;
 if(more.length)h+=`<details class="fmore"><summary>${more.length} more match${more.length>1?'es':''}</summary><ul class="fru">${more.map(t=>`<li>${lg(t)}<div><a href="${t.u}"><b>${X(t.n)}</b></a> <span class="small">· ${ptxt(t)}${t.fr?' · free plan':''}</span></div></li>`).join('')}</ul></details>`;
@@ -301,9 +362,9 @@ out.innerHTML=h}
 ['q','cat','budget','skill','pf-all','pf-free','pf-paid'].forEach(i=>{const el=document.getElementById(i);el.addEventListener('input',run);el.addEventListener('change',run)});document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{const q=document.getElementById('q');q.value=b.dataset.q;run();q.focus()}));document.getElementById('out').addEventListener('click',ev=>{const ex=ev.target.closest('[data-ex]'),ct=ev.target.closest('[data-cat]');if(ex){const q=document.getElementById('q');q.value=ex.dataset.ex;run();q.focus()}else if(ct){document.getElementById('q').value='';document.getElementById('cat').value=ct.dataset.cat;run();document.getElementById('out').scrollIntoView({behavior:'smooth'})}});run();</script>
 ''')
 desc = f"Tell us what you need and compare {total_tools} AI tools across {len(CATEGORIES)} categories — prices checked on official pages, a best-value pick and a free option."
-body = f"""<section class="hero"><h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p></section>{FINDER}<div class="pick"><b>Save money on tools you already pay for</b> — find a cheaper plan, see if yearly pays off, find real free plans, and track price changes. <a href="/save-money.html">Open Save money →</a></div><p class="small">More tools: <a href="/help-me-choose.html">Help me choose</a> · <a href="/compare-builder.html">Compare builder</a> · <a href="/cost-calculator.html">Cost calculator</a> · <a href="/tools.html">Browse all {total_tools} tools</a> · <a href="/stacks.html">Starter stacks</a> · <a href="/subscription-audit.html">Subscription Audit</a></p><h2>Browse by category</h2>
+body = f"""<section class="hero"><h1>Find the right AI tool for your need</h1><p class="tag">{e(desc)}</p></section>{FINDER}<div class="pick"><b>Save money on tools you already pay for</b> — find a cheaper plan, see if yearly pays off, find real free plans, and track price changes. <a href="/save-money.html">Open Save money →</a></div><p class="small">More tools: <a href="/help-me-choose.html">Help me choose</a> · <a href="/compare-builder.html">Compare builder</a> · <a href="/cost-calculator.html">Cost calculator</a> · <a href="/tools.html">Browse all {total_tools} tools</a> · <a href="/stacks.html">Starter stacks</a> · <a href="/subscription-audit.html">Subscription Audit</a></p><div id="browse"><h2>Browse by category</h2>
 <div class="needs">{''.join(f'<button data-id="{c["id"]}" class="{"on" if i==0 else ""}">{e(c["name"])}</button>' for i,c in enumerate(CATEGORIES))}</div><div class="tabs">
-{''.join(f'<section id="{c["id"]}" class="{"on" if i==0 else ""}"><h2>{e(c["need"])}</h2>{picks(c)}<div class="grid">{"".join(card(t,c) for t in c["tools"])}</div><p><a href="/best-ai-{c["id"]}-tools.html">Full guide: best AI {e(c["name"].lower())} tools →</a></p></section>' for i,c in enumerate(CATEGORIES))}</div>
+{''.join(f'<section id="{c["id"]}" class="{"on" if i==0 else ""}"><h2>{e(c["need"])}</h2>{picks(c)}<div class="grid">{"".join(card(t,c) for t in c["tools"])}</div><p><a href="/best-ai-{c["id"]}-tools.html">Full guide: best AI {e(c["name"].lower())} tools →</a></p></section>' for i,c in enumerate(CATEGORIES))}</div></div>
 {complinks(COMPARISONS)}<p><a href="/guides.html">All guides →</a> · <a href="/price-changes.html">Price changes log</a></p><h2>Best AI tool for…</h2><ul>{"".join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS)}</ul>
 <script>const b=document.querySelectorAll('.needs button');function show(id){{b.forEach(x=>x.classList.toggle('on',x.dataset.id==id));document.querySelectorAll('.tabs section').forEach(s=>s.classList.toggle('on',s.id==id));}}
 b.forEach(x=>x.onclick=()=>{{show(x.dataset.id);history.replaceState(null,'','#'+x.dataset.id)}});if(location.hash)show(location.hash.slice(1));</script>"""
@@ -313,7 +374,7 @@ page("/", "ToolPick — find the right AI tool for your need (verified prices)",
 for c in CATEGORIES:
     path = f"/best-ai-{c['id']}-tools.html"; n = c["name"]
     title = f"Best AI {n} Tools ({CHECKED[:4]}): Prices, Free Plans & Best Value"
-    d = f"{len(c['tools'])} AI {n.lower()} tools compared with prices checked {CHECKED}. Best value: {c['best']}. Free options: {', '.join(c['free'])}."
+    d = f"{len(c['tools'])} AI {n.lower()} tools compared with prices from official pricing pages (each tool shows its own checked date). Best value: {c['best']}. Free options: {', '.join(c['free'])}."
     rows = "".join(f"<tr><td><a href='{turl(t['name'])}'>{e(t['name'])}</a></td><td>{fmt(t['monthly'])}</td><td>{fmt(t['annual'])}</td><td>{e(t['per_output'] or '—')}</td><td>{e(t['price'])}</td><td>{e(t['free'])}</td><td>{CHECKED}</td></tr>" for t in c["tools"])
     body = f"""<h1>Best AI {e(n.lower())} tools</h1><p class="tag">{e(d)}</p>{picks(c)}
 <div class="sponsor">Sponsored slot available for this category — <a href="/sponsor.html">sponsor ToolPick</a></div>
@@ -366,30 +427,21 @@ for _c in CHANGES: CHANGES_BY_TOOL.setdefault(_c["name"], []).append(_c)
 def _num(v): return v if isinstance(v, (int, float)) else None
 def _usd(v): r = round(v, 2); return "$" + (str(int(r)) if r == int(r) else f"{r:.2f}")
 def tool_verdict(name, cats, t):
-    alts = []; seen = {dom(t["url"])}
-    for cc in cats:
-        for x in cc["tools"]:
-            if x["name"] != name and dom(x["url"]) not in seen: seen.add(dom(x["url"])); alts.append((x, cc))
     m, a = _num(t["monthly"]), _num(t["annual"])
-    def cheapest(key):
-        L = sorted([(x[key], x["name"], x) for x, cc in alts if _num(x[key]) is not None], key=lambda z: (z[0], z[1].lower()))
-        return L[0][2] if L else None
-    cm, ca = cheapest("monthly"), cheapest("annual")
-    fa = None
-    for cc in cats:
-        L = [x for x in cc["tools"] if x["name"] != name and dom(x["url"]) != dom(t["url"]) and realfree(x)]
-        if not L: continue
-        fa = next((x for x in L if x["name"] == cc["best"]), None) or next((x for n in cc["free"] for x in L if x["name"] == n), None) or L[0]
-        break
+    cm, ca = cheaper_alt(name, "monthly"), cheaper_alt(name, "annual")
+    fa = free_alt(name)
     bestc = [cc for cc in cats if cc["best"] == name]
+    tn = ""
     if bestc: verdict = f"Best value for {bestc[0]['name'].lower()}" + (" — and it has a real free plan" if realfree(t) else "")
-    elif m is not None and cm is not None and cm["monthly"] < m: verdict = f"Cheaper option: {cm['name']} at {_usd(cm['monthly'])}/mo (monthly prices)"
-    elif m is None and a is not None and ca is not None and ca["annual"] < a: verdict = f"Cheaper option: {ca['name']} at {_usd(ca['annual'])}/mo (yearly prices)"
+    elif m is not None and cm is not None and cm["monthly"] < m: verdict = f"Cheaper option: {cm['name']} at {_usd(cm['monthly'])}/mo (monthly prices, same job: {cap_label(name)})"; tn = tier_note(name, cm["name"])
+    elif a is not None and ca is not None and ca["annual"] < a: verdict = f"Cheaper option: {ca['name']} at {_usd(ca['annual'])}/mo (billed-yearly prices, same job: {cap_label(name)})"; tn = tier_note(name, ca["name"])
     elif m is None and a is None: verdict = "Price not checked — see the official pricing page"
-    else: verdict = "No cheaper checked option" + (f" — {name} has the lowest checked price for this job" if (m is not None and cm is not None) or (a is not None and ca is not None) else "")
+    elif not samejob(name) or (cm is None and ca is None): verdict = NO_LIKE
+    else: verdict = f"No cheaper checked option — {name} has the lowest checked price for {cap_label(name)}"
+    if tn: verdict += ". " + tn.rstrip(".")
     s = slug(name); rows = []
     rows.append(("Cheapest plan we checked", " · ".join(x for x in [f"{_usd(m)}/mo monthly" if m is not None else "", f"{_usd(a)}/mo paid yearly" if a is not None else ""] if x) or "Not checked in US dollars — see the official page"))
-    rows.append(("All plans we listed", e(t["price"])))
+    rows.append(("All plans we listed", e(PLANS_SHORT.get(name, t["price"]))))
     rows.append(("Real free plan", ("Yes — " + e(t["free"])) if realfree(t) else "No (" + e(t["free"]) + ")"))
     rows.append(("ToolPick Best Value pick", f"Yes, for {e(bestc[0]['name'].lower())}" if bestc else "No"))
     def cmp(x, key, own):
@@ -397,11 +449,11 @@ def tool_verdict(name, cats, t):
         d = (f" — {_usd(own - x[key])}/mo less" if x[key] < own else f" — {_usd(x[key] - own)}/mo more" if x[key] > own else " — same price") if own is not None else ""
         return f'<a href="{turl(x["name"])}">{e(x["name"])}</a> {_usd(x[key])}/mo{d}'
     alt_parts = []
-    if m is not None or cm is not None: alt_parts.append("Monthly: " + cmp(cm, "monthly", m))
-    if a is not None: alt_parts.append("Yearly: " + cmp(ca, "annual", a))
-    rows.append(("Cheapest same-job alternative", " · ".join(alt_parts) or "none checked"))
-    rows.append(("Best real-free alternative", f'<a href="{turl(fa["name"])}">{e(fa["name"])}</a> — {e(fa["free"])}' if fa else "None in our list"))
-    rows.append(("Categories", ", ".join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)))
+    if m is not None or (a is None and cm is not None): alt_parts.append("Monthly: " + cmp(cm, "monthly", m))
+    if a is not None: alt_parts.append("Billed yearly: " + cmp(ca, "annual", a))
+    rows.append((f"Cheapest same-job alternative ({e(cap_label(name))})", " · ".join(alt_parts) if (cm or ca) else NO_LIKE))
+    rows.append(("Best real-free alternative", f'<a href="{turl(fa["name"])}">{e(fa["name"])}</a> — {e(fa["free"])}' if fa else "None with the same main job in our list"))
+    rows.append(("What it does (main job first)", e(", ".join(CAP_LABEL.get(k, k) for k in CAPS[name])))); rows.append(("Categories", ", ".join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)))
     ch = CHANGES_BY_TOOL.get(name, [])
     if ch: rows.append(("Recent price change", f'{e(ch[0]["label"])}, {ch[0]["date"]}: {e(ch[0]["summary"])} <a href="/price-changes.html#{ch[0]["date"]}-{ch[0]["s"]}">Details</a>'))
     btns = f'<a class="bbtn primary" href="/pay-less.html?tool={s}">Can I pay less?</a>'
@@ -409,7 +461,7 @@ def tool_verdict(name, cats, t):
     if m is not None and a is not None: btns += f'<a class="bbtn" href="/monthly-or-yearly.html?tool={s}">Monthly or yearly?</a>'
     html_ = (f'<section class="verdict card best" aria-labelledby="vh"><h2 id="vh" style="margin:0 0 6px;font-size:1.15rem">Is {e(name)} worth it?</h2><p class="vline"><b>{e(verdict)}.</b></p>'
              '<dl class="vgrid">' + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in rows) + '</dl>'
-             f'<div class="factions">{btns}</div><p class="small" style="margin:8px 0 0">Prices checked {t.get("checked", CHECKED)} on the <a href="{e(t["pricing"])}" rel="noopener" target="_blank">official pricing page</a> · <a href="/cost-calculator.html?tool={s}&amp;seats=1&amp;billing=monthly">Full cost calculator</a>. Verdict rule: Best Value pick first; otherwise a cheaper same-job tool on the same billing; otherwise “no cheaper checked option”. No ratings or reviews.</p></section>')
+             f'<div class="factions">{btns}</div><p class="small" style="margin:8px 0 0">Prices checked {t.get("checked", CHECKED)} on the <a href="{e(t["pricing"])}" rel="noopener" target="_blank">official pricing page</a> · <a href="/cost-calculator.html?tool={s}&amp;seats=1&amp;billing=monthly">Full cost calculator</a>. Verdict rule: Best Value pick first; otherwise a cheaper tool that does the same main job ({e(cap_label(name))}) on the same billing; otherwise “{NO_LIKE}”. No ratings or reviews.</p></section>')
     return html_, verdict
 for name, cats in tool_pages.items():
     c = cats[0]; t = next(x for x in c["tools"] if x["name"] == name); path = turl(name)
@@ -418,10 +470,12 @@ for name, cats in tool_pages.items():
     d = f"{name} pricing checked {t.get('checked', CHECKED)}: {t['price']}. Free tier: {t['free']}. Pros, cons and alternatives."[:300]
     alts = [x["name"] for cc in cats for x in cc["tools"] if x["name"] != name]
     vhtml, vtxt = tool_verdict(name, cats, t)
+    u20 = ('<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> This tool is in our under-$20 video list' + ('' if (_num(t['monthly']) is not None and t['monthly'] < 20) else ' (only when billed yearly)') + '.</p>') if (cats[0]['id']=='video' and _entry_num(t) is not None and _entry_num(t) < 20) else ''
+
     body = f"""<h1>{e(name)} pricing &amp; review</h1><p class="tag">{e(t['about'])}</p>{vhtml}
 <p><a class="btn" href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Visit {e(name)} official site</a></p>{DISCLOSURE if t.get('affiliate') else ''}
-{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Compare Images tools with a verified real free plan.</p>' if name=='Recraft' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Compare Writing tools with a verified real free plan.</p>' if name=='Rytr' else ''}{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> This tool is in our verified under-$20 video list.</p>' if (cats[0]['id']=='video' and _entry_num(t) is not None and _entry_num(t) < 20) else ''}
-<h2>Alternatives</h2><p>{' · '.join(f'<a href="{turl(a)}">{e(a)}</a>' for a in dict.fromkeys(alts))}</p>{complinks(comps_for([name]))}"""
+{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Compare Images tools with a verified real free plan.</p>' if name=='Recraft' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Compare Writing tools with a verified real free plan.</p>' if name=='Rytr' else ''}{u20}
+<h2>Alternatives that do the same main job ({e(cap_label(name))})</h2><p>{(' · '.join(f'<a href="{turl(x["name"])}">{e(x["name"])}</a>' for x in samejob(name))) or 'None in our list yet. ' + ' · '.join(f'<a href="/best-ai-{cc["id"]}-tools.html">All {e(cc["name"].lower())} tools</a>' for cc in cats)}</p>{complinks(comps_for([name]))}"""
     sw = {"@context":"https://schema.org","@type":"SoftwareApplication","name":name,"applicationCategory":"BusinessApplication","operatingSystem":"Web","url":t["url"],"description":t["about"]}
     fh, fl = faq(tool_qas(t) + [(f"Is there a cheaper alternative to {name}?", vtxt + " (ToolPick verdict from prices checked on official pricing pages).")]); body += fh
     page(path, title, d, body, [sw, fl, crumbs([("ToolPick","/"),(f"Best AI {c['name']} tools",f"/best-ai-{c['id']}-tools.html"),(name,path)])])
@@ -432,7 +486,7 @@ for x in COMPARISONS:
     s_, title0, cid = x[0], x[1], x[4]; N = cnames(x); TT = [find(n) for n in N]
     path = f"/compare/{s_}.html"; c = next(y for y in CATEGORIES if y["id"] == cid)
     title = f"{title0} ({CHECKED[:4]}): Price, Free Plan & Which to Pick"
-    d = f"{' vs '.join(N)} compared with prices checked {CHECKED} on official pricing pages: plans, free tiers and which is better value."
+    d = f"{' vs '.join(N)} compared with prices from official pricing pages (per-tool checked dates): plans, free tiers and which is better value."
     verdict = f"ToolPick's best-value pick for {c['name'].lower()} is <a href='{turl(c['best'])}'>{e(c['best'])}</a>."
     if c["best"] not in N: verdict += " Among these, compare the entry prices above and pick the one whose free tier lets you test your exact use case."
     if any(t["price"] == "check site" for t in TT): verdict += " Some prices here could not be verified; check the official pricing pages."
@@ -761,6 +815,9 @@ for _c in CATEGORIES:
                              dm=dom(_t["url"]), pr=_t["pricing"], m=_t["monthly"], a=_t["annual"], fr=realfree(_t), cats=[], bc=[])
         if _c["id"] not in _pmap[_k]["cats"]: _pmap[_k]["cats"].append(_c["id"])
         if _c["best"] == _t["name"]: _pmap[_k]["bc"].append(_c["id"])
+for _v in _pmap.values():
+    _v["al"] = [slug(x["name"]) for x in samejob(_v["n"])]; _fa = free_alt(_v["n"]); _v["fa"] = slug(_fa["name"]) if _fa else None
+    _v["cap"] = cap_label(_v["n"]); _v["lt"] = _v["n"] in LOWER_TIER
 PCATS = json.dumps({c["id"]: c["name"] for c in CATEGORIES})
 PDATA = json.dumps(sorted(_pmap.values(), key=lambda x: x["n"].lower())).replace("</", "<\\/")
 POPTS = "".join(f'<option value="{e(v["s"])}">{e(v["n"])}</option>' for v in sorted(_pmap.values(), key=lambda x: x["n"].lower()))
@@ -783,23 +840,23 @@ function note(t){const B=billEl().value,v=usd(t[B]);document.getElementById('pl-
 function run(){const s=document.getElementById('pl-tool').value,raw=document.getElementById('pl-pay').value.trim(),o=out();share(s,raw);
 if(!s){o.innerHTML='<div class="pick" role="status"><b>Pick the tool you pay for to see your answer.</b><p class="small" style="margin-bottom:0">Try an example: <a href="/pay-less.html?tool=descript&amp;pay=24">Descript at $24 a month</a> · <a href="/pay-less.html?tool=descript&amp;pay=16&amp;bill=yearly">Descript at $16 a month, paid yearly</a> · <a href="/pay-less.html?tool=elevenlabs&amp;pay=6">ElevenLabs at $6</a></p></div>';return}
 const t=byS[s];const B=billEl().value,O=B=='m'?'a':'m';const pay=raw===''?null:parseFloat(raw);const bad=raw!==''&&(isNaN(pay)||pay<0);
-const alts=PD.filter(x=>x.s!=t.s&&x.dm!=t.dm&&x.cats.some(c=>t.cats.includes(c)));
+const alts=t.al.map(k=>byS[k]).filter(Boolean);const TN=x=>x&&x.lt!=t.lt?' <span class="small"><b>Different tier: compare features before switching.</b></span>':'';
 const cheap=cheapOn(alts,B);const cheapO=cheapOn(alts,O);
-const frees=alts.filter(x=>x.fr).sort((a,b)=>{const ab=a.bc.some(c=>t.cats.includes(c))?0:1,bb=b.bc.some(c=>t.cats.includes(c))?0:1;if(ab!=bb)return ab-bb;const ca=priceOn(a,B),cb=priceOn(b,B);return (ca!=null?ca:1e9)-(cb!=null?cb:1e9)||a.n.localeCompare(b.n)});const free=frees[0]||null;
-const cats=t.cats.map(c=>PC[c]).join(' and ');let h='';const per=B=='a'?'/mo paid yearly':'/mo';
+const free=t.fa?byS[t.fa]:null;
+const cats=t.cap;let h='';const per=B=='a'?'/mo paid yearly':'/mo';
 if(bad){o.innerHTML='<div class="pick" role="status"><b>Please type what you pay as a number, like 24 or 19.99.</b></div>';return}
 if(pay==null){h+=`<div class="pick" role="status"><b>Type what you pay for ${X(t.n)} per month to see your saving.</b> The options below still show what we checked.</div>`}
 const cheaper=cheap&&pay!=null&&cheap.v<pay,ownFree=t.fr;
-if(pay!=null){if(cheaper)h+=`<div class="pick pl-ans"><span class="badge b-best">YOU CAN PAY LESS</span> <b>${X(cheap.x.n)} costs ${plan(cheap.v,B)}</b> — ${money(pay-cheap.v)}/mo less than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} (${money((pay-cheap.v)*12)}/yr). Both prices are ${BL[B]} billing.${ownFree?` Or try ${X(t.n)}\u2019s own free plan first.`:''}</div>`;
-else if(ownFree)h+=`<div class="pick pl-ans"><span class="badge b-free">TRY YOUR FREE PLAN</span> <b>No cheaper ${BL[B]} plan we checked — but ${X(t.n)} has its own free plan.</b> If it covers what you do, you could pay $0 and save ${money(pay)}/mo (${money(pay*12)}/yr).<p class="small" style="margin:6px 0 0">Free plan: ${X(t.f)} · ${src(t)}</p></div>`;
-else h+=`<div class="pick pl-ans"><span class="badge b-rank">STAY PUT</span> <b>Nothing cheaper that we checked.</b> No other ${X(cats)} tool in our list has a checked ${BL[B]} price below the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} for ${X(t.n)}, so keep it.${free?` The only way to pay less is a free plan with limits, like ${X(free.n)}\u2019s below.`:''}</div>`}
+if(pay!=null){if(cheaper)h+=`<div class="pick pl-ans"><span class="badge b-best">YOU CAN PAY LESS</span> <b>${X(cheap.x.n)} costs ${plan(cheap.v,B)}</b> — ${money(pay-cheap.v)}/mo less than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} (${money((pay-cheap.v)*12)}/yr). Both prices are ${BL[B]} billing.${TN(cheap.x)}${ownFree?` Or try ${X(t.n)}\u2019s own free plan first.`:''}</div>`;
+else if(ownFree)h+=`<div class="pick pl-ans"><span class="badge b-free">TRY YOUR FREE PLAN</span> <b>${alts.length?'No cheaper '+BL[B]+' plan we checked':'No like-for-like cheaper option checked'} — but ${X(t.n)} has its own free plan.</b> If it covers what you do, you could pay $0 and save ${money(pay)}/mo (${money(pay*12)}/yr).<p class="small" style="margin:6px 0 0">Free plan: ${X(t.f)} · ${src(t)}</p></div>`;
+else h+=`<div class="pick pl-ans"><span class="badge b-rank">STAY PUT</span> <b>${alts.length?'Nothing cheaper that we checked.':'No like-for-like cheaper option checked.'}</b> No other tool that does the same main job (${X(cats)}) in our list has a checked ${BL[B]} price below the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} for ${X(t.n)}, so keep it.${free?` The only way to pay less is a free plan with limits, like ${X(free.n)}\u2019s below.`:''}</div>`}
 const card=(lab,cls,x,body)=>`<article class="card" style="margin:12px 0"><div class="badges"><span class="badge ${cls}">${lab}</span></div><h3 style="margin:4px 0"><a href="${x.u}">${X(x.n)}</a></h3>${body}<p class="small">${src(x)} · <a href="/compare-builder.html?tools=${t.s},${x.s}">Compare with ${X(t.n)} →</a></p></article>`;
 h+=`<h2>Cheapest plan we checked (${BL[B]} billing)</h2>`;
-h+=cheap?card(cheaper?'CHEAPER':'CHEAPEST OTHER','b-best',cheap.x,`<p class="price">${plan(cheap.v,B)}</p><p class="small">${X(cheap.x.p)}</p><p>${pay==null?'Type what you pay to see the difference.':cheaper?`You would save <b>${money(pay-cheap.v)}/mo</b> (<b>${money((pay-cheap.v)*12)}/yr</b>) compared with the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}.`:`This is not cheaper than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}, so it would not save you money.`}</p>`):`<p>We have no checked ${BL[B]} dollar price for another ${X(cats)} tool.</p>`;
+h+=cheap?card(cheaper?'CHEAPER':'CHEAPEST OTHER','b-best',cheap.x,`<p class="price">${plan(cheap.v,B)}</p><p class="small">${X(cheap.x.p)}</p>${TN(cheap.x)}<p>${pay==null?'Type what you pay to see the difference.':cheaper?`You would save <b>${money(pay-cheap.v)}/mo</b> (<b>${money((pay-cheap.v)*12)}/yr</b>) compared with the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}.`:`This is not cheaper than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}, so it would not save you money.`}</p>`):`<p>${alts.length?`We have no checked ${BL[B]} dollar price for another tool that does the same main job (${X(cats)}).`:'No like-for-like cheaper option checked: no other tool in our list does the same main job ('+X(cats)+').'}</p>`;
 const tO=usd(t[O]);if(tO!=null&&cheapO){const d=Math.round((tO-cheapO.v)*100)/100;h+=`<div class="bnote"><p style="margin:0"><b>On ${BL[O]} billing instead:</b> ${X(t.n)} is ${plan(tO,O)} and the cheapest other is ${X(cheapO.x.n)} at ${plan(cheapO.v,O)} — ${d>0?`${money(d)}/mo less (${money(d*12)}/yr)`:'not cheaper'}. We only compare ${BL[O]} with ${BL[O]}.</p></div>`}
 h+='<h2>Best free option</h2>';
-h+=free?card('FREE PLAN','b-free',free,`<p>${X(free.f)}</p><p>${pay==null?'':`If the free plan covers you, you would save <b>${money(pay)}/mo</b> (<b>${money(pay*12)}/yr</b>). Free plans have limits — check them on the official page.`}</p>`):`<p>No other ${X(cats)} tool in our list has a real free plan (free trials and one-time credits do not count).</p>`;
-h+=`<p class="small">What we compared against: <a href="${t.u}">${X(t.n)}</a> — ${X(t.p)} · ${src(t)}. Same job means the same category on ToolPick (${X(cats)}); features differ, so check the tool fits before you switch. <a href="/cost-calculator.html?tool=${t.s}&amp;seats=1&amp;billing=monthly">See the full cost of ${X(t.n)} →</a>${usd(t.m)!=null&&usd(t.a)!=null?` · <a href="/monthly-or-yearly.html?tool=${t.s}">Monthly or yearly for ${X(t.n)}? →</a>`:''}</p>`;
+h+=free?card('FREE PLAN','b-free',free,`<p>${X(free.f)}</p><p>${pay==null?'':`If the free plan covers you, you would save <b>${money(pay)}/mo</b> (<b>${money(pay*12)}/yr</b>). Free plans have limits — check them on the official page.`}</p>`):`<p>No other tool that does the same main job (${X(cats)}) has a real free plan (free trials and one-time credits do not count).</p>`;
+h+=`<p class="small">What we compared against: <a href="${t.u}">${X(t.n)}</a> — ${X(t.p)} · ${src(t)}. Same job means the same main job (${X(cats)}), based on what each tool’s official site says it does; features differ, so check the tool fits before you switch. <a href="/cost-calculator.html?tool=${t.s}&amp;seats=1&amp;billing=monthly">See the full cost of ${X(t.n)} →</a>${usd(t.m)!=null&&usd(t.a)!=null?` · <a href="/monthly-or-yearly.html?tool=${t.s}">Monthly or yearly for ${X(t.n)}? →</a>`:''}</p>`;
 o.innerHTML=h}
 document.getElementById('pl-tool').addEventListener('change',e=>{pickTool(e.target.value,false);run()});
 document.getElementById('pl-pay').addEventListener('input',run);document.getElementById('pl-bill').addEventListener('change',()=>{const t=byS[document.getElementById('pl-tool').value];if(t){const v=usd(t[billEl().value]);if(v!=null)document.getElementById('pl-pay').value=String(v);note(t)}run()});
@@ -810,7 +867,7 @@ document.getElementById('pl-copy').addEventListener('click',async()=>{const st=d
 payless_body = f"""<section class="hero"><h1>Pay less for the same job</h1><p class="tag">Pick the AI tool you pay for. We will show you the cheapest plan we checked for the same kind of tool, the best free option, and how much you could save.</p></section>
 <form class="builder" id="pl-form"><div class="aform"><div><label for="pl-tool">The tool you pay for</label><select id="pl-tool"><option value="">Choose a tool…</option>{POPTS}</select></div><div><label for="pl-pay">What you pay per month ($)</label><input type="number" id="pl-pay" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 20"><p class="small" id="pl-paynote" style="margin:6px 0 0"></p></div><div id="pl-billwrap" hidden><label for="pl-bill">How you pay</label><select id="pl-bill"><option value="m">Monthly</option><option value="a">Yearly (price per month)</option></select></div><button type="submit" class="bbtn primary">Show my answer</button></div><p class="small" style="margin:10px 0 0"><button type="button" class="bbtn" id="pl-copy">Copy link to this answer</button> <span id="pl-status" role="status"></span></p></form>
 <div id="pl-out" tabindex="-1" aria-live="polite"></div>
-<div class="bnote"><h2 style="margin-top:0;font-size:1.05rem">How we work it out</h2><p class="small" style="margin:0">“Same job” means the same category on ToolPick. “Cheapest plan we checked” is the lowest dollar price we copied from each tool’s official pricing page, with the date we checked it. Tools whose price we could not check, or that only list non-dollar prices, are never ranked. A “free option” must be a real free plan — free trials and one-time credits do not count. Your saving is what you pay minus the other tool’s price on the same billing — monthly against monthly, yearly against yearly, never mixed. Everything runs in your browser; nothing is sent to us.</p><p class="small" style="margin:12px 0 0"><a href="/free.html">Can I do it for free? →</a> · <a href="/monthly-or-yearly.html">Monthly or yearly?</a> · <a href="/save-money.html">Save money hub</a> · Paying for several tools? <a href="/subscription-audit.html">Run the Subscription Audit →</a> · <a href="/tools.html">Browse all tools</a> · <a href="/compare-builder.html">Compare builder</a></p></div>
+<div class="bnote"><h2 style="margin-top:0;font-size:1.05rem">How we work it out</h2><p class="small" style="margin:0">“Same job” means the same main job — the tool’s first capability tag, taken from what its official site says it does (for example text to speech, edit by transcript, meeting notes). A broad category is not enough. “Cheapest plan we checked” is the lowest dollar price we copied from each tool’s official pricing page, with the date we checked it. Tools whose price we could not check, or that only list non-dollar prices, are never ranked. A “free option” must be a real free plan — free trials and one-time credits do not count. Your saving is what you pay minus the other tool’s price on the same billing — monthly against monthly, yearly against yearly, never mixed. Everything runs in your browser; nothing is sent to us.</p><p class="small" style="margin:12px 0 0"><a href="/free.html">Can I do it for free? →</a> · <a href="/monthly-or-yearly.html">Monthly or yearly?</a> · <a href="/save-money.html">Save money hub</a> · Paying for several tools? <a href="/subscription-audit.html">Run the Subscription Audit →</a> · <a href="/tools.html">Browse all tools</a> · <a href="/compare-builder.html">Compare builder</a></p></div>
 """ + _pl_js.replace("__PD__", PDATA).replace("__PC__", PCATS)
 page(PAYLESS_PATH, "Pay Less for the Same AI Tool — Cheaper & Free Alternatives, Checked Prices | ToolPick",
      "Pick the AI tool you pay for and see the cheapest plan we checked for the same job, the best free option, and your monthly and yearly saving. Official prices with checked dates.", payless_body,
@@ -957,7 +1014,7 @@ page("/tools.html", "Browse All AI Tools — Filter by Category, Free Plan & Ver
 for js, job, cid, ranked in JOBS:
     path = f"/best-ai-tool-for-{js}.html"; c = next(x for x in CATEGORIES if x["id"] == cid)
     title = f"Best AI Tool for {job[0].upper()+job[1:]} ({CHECKED[:4]}) — Top 3 with Prices"
-    d = f"The top 3 AI tools for {job}: {', '.join(ranked)}. Prices checked {CHECKED} on official pricing pages."
+    d = f"The top 3 AI tools for {job}: {', '.join(ranked)}. Prices from official pricing pages, each with its own checked date."
     items = "".join(f"<li><h3><a href='{turl(n)}'>{e(n)}</a></h3><p>{e(find(n)['about'])}</p><p class='price'>💲 {e(find(n)['price'])}</p><p>🆓 {e(find(n)['free'])}</p><p class='small'>checked {find(n).get('checked', CHECKED)}</p></li>" for n in ranked)
     body = f"""<h1>Best AI tool for {e(job)}</h1><p class="tag">{e(d)}</p><ol>{items}</ol><div class="sponsor">Sponsored slot available — <a href="/sponsor.html">sponsor ToolPick</a></div>
 <p>More options: <a href="/best-ai-{cid}-tools.html">all AI {e(c['name'].lower())} tools</a> · <a href="/tools.html?category={cid}">browse them in the full directory with price and free-plan filters</a>.</p>{complinks(comps_for(ranked))}
@@ -972,14 +1029,14 @@ def hasfree(t, c):
 FREE_ALT_URLS = []
 for name in FREE_ALT_FOR:
     cats = tool_pages[name]; t = find(name)
-    alts = list(dict.fromkeys(x["name"] for c in cats for x in c["tools"] if x["name"] != name and hasfree(x, c)))
-    if not alts: continue
+    alts = [x["name"] for x in samejob(name) if realfree(x)]
+    if not alts: REDIRECTS[f"/free-alternative-to-{slug(name)}.html"] = turl(name); continue
     path = f"/free-alternative-to-{slug(name)}.html"; FREE_ALT_URLS.append((name, path))
     title = f"Free Alternatives to {name} ({CHECKED[:4]}) — {len(alts)} Options with Free Plans"
-    d = f"{name} costs {t['price']}. Free alternatives with a verified free tier: {', '.join(alts[:5])}. Checked {CHECKED}."[:300]
+    d = f"{name} costs {t['price']}. Free alternatives with a verified free tier: {', '.join(alts[:5])}. Checked {t.get('checked', CHECKED)}."[:300]
     items = "".join(f"<li><h3><a href='{turl(a)}'>{e(a)}</a></h3><p>{e(find(a)['about'])}</p><p>🆓 {e(find(a)['free'])}</p><p class='price'>💲 Paid: {e(find(a)['price'])}</p><p class='small'>checked {find(a).get('checked', CHECKED)}</p></li>" for a in alts)
     body = f"""<h1>Free alternatives to {e(name)}</h1><p class="tag">{e(d)}</p><p><a href="{turl(name)}">{e(name)}</a>: {e(t['price'])}. Free tier: {e(t['free'])}.</p><ol>{items}</ol>
-<p class="small">Only tools whose official pricing page showed a free plan on {CHECKED} are listed.</p><p>See all <a href="/best-ai-{cats[0]['id']}-tools.html">AI {e(cats[0]['name'].lower())} tools</a>.</p>"""
+<p class="small">Only tools whose official pricing page showed a free plan are listed; each shows its own checked date.</p><p>See all <a href="/best-ai-{cats[0]['id']}-tools.html">AI {e(cats[0]['name'].lower())} tools</a>.</p>"""
     il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(a),"name":a} for i,a in enumerate(alts)]}
     page(path, title, d, body, [il, crumbs([("ToolPick","/"),(f"Free alternatives to {name}",path)])])
 
@@ -995,18 +1052,24 @@ def _seo_rank(tools, cat):
         en = _entry_num(t)
         return (is_best, en if en is not None else 1e12, t["name"].lower())
     return sorted(tools, key=key)
+UNDER = None
 def _seo_card(t, cat, rank, best_name, lowest_name):
     en = _entry_num(t)
     is_best = t["name"] == best_name
     badges = (f"<span class='badge b-rank'>#{rank}</span>" if True else "") + ("<span class='badge b-best'>BEST VALUE</span>" if is_best else "") + ("<span class='badge b-free'>FREE PLAN</span>" if realfree(t) else "")
     reasons = []
     if is_best: reasons.append(f"ToolPick's Best Value pick for {cat['name']}")
-    if lowest_name and t["name"] == lowest_name and en is not None: reasons.append(f"Lowest verified entry on this page at ${en:g}/mo")
+    if lowest_name and t["name"] == lowest_name and en is not None: reasons.append(f"Lowest checked entry on this page: ${en:g}/mo" + (" billed yearly" if en != _num(t.get("monthly")) else " monthly"))
     if realfree(t): reasons.append("Has a verified real free plan (trials and one-time credits do not count)")
-    if en is not None: reasons.append(f"Verified entry ${en:g}/mo from our price table")
+    if en is not None: reasons.append(f"Entry ${en:g}/mo " + ("monthly" if en == _num(t.get("monthly")) else "billed yearly"))
     else: reasons.append("No verified numeric entry rate in our price table")
     reason_txt = " · ".join(dict.fromkeys(reasons))
-    entry_line = f"Lowest verified entry: ${en:g}/mo (monthly or annual billing, from our price table)" if en is not None else "Entry price not verified in our price table"
+    _m, _a = _num(t.get("monthly")), _num(t.get("annual"))
+    _bill = " · ".join(x for x in [f"{_usd(_m)}/mo monthly" if _m is not None else "", f"{_usd(_a)}/mo billed yearly" if _a is not None else ""] if x)
+    entry_line = (f"Cheapest plan we checked: {_bill}" if en is not None else "Entry price not verified in our price table")
+    if UNDER and en is not None:
+        if _m is not None and _m < UNDER: entry_line += f" — under ${UNDER} on monthly billing"
+        elif _a is not None and _a < UNDER: entry_line += f" — under ${UNDER} only when billed yearly" + (f" ({_usd(_m)}/mo if you pay monthly)" if _m is not None else " (no monthly price checked)")
     return f"""<article class="card{' best' if is_best else ''}"><div class="th">{logo(t)}<div><div class="badges">{badges}</div><h3><a href="{turl(t['name'])}">{e(t['name'])}</a></h3></div></div><p>{e(t['about'])}</p>
 <p class="price">{e(t['price'])}</p><p class="small">{e(entry_line)}</p><p class="small">{e(t['free'])}</p><p class="small"><b>Why this pick:</b> {e(reason_txt)}.</p>
 <p class="small meta">{e(cat['name'])} · checked {t.get('checked', CHECKED)} · <a href="{e(t['pricing'])}" rel="noopener" target="_blank">Official pricing page</a></p></article>"""
@@ -1014,13 +1077,13 @@ def _seo_table(rows_tools, cat):
     rows = ""
     for i, t in enumerate(rows_tools, 1):
         en = _entry_num(t)
-        rows += f"<tr><td>{i}</td><td><a href='{turl(t['name'])}'>{e(t['name'])}</a>{' <span class=\"badge b-best\">BEST VALUE</span>' if t['name']==cat['best'] else ''}</td><td>{('$'+format(en,'g')+'/mo') if en is not None else '—'}</td><td>{e(t['price'])}</td><td>{e(t['free'])}</td><td>{t.get('checked', CHECKED)}<br><a href=\"{e(t['pricing'])}\" rel=\"noopener\" target=\"_blank\">Pricing page</a></td></tr>"
+        rows += f"<tr><td>{i}</td><td><a href='{turl(t['name'])}'>{e(t['name'])}</a>{' <span class=\"badge b-best\">BEST VALUE</span>' if t['name']==cat['best'] else ''}</td><td>{('$'+format(en,'g')+'/mo ' + ('monthly' if en == _num(t.get('monthly')) else 'billed yearly')) if en is not None else '—'}</td><td>{e(t['price'])}</td><td>{e(t['free'])}</td><td>{t.get('checked', CHECKED)}<br><a href=\"{e(t['pricing'])}\" rel=\"noopener\" target=\"_blank\">Pricing page</a></td></tr>"
     return f"<div class='tw'><table><caption class='small' style='text-align:left;padding:12px 16px'>Verified prices from official pricing pages. Confirm before buying.</caption><tr><th>#</th><th>Tool</th><th>Verified entry</th><th>All plans (as listed)</th><th>Free plan</th><th>Checked</th></tr>{rows}</table></div>"
 
 SEO_URLS = []
 for _target in SEO_FREE_ALT:
     _cats = tool_pages[_target]; _cat = _cats[0]; _tgt = find(_target)
-    _alts = list(dict.fromkeys(x["name"] for cc in _cats for x in cc["tools"] if x["name"] != _target and hasfree(x, cc)))
+    _alts = [x["name"] for x in samejob(_target) if realfree(x)]
     _alt_tools = _seo_rank([find(a) for a in _alts], _cat)
     _path = f"/free-alternative-to-{slug(_target)}.html"; SEO_URLS.append(_path)
     _best_name = _cat["best"] if any(t["name"] == _cat["best"] for t in _alt_tools) else None
@@ -1054,20 +1117,25 @@ _vbest = _vcat["best"] if any(t["name"] == _vcat["best"] for t in _video_under_s
 _vlowest = _video_under_sorted[0]["name"] if _video_under_sorted else None
 _vtitle = f"Best AI Video Tools Under $20 ({CHECKED[:4]}) — {len(_video_under_sorted)} Tools with Verified Entry Under $20/mo"
 _vd = f"{len(_video_under_sorted)} AI video tools with a verified entry price under $20/mo (lowest monthly or annual rate in our price table): {', '.join(t['name'] for t in _video_under_sorted)}. Prices, free plans, checked dates and official pricing links."
+UNDER = 20
 _vcards = "".join(_seo_card(t, _vcat, i+1, _vbest, _vlowest) for i, t in enumerate(_video_under_sorted))
 _vtop3 = ",".join(slug(t["name"]) for t in _video_under_sorted[:3])
+_vyonly = [t for t in _video_under_sorted if not (_num(t.get("monthly")) is not None and _num(t["monthly"]) < 20)]
+_vyl = ", ".join(f"{t['name']} (" + (f"{_usd(_num(t['monthly']))}/mo monthly, " if _num(t.get('monthly')) is not None else "no monthly price checked, ") + f"{_usd(_num(t['annual']))}/mo billed yearly)" for t in _vyonly)
 _vqas = [
+    ("Which of these are under $20 only when billed yearly?", (f"{_vyl}. On monthly billing they cost $20/mo or more (or have no checked monthly price)." if _vyonly else "None: every tool here is under $20 on monthly billing.")),
     ("What does “under $20” mean on this page?", "It means the tool's lowest verified entry rate in ToolPick's price table — the lower of its monthly rate and its per-month rate when billed yearly — is under $20/mo (less than $20, not $20 or less). Tools at exactly $20/mo or with no verified numeric entry rate are not included."),
     (f"What is the cheapest AI video tool under $20 here?", f"{_video_under_sorted[0]['name']} at ${_entry_num(_video_under_sorted[0]):g}/mo verified entry (checked {_video_under_sorted[0].get('checked', CHECKED)}): {_video_under_sorted[0]['price']}."),
     ("What is the Best Value pick among these video tools?", f"{_vcat['best']} is ToolPick's Best Value pick for video and carries the badge on this page. " + find(_vcat['best']).get('why','')),
 ]
 _vfh, _vfl = faq(_vqas)
-_vbody = f"""<h1>Best AI video tools under $20</h1><p class="tag">Every AI video tool on ToolPick whose verified entry price is <b>under $20/mo</b> — that means less than $20, using the lowest verified monthly or annual-billing rate in our price table. Sorted cheapest first. Prices were copied from official pricing pages; each tool shows its checked date and pricing link.</p>
+_vbody = f"""<h1>Best AI video tools under $20</h1><p class="tag">Every AI video tool on ToolPick whose verified entry price is <b>under $20/mo</b> — that means less than $20, using the lowest verified monthly or annual-billing rate in our price table. Sorted cheapest first.{(" Under $20 only when billed yearly: " + e(_vyl) + ".") if _vyonly else ""} Prices were copied from official pricing pages; each tool shows its checked date and pricing link.</p>
 <p>Threshold stated plainly: a tool is included only if its verified entry rate is &lt; $20/mo. A tool listed at exactly $20/mo, or with no verified numeric entry rate (“check site”), is excluded — never guessed in. The Best Value badge follows ToolPick's existing rule: the category Best Value pick for video ({e(_vcat['best'])}) when it is on this list.</p>
 <h2>Ranked cheapest first</h2><div class="grid">{_vcards}</div>{_seo_table(_video_under_sorted, _vcat)}
 <p><a class="btn" href="/compare-builder.html?tools={_vtop3}">Compare the 3 cheapest side by side →</a></p>
 <p><a href="/cost-calculator.html?category=video&amp;seats=1&amp;billing=monthly">What will video tools really cost? →</a> See true monthly and yearly costs by seats and billing in the cost calculator.</p>
 <p>More: <a href="/best-ai-video-tools.html">best AI video tools</a> · <a href="/best-free-ai-video-tools.html">best free AI video tools</a> · <a href="/tools.html?category=video">browse all video tools in the directory</a> · <a href="/help-me-choose.html?category=video">help me choose a video tool</a></p>{_vfh}"""
+UNDER = None
 _vil = {"@context":"https://schema.org","@type":"ItemList","name":_vtitle,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(t["name"]),"name":t["name"]} for i,t in enumerate(_video_under_sorted)]}
 page(SEO_VIDEO_PATH, _vtitle, _vd[:300], _vbody, [_vil, _vfl, crumbs([("ToolPick","/"),("Best AI video tools","/best-ai-video-tools.html"),("Best AI video tools under $20",SEO_VIDEO_PATH)])])
 SEO_URLS.append(SEO_VIDEO_PATH)
@@ -1101,7 +1169,7 @@ if FREE_V21:
         L = [t for t in c["tools"] if realfree(t)]; X_ = [t for t in c["tools"] if not realfree(t)]
         tp = _fr_top(c)
         cards = "".join(f'<article class="card"><div class="th">{logo(t)}<div><div class="badges"><span class="badge b-free">REAL FREE PLAN</span>{"<span class=\'badge b-best\'>START HERE</span>" if tp and t is tp[0] else ""}</div><h3><a href="{turl(t["name"])}">{e(t["name"])}</a></h3></div></div><p>{e(t["about"])}</p><p><b>Free plan:</b> {_fr_inc(t)}</p><p class="small"><b>If you outgrow it:</b> {e(_fr_up(t))}</p><p class="small meta">Checked {t.get("checked", CHECKED)} · <a href="{e(t["pricing"])}" rel="noopener" target="_blank">Official pricing page</a></p></article>' for t in L)
-        excl = ("<p class='small'><b>Not counted as free</b> (trial, credits only, or not verified): " + "; ".join(f'<a href="{turl(t["name"])}">{e(t["name"])}</a> — {e(t["free"])}' for t in X_) + "</p>") if X_ else ""
+        excl = ("<p class='small'><b>Not counted as free</b> (trial, credits only, or not verified): " + "; ".join(f'<a href="{turl(t["name"])}">{e(t["name"])}</a> — {e(t["free"])}' + ((lambda f: f' (free alternative that does the same main job: <a href="{turl(f["name"])}">{e(f["name"])}</a>)' if f else ' (no free alternative that does the same main job)')(free_alt(t["name"]))) for t in X_) + "</p>") if X_ else ""
         top = (f'<div class="pick pl-ans"><span class="badge b-free">START WITH</span> <b>Start with {e(tp[0]["name"])} free</b> — {e(tp[1])}. <span class="small">If you outgrow it: {e(_fr_up(tp[0]))}</span></div>' if tp else '<div class="pick"><b>We found no real free plan for this job.</b> Every tool here is paid, a trial or credits only.</div>')
         _fr_secs += f'<section class="frjob" id="job-{c["id"]}" data-job="{c["id"]}" hidden><h2>{e(c["need"])}: {len(L)} tool{"s" if len(L)!=1 else ""} with a real free plan</h2>{top}<div class="grid">{cards}</div>{excl}<p class="small"><a href="/best-free-ai-{c["id"]}-tools.html">Best free {e(c["name"].lower())} tools guide</a> · <a href="/best-ai-{c["id"]}-tools.html">All {e(c["name"].lower())} tools</a> · <a href="/save-money.html">More ways to save →</a></p></section>'
         if tp: _fr_summary += f'<li><a href="/free.html?job={c["id"]}">{e(c["need"])}</a> — start with <a href="{turl(tp[0]["name"])}">{e(tp[0]["name"])}</a> free ({len(L)} free option{"s" if len(L)!=1 else ""})</li>'
@@ -1121,7 +1189,7 @@ if FREE_V21:
 else:
     fcards = "".join(f'<article class="card" data-c="{c["id"]}"><div class="th">{logo(t)}<div><div class="badges"><span class="badge b-free">FREE PLAN</span></div><h3><a href="{turl(t["name"])}">{e(t["name"])}</a></h3></div></div><p>{e(t["about"])}</p><p class="small">{e(t["free"])}</p><p class="price">Paid: {e(t["price"])}</p><p class="small meta">{e(c["name"])} · checked {t.get("checked", CHECKED)}</p></article>' for c, t in FREE_LIST)
     page("/free.html", f"Free AI Tools ({CHECKED[:4]}): {len({t['name'] for _,t in FREE_LIST})} Tools with a Confirmed Free Plan", "Every AI tool on ToolPick with a free plan confirmed on its official pricing page, filterable by category.",
-      f"""<h1>Free AI tools</h1><p class="tag">Tools whose official pricing page showed a free plan on {CHECKED}. Free trials are not counted.</p>
+      f"""<h1>Free AI tools</h1><p class="tag">Tools whose official pricing page showed a free plan (each tool shows its own checked date). Free trials are not counted.</p>
     <select id="fc" class="finder" style="padding:10px"><option value="">All categories</option>{''.join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES)}</select>
     <p>{''.join(f'<a href="/best-free-ai-{c["id"]}-tools.html">Best free {e(c["name"].lower())}</a> · ' for c in CATEGORIES)}</p><div class="grid" id="fl">{fcards}</div>
     <script>document.getElementById('fc').onchange=function(){{var v=this.value;document.querySelectorAll('#fl .card').forEach(function(x){{x.style.display=!v||x.dataset.c==v?'':'none'}})}}</script>""",
@@ -1183,7 +1251,7 @@ page("/sponsor.html", "Sponsor ToolPick — reach people choosing AI tools", "Sp
 page("/newsletter.html", "ToolPick newsletter — AI tool price changes (coming soon)", "A weekly email with AI tool price changes and new free tiers. Coming soon.",
      "<h1>ToolPick newsletter</h1><p>Weekly: AI tool price changes, new free tiers and best-value picks. <b>Coming soon. Nothing is collected yet.</b></p><form onsubmit='return false'><input type='email' placeholder='you@example.com' disabled style='padding:10px;border-radius:8px'> <button disabled class='btn'>Coming soon</button></form>")
 # llms.txt
-ll = [f"# ToolPick", f"> Needs-based AI tool finder. {total_tools} tools, prices copied from official pricing pages on {CHECKED}. 'check site' means unverified.", "", "## Categories"]
+ll = [f"# ToolPick", f"> Needs-based AI tool finder. {total_tools} tools, prices copied from official pricing pages; each tool has its own checked date (latest {CHECKED}). 'check site' means unverified.", "", "## Categories"]
 ll += [f"- [{c['name']}]({BASE}/best-ai-{c['id']}-tools.html): best value {c['best']}; free options {', '.join(c['free'])}" for c in CATEGORIES]
 ll += ["", "## Tools"] + [f"- [{n}]({BASE}{turl(n)}): {find(n)['price']} | free: {find(n)['free']}" for n in tool_pages]
 ll += ["", "## Comparisons"] + [f"- [{t}]({BASE}/compare/{s}.html)" for s,t,*_ in COMPARISONS] + ["", "## Best tool for a job"] + [f"- [{j[1]}]({BASE}/best-ai-tool-for-{j[0]}.html)" for j in JOBS]
