@@ -229,6 +229,9 @@
 ## How we pick
 - [How we pick](https://toolpick-ai.vercel.app/how-we-pick.html): every pick shows how it was picked (official pricing data, not hands-on tested), price on its checked date, price history, earn disclosure (no affiliate links) and one real limitation
 
+## Real cost of AI video
+- [Real cost of AI video](https://toolpick-ai.vercel.app/ai-video-cost.html): seconds of video per plan and $/minute for Runway, Pika, Luma from official credit rates; same model+resolution comparisons only, e.g. ?s=60&t=3
+
 ## Renewal reminders
 - [Renewal reminders](https://toolpick-ai.vercel.app/renewal-reminders.html): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20
 

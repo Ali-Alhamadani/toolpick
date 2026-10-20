@@ -525,3 +525,24 @@ for _c in CATEGORIES:
             _t["pricing"] = "https://www.microsoft.com/en-us/microsoft-365/buy/compare-all-microsoft-365-products"
             _t["price"] = "Copilot Pro no longer sold; Microsoft 365 Personal $9.99/mo ($99.99/yr); Microsoft 365 Premium $19.99/mo ($199.99/yr), advanced Copilot (US prices)"
             _t["checked"] = "2026-10-20"
+
+# v37 (2026-10-20): AI video credit costs, copied from each official pricing page (monthly billing; credits per month).
+# Runway https://runwayml.com/pricing : "Standard $15 ... 625 credits /mo"; "Pro $35 ... 2250 credits /mo"; "Max $95 ... 9500 credits /mo";
+#   "Gen-4.5 60 credits/5s"; FAQ "Gen-4.5 uses 12 credits per second"; "Seedance 2.0 Pro 1080p 160 credits/4s"; "Seedance 2.0 Fast 116 credits/4s";
+#   "minimum purchase is 1,000 credits" (top-up price not shown). Free: "125 one-time credits".
+# Pika https://pika.art/pricing : "Starter 900 credits / month $10"; "Creator 3,150 credits / month $35"; "Fancy 8,550 credits / month $95";
+#   "Seedance 2.5 Video · 720p · 5s 122"; "Wan 3.0 Video · 720p · 5s 33"; "One-time top up 60 credits per $1"; Free "0 credits / month · packs only".
+# Luma https://lumalabs.ai/pricing : "Plus $30 /month ... 10,000 credits"; "Pro $90 /month ... 40,000 credits"; "Ultra $300 /month ... 150,000 credits";
+#   Ray3.14 Text-to-Video "720p - 20 credits/sec", "1080p - 80 credits/sec"; Seedance 2.5 "720p Yes 78 credits/sec"; Kling 3.0 "720p - 30 credits/sec".
+VIDEO_CHECKED = "2026-10-20"
+VIDEO_CREDITS = {
+ "Runway": dict(pricing="https://runwayml.com/pricing", free="125 one-time credits",
+   plans=[("Standard",15,625),("Pro",35,2250),("Max",95,9500)], topup=None, topup_note="extra credits from 1,000 (price not shown on the pricing page)",
+   models=[("Gen-4.5","",12.0),("Seedance 2.0 Fast","",29.0),("Seedance 2.0 Pro","1080p",40.0)]),
+ "Pika": dict(pricing="https://pika.art/pricing", free="0 credits a month (credit packs only)",
+   plans=[("Starter",10,900),("Creator",35,3150),("Fancy",95,8550)], topup=60, topup_note="one-time top-ups at 60 credits per $1",
+   models=[("Seedance 2.5","720p",24.4),("Wan 3.0","720p",6.6)]),
+ "Luma Dream Machine": dict(pricing="https://lumalabs.ai/pricing", free="no free plan listed",
+   plans=[("Plus",30,10000),("Pro",90,40000),("Ultra",300,150000)], topup=None, topup_note="no top-up price shown on the pricing page",
+   models=[("Seedance 2.5","720p",78.0),("Ray3.14","720p",20.0),("Kling 3.0","720p",30.0),("Ray3.14","1080p",80.0)]),
+}
