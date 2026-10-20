@@ -546,3 +546,29 @@ VIDEO_CREDITS = {
    plans=[("Plus",30,10000),("Pro",90,40000),("Ultra",300,150000)], topup=None, topup_note="no top-up price shown on the pricing page",
    models=[("Seedance 2.5","720p",78.0),("Ray3.14","720p",20.0),("Kling 3.0","720p",30.0),("Ray3.14","1080p",80.0)]),
 }
+
+# v38 (2026-10-20): AI voice (text-to-speech) costs, from each official pricing page (monthly billing).
+# ElevenLabs https://elevenlabs.io/pricing FAQ: "Monthly price and included credits per plan: Free $0 (10,000 credits); Starter $6 (30,000 credits);
+#   Creator $22 (121,000 credits, $11 for the first month); Pro $99 (600,000 credits); Scale $299 (1,800,000 credits, 3 seats); Business $990 (6,000,000 credits, 10 seats)";
+#   "Text to Speech 1 credit per character"; plan table "Text to Speech (UI) Minutes included / Extra minute": ~10 / ~$0.36, ~30 / ~$0.20, ~121 / ~$0.18,
+#   ~600 / ~$0.17, ~1,800 / ~$0.17, ~6,000 / ~$0.17 (Free, Starter, Creator, Pro, Scale, Business) -> ~1,000 characters per minute (ElevenLabs' own estimate).
+# Runway https://runwayml.com/pricing : "Text to Speech 1 credit/50 chars"; Standard $15 625 credits/mo, Pro $35 2,250, Max $95 9,500; top-up price not shown.
+# Luma https://lumalabs.ai/pricing : "ElevenLabs v3 text-to-speech 21 credits/1000 characters"; Plus $30 10,000 credits, Pro $90 40,000, Ultra $300 150,000.
+# Left out: Murf (https://murf.ai/pricing shows API pay-as-you-go "$0.03 / 1000 characters", no monthly Studio quota shown);
+#   Speechify (https://speechify.com/pricing/ is a read-aloud app: "Premium $29 /Month", no generation quota).
+VOICE_CHECKED = "2026-10-20"
+VOICE_CPM = 1000  # characters per minute, ElevenLabs' stated estimate (10,000 credits ~ 10 min)
+VOICE_COSTS = {
+ "ElevenLabs": dict(pricing="https://elevenlabs.io/pricing", free="10,000 credits a month (~10 min)", model="Eleven v3 / v4 (Studio)", same="ElevenLabs v3",
+   plans=[("Starter",6,30000,0.20),("Creator",22,121000,0.18),("Pro",99,600000,0.17),("Scale",299,1800000,0.17),("Business",990,6000000,0.17)],
+   note="Scale includes 3 seats and Business 10.", topup_note="extra minutes at the per-plan rate shown on the pricing page"),
+ "Luma Dream Machine": dict(pricing="https://lumalabs.ai/pricing", free="no free plan listed", model="ElevenLabs v3", same="ElevenLabs v3",
+   plans=[("Plus",30,int(10000/21*1000),None),("Pro",90,int(40000/21*1000),None),("Ultra",300,int(150000/21*1000),None)],
+   note="Luma is a video tool; its credits are shared with video and images.", topup_note="no top-up price shown on the pricing page"),
+ "Runway": dict(pricing="https://runwayml.com/pricing", free="125 one-time credits", model="Runway text to speech (model not named)", same=None,
+   plans=[("Standard",15,625*50,None),("Pro",35,2250*50,None),("Max",95,9500*50,None)],
+   note="Runway is a video tool; its credits are shared with video and images.", topup_note="extra credits from 1,000 (price not shown on the pricing page)"),
+}
+VOICE_LEFT_OUT = [("Murf","its pricing page shows only pay-as-you-go API rates ($0.03 per 1,000 characters), not a monthly plan quota"),
+                  ("Speechify","it's a read-aloud app with unlimited listening, not a voice-generation quota"),
+                  ("Descript","its plans count media minutes for editing and transcription, not a text-to-speech character quota")]
