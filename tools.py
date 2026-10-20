@@ -494,3 +494,22 @@ LOWER_TIER = {
  "Google Gemini": "$4.99/mo is Google's entry AI tier, below its $19.99/mo Pro tier",
  "ChatGPT": "$8/mo is the Go tier, below the $20/mo Plus tier",
 }
+
+# v31 (2026-10-20): Google Gemini re-verified on https://one.google.com/about/google-ai-plans/ (region shown: "United States"):
+# "Google AI Plus $4.99/mo" · "Google AI Pro $19.99/mo" · "Google AI Ultra 5x $99.99/mo" · "Google AI Ultra 20x $199.99/mo".
+# Plan table: Plus has "Higher Usage Limits 2x*" and Gemini 3.6 Flash; Pro has "Access to Gemini 4 Argon" (frontier model), 4x limits, 1M context.
+# FAQ: "The Google AI Premium plan has a new name: Google AI Plus." -> old pricing URL /about/ai-premium replaced.
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] == "Google Gemini":
+            _t["pricing"] = "https://one.google.com/about/google-ai-plans/"
+            _t["price"] = "Google AI Plus $4.99/mo (Flash model, lighter tier); Google AI Pro $19.99/mo; Ultra from $99.99/mo (US prices)"
+            _t["checked"] = "2026-10-20"
+LOWER_TIER["Google Gemini"] = "$4.99/mo is Google AI Plus, a lighter tier below Google AI Pro ($19.99/mo)"
+# Like-for-like matching tier: when a lower-tier entry plan is compared with a tool whose entry plan is a full tier
+# (e.g. Claude Pro), we compare that tool's comparable full tier instead (monthly price from the same official page).
+TIER_MATCH = {"Google Gemini": ("Google AI Pro", 19.99), "ChatGPT": ("Plus", 20)}
+# Microsoft Copilot: our saved checked entry ($9.99) is Microsoft 365 Personal, a bundle tier below Microsoft 365 Premium
+# ($19.99/mo, same saved check). Treated like the other lower tiers so it is not ranked against Claude Pro-class plans.
+LOWER_TIER["Microsoft Copilot"] = "$9.99/mo is Microsoft 365 Personal, below Microsoft 365 Premium ($19.99/mo)"
+TIER_MATCH["Microsoft Copilot"] = ("Microsoft 365 Premium", 19.99)

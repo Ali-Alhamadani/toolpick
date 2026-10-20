@@ -28,7 +28,7 @@
 - [Captions](https://toolpick-ai.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
 - [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
 - [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
-- [Google Gemini](https://toolpick-ai.vercel.app/tools/google-gemini.html): Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo | free: Gemini app is free to use
+- [Google Gemini](https://toolpick-ai.vercel.app/tools/google-gemini.html): Google AI Plus $4.99/mo (Flash model, lighter tier); Google AI Pro $19.99/mo; Ultra from $99.99/mo (US prices) | free: Gemini app is free to use
 - [Grammarly](https://toolpick-ai.vercel.app/tools/grammarly.html): Pro $12/mo | free: Free: $0 spelling & grammar checks
 - [Notion AI](https://toolpick-ai.vercel.app/tools/notion-ai.html): Plus $10/member/mo; Business $20/member/mo | free: Free plan: $0 (AI trial only)
 - [Copy.ai](https://toolpick-ai.vercel.app/tools/copy-ai.html): Chat $29/mo ($24 yearly); team plans from $1,000/mo | free: Free trial available

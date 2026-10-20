@@ -309,9 +309,19 @@ def cap_label(n): return CAP_LABEL.get(cap1(n), cap1(n))
 def samejob(n):
     t = TOOL[n]; c = cap1(n)
     return [x for k, x in TOOL.items() if k != n and dom(x["url"]) != dom(t["url"]) and CAPS[k][0] == c]
+TIER_MATCH = getattr(_tm, "TIER_MATCH", {})
+def cmp_price(x, n, key):
+    """v31 like-for-like tier rule: a lower-tier entry plan (LOWER_TIER) compared with a full-tier tool uses its comparable
+    full tier (TIER_MATCH, monthly) instead; two lower-tier entry plans are compared entry to entry."""
+    if key == "monthly" and x["name"] in TIER_MATCH and n not in LOWER_TIER: return TIER_MATCH[x["name"]][1]
+    return _num(x[key])
+def tname(x): return x["name"] + (f" ({x['_tier']})" if x.get("_tier") else "")
 def cheaper_alt(n, key):
-    L = sorted([x for x in samejob(n) if _num(x[key]) is not None], key=lambda x: (x[key], x["name"].lower()))
-    return L[0] if L else None
+    L = sorted([x for x in samejob(n) if cmp_price(x, n, key) is not None], key=lambda x: (cmp_price(x, n, key), x["name"].lower()))
+    if not L: return None
+    x = L[0]; v = cmp_price(x, n, key)
+    if v != _num(x[key]): x = dict(x, **{key: v, "_tier": TIER_MATCH[x["name"]][0]})
+    return x
 def free_alt(n):
     """Shared free alternative: a real-free tool sharing n's primary capability.
     Order: a ToolPick Best Value pick first, then same PRIMARY capability, then lowest checked price, then name."""
@@ -328,7 +338,8 @@ NO_LIKE = "No like-for-like cheaper option checked"
 def _likefields(m):
     for _v in m.values():
         _f = free_alt(_v["n"]); _v.update(cap=cap1(_v["n"]), cl=cap_label(_v["n"]), al=[slug(x["name"]) for x in samejob(_v["n"])], fa=slug(_f["name"]) if _f else None,
-            mm=_num(TOOL[_v["n"]]["monthly"]), ma=_num(TOOL[_v["n"]]["annual"]), lt=LOWER_TIER.get(_v["n"]))
+            mm=_num(TOOL[_v["n"]]["monthly"]), ma=_num(TOOL[_v["n"]]["annual"]), lt=LOWER_TIER.get(_v["n"]),
+            mf=TIER_MATCH[_v["n"]][1] if _v["n"] in TIER_MATCH else None, mp=TIER_MATCH[_v["n"]][0] if _v["n"] in TIER_MATCH else None)
 def _entry_num(t):
     vals = [v for v in (t.get("monthly"), t.get("annual")) if isinstance(v, (int, float))]
     return min(vals) if vals else None
@@ -479,11 +490,14 @@ def tool_verdict(name, cats, t):
     # overridden by the Best Value label; Best Value is added as a separate note.
     bv = (f"{name} is ToolPick's Best Value pick for {bestc[0]['name'].lower()} (chosen for overall value, not only price)" + (" and has a real free plan" if realfree(t) else "")) if bestc else ""
     if m is None and a is None: verdict = "Price not checked — see the official pricing page"
-    elif m is not None and cm is not None and cm["monthly"] < m: verdict = f"Cheaper option: {cm['name']} at {_usd(cm['monthly'])}/mo (monthly prices, same job: {cap_label(name)})"; tn = tier_note(name, cm["name"])
-    elif a is not None and ca is not None and ca["annual"] < a: verdict = f"Cheaper option: {ca['name']} at {_usd(ca['annual'])}/mo (billed-yearly prices, same job: {cap_label(name)})"; tn = tier_note(name, ca["name"])
+    elif m is not None and cm is not None and cm["monthly"] < m: verdict = f"Cheaper option: {tname(cm)} at {_usd(cm['monthly'])}/mo (monthly prices, same job: {cap_label(name)})"; tn = tier_note(name, cm["name"])
+    elif a is not None and ca is not None and ca["annual"] < a: verdict = f"Cheaper option: {tname(ca)} at {_usd(ca['annual'])}/mo (billed-yearly prices, same job: {cap_label(name)})"; tn = tier_note(name, ca["name"])
     elif not samejob(name) or (cm is None and ca is None): verdict = NO_LIKE
-    else: verdict = f"No cheaper checked option — {name} has the lowest checked price for {cap_label(name)}"
+    else:
+        _lt = [x["name"] for x in samejob(name) if x["name"] in TIER_MATCH] if name not in LOWER_TIER else []
+        verdict = (f"No cheaper comparable plan checked — {name} has the lowest checked price for {cap_label(name)} among comparable plans (lighter entry tiers of " + ", ".join(_lt) + " are compared at their comparable tier)") if _lt else f"No cheaper checked option — {name} has the lowest checked price for {cap_label(name)}"
     if bv: verdict += ". " + bv
+    if name in LOWER_TIER and m is not None: verdict += ". Tier note: " + LOWER_TIER[name].rstrip(".") + (f"; against full-tier plans like Claude Pro we compare its {TIER_MATCH[name][0]} plan ({_usd(TIER_MATCH[name][1])}/mo)" if name in TIER_MATCH else "")
     if tn: verdict += ". " + tn.rstrip(".")
     s = slug(name); rows = []
     rows.append(("Cheapest plan we checked", " · ".join(x for x in [f"{_usd(m)}/mo monthly" if m is not None else "", f"{_usd(a)}/mo paid yearly" if a is not None else ""] if x) or "Not checked in US dollars — see the official page"))
@@ -493,7 +507,7 @@ def tool_verdict(name, cats, t):
     def cmp(x, key, own):
         if x is None: return "none checked"
         d = (f" — {_usd(own - x[key])}/mo less" if x[key] < own else f" — {_usd(x[key] - own)}/mo more" if x[key] > own else " — same price") if own is not None else ""
-        return f'<a href="{turl(x["name"])}">{e(x["name"])}</a> {_usd(x[key])}/mo{d}'
+        return f'<a href="{turl(x["name"])}">{e(tname(x))}</a> {_usd(x[key])}/mo{d}'
     alt_parts = []
     if m is not None or (a is None and cm is not None): alt_parts.append("Monthly: " + cmp(cm, "monthly", m))
     if a is not None: alt_parts.append("Billed yearly: " + cmp(ca, "annual", a))
@@ -531,11 +545,16 @@ def find(n): return next(x for c in CATEGORIES for x in c["tools"] if x["name"] 
 def cnames(x): return x[2] if isinstance(x[2], list) else [x[2], x[3]]
 def compare_verdict(N, TT, c):
     """v25: like-for-like compare verdict. Same main job (cap1) -> same-billing price comparison; else 'different jobs', no price pick."""
+    if any(t["name"] not in LOWER_TIER for t in TT):
+        TT = [dict(t, monthly=TIER_MATCH[t["name"]][1], _tier=TIER_MATCH[t["name"]][0]) if t["name"] in TIER_MATCH and _num(t["monthly"]) is not None else t for t in TT]
     def nm(t): return f'<a href="{turl(t["name"])}">{e(t["name"])}</a>'
+    def nmp(t): return f'<a href="{turl(t["name"])}">{e(tname(t))}</a>'
     caps = {t["name"]: cap1(t["name"]) for t in TT}
     same = len(set(caps.values())) == 1
     free = [t for t in TT if realfree(t)]
     rows = []; tnote = ""; ranked = []; basis = None; win = None
+    if same and any(t.get("_tier") for t in TT):
+        rows.append(("Plan compared", " · ".join(f'{nm(t)}: {e(t["_tier"])} {_usd(t["monthly"])}/mo, the tier comparable to the others here (its lighter entry plan is not compared: {e(LOWER_TIER.get(t["name"], ""))})' for t in TT if t.get("_tier"))))
     BL = {"monthly": "monthly", "annual": "billed-yearly"}
     if not same:
         verdict = "These do different jobs: " + ", ".join(f"{t['name']} is for {cap_label(t['name'])}" for t in TT) + " — so we make no price-based pick"
@@ -546,12 +565,12 @@ def compare_verdict(N, TT, c):
             ranked = sorted(TT, key=lambda t: (t[basis], t["name"].lower()))
             win = ranked[0] if ranked[0][basis] < ranked[1][basis] else None
             lo = ranked[0][basis]
-            rows.append((f"Price on {BL[basis]} billing", " · ".join(f'{nm(t)} {_usd(t[basis])}/mo' + (f' (+{_usd(t[basis]-lo)}/mo, +{_usd((t[basis]-lo)*12)}/yr)' if t[basis] > lo else '') for t in ranked)))
+            rows.append((f"Price on {BL[basis]} billing", " · ".join(f'{nmp(t)} {_usd(t[basis])}/mo' + (f' (+{_usd(t[basis]-lo)}/mo, +{_usd((t[basis]-lo)*12)}/yr)' if t[basis] > lo else '') for t in ranked)))
             ob = "annual" if basis == "monthly" else "monthly"
             if all(_num(t[ob]) is not None for t in TT):
                 r2 = sorted(TT, key=lambda t: (t[ob], t["name"].lower())); lo2 = r2[0][ob]
-                rows.append((f"On {BL[ob]} billing", " · ".join(f'{nm(t)} {_usd(t[ob])}/mo' + (f' (+{_usd(t[ob]-lo2)}/mo, +{_usd((t[ob]-lo2)*12)}/yr)' if t[ob] > lo2 else '') for t in r2)))
-            if win: tnote = next((tier_note(win["name"], t["name"]) for t in ranked[1:] if tier_note(win["name"], t["name"])), "")
+                rows.append((f"On {BL[ob]} billing", " · ".join(f'{nmp(t)} {_usd(t[ob])}/mo' + (f' (+{_usd(t[ob]-lo2)}/mo, +{_usd((t[ob]-lo2)*12)}/yr)' if t[ob] > lo2 else '') for t in r2)))
+            if win and not any(t.get("_tier") for t in TT): tnote = next((tier_note(win["name"], t["name"]) for t in ranked[1:] if tier_note(win["name"], t["name"])), "")
         else:
             nop = [t for t in TT if _num(t["monthly"]) is None and _num(t["annual"]) is None]
             S = {b: sorted([t for t in TT if _num(t[b]) is not None], key=lambda t: (t[b], t["name"].lower())) for b in ("monthly", "annual")}
@@ -571,10 +590,10 @@ def compare_verdict(N, TT, c):
                 verdict_mixed = "No price pick: " + (", ".join(t["name"] for t in nop) + " has no comparable checked price" if nop else "their prices are not all checked on the same billing") + " — compare the plans on the official pages"
         if len(free) == 1:
             o = [t for t in TT if t is not free[0]]
-            verdict = f"Start free with {free[0]['name']}: only it has a real free plan" + (f"; if you will pay, {win['name']} is {_usd(ranked[1][basis]-win[basis])}/mo ({_usd((ranked[1][basis]-win[basis])*12)}/yr) less on {BL[basis]} billing" if win and len(TT) == 2 else "")
+            verdict = f"Start free with {free[0]['name']}: only it has a real free plan" + (f"; if you will pay, {tname(win)} is {_usd(ranked[1][basis]-win[basis])}/mo ({_usd((ranked[1][basis]-win[basis])*12)}/yr) less on {BL[basis]} billing" if win and len(TT) == 2 else "")
         elif win:
             nxt = ranked[1]; d = nxt[basis] - win[basis]
-            verdict = f"Pick {win['name']} if price matters: {_usd(d)}/mo ({_usd(d*12)}/yr) less than {nxt['name']} on {BL[basis]} billing"
+            verdict = f"Pick {tname(win)} if price matters: {_usd(d)}/mo ({_usd(d*12)}/yr) less than {tname(nxt)} on {BL[basis]} billing"
         elif basis: verdict = f"Same {BL[basis]} price — pick on features"
         else: verdict = verdict_mixed
         if tnote: verdict += ". " + tnote.rstrip(".")
@@ -647,10 +666,11 @@ const sels=()=>['tool1','tool2','tool3'].map(id=>document.getElementById(id));
 function selected(){{const seen=new Set(),out=[];sels().forEach(s=>{{if(s.value&&!seen.has(s.value)&&bySlug[s.value]){{seen.add(s.value);out.push(bySlug[s.value])}}}});return out}}
 function sameJob(list){{return list.every(t=>t.cap==list[0].cap)}}
 function basis(list){{return list.every(t=>t.mm!=null)?'mm':(list.every(t=>t.ma!=null)?'ma':null)}}
-function bestValue(list){{if(list.length<2||!sameJob(list))return null;const catBest=list.filter(t=>t.b);if(catBest.length==1)return catBest[0];const B=basis(list);if(!B)return null;const r=list.slice().sort((a,b)=>a[B]-b[B]);return r[0][B]<r[1][B]?r[0]:null}}
+function adj(list){{return list.some(x=>!x.lt)?list.map(t=>t.mf!=null&&t.mm!=null?Object.assign({{}},t,{{mm:t.mf,n:t.n+' ('+t.mp+')',lt:null}}):t):list}}
+function bestValue(list){{list=adj(list);if(list.length<2||!sameJob(list))return null;const catBest=list.filter(t=>t.b);if(catBest.length==1)return catBest[0];const B=basis(list);if(!B)return null;const r=list.slice().sort((a,b)=>a[B]-b[B]);return r[0][B]<r[1][B]?r[0]:null}}
 function m$(v){{const r=Math.round(v*100)/100;return '$'+(Number.isInteger(r)?r:r.toFixed(2))}}
 function entry(t){{const p=[];if(t.mm!=null)p.push(m$(t.mm)+'/mo monthly');if(t.ma!=null)p.push(m$(t.ma)+'/mo billed yearly');return p.length?'Cheapest plan we checked: '+p.join(' · '):'Price not in a form we can compare (“check site”, euros or usage-based)'}}
-function verdictLine(list,bv){{if(!sameJob(list))return '<div class="pick"><b>These do different jobs:</b> '+list.map(t=>X(t.n)+' is for '+X(t.cl)).join(', ')+' — so we don’t pick one on price.</div>';const B=basis(list);if(!B)return '<div class="pick"><b>Same main job ('+X(list[0].cl)+'), but not every price is checked on the same billing</b>, so we don’t name a cheaper one.</div>';const r=list.slice().sort((a,b)=>a[B]-b[B]);const BL=B=='mm'?'monthly':'billed-yearly';const d=r[1][B]-r[0][B];const tn=list.some(t=>t.lt)&&!list.every(t=>t.lt)?' <b>Different tier: compare features before switching.</b>':'';return '<div class="pick">'+(bv?'<span class="badge b-best">BEST VALUE</span> <b><a href="'+bv.u+'">'+X(bv.n)+'</a></b> — '+(bv.b&&list.filter(t=>t.b).length==1?'ToolPick’s Best Value pick for its category. ':'')+'':'')+'Same main job ('+X(list[0].cl)+'). On '+BL+' billing: '+r.map(t=>X(t.n)+' '+m$(t[B])+'/mo').join(' · ')+(d>0?' — '+X(r[0].n)+' is '+m$(d)+'/mo ('+m$(d*12)+'/yr) less than '+X(r[1].n)+'.':' — same price.')+tn+'</div>'}}
+function verdictLine(list,bv){{list=adj(list);if(!sameJob(list))return '<div class="pick"><b>These do different jobs:</b> '+list.map(t=>X(t.n)+' is for '+X(t.cl)).join(', ')+' — so we don’t pick one on price.</div>';const B=basis(list);if(!B)return '<div class="pick"><b>Same main job ('+X(list[0].cl)+'), but not every price is checked on the same billing</b>, so we don’t name a cheaper one.</div>';const r=list.slice().sort((a,b)=>a[B]-b[B]);const BL=B=='mm'?'monthly':'billed-yearly';const d=r[1][B]-r[0][B];const tn=list.some(t=>t.lt)&&!list.every(t=>t.lt)?' <b>Different tier: compare features before switching.</b>':'';return '<div class="pick">'+(bv?'<span class="badge b-best">BEST VALUE</span> <b><a href="'+bv.u+'">'+X(bv.n)+'</a></b> — '+(bv.b&&list.filter(t=>t.b).length==1?'ToolPick’s Best Value pick for its category. ':'')+'':'')+'Same main job ('+X(list[0].cl)+'). On '+BL+' billing: '+r.map(t=>X(t.n)+' '+m$(t[B])+'/mo').join(' · ')+(d>0?' — '+X(r[0].n)+' is '+m$(d)+'/mo ('+m$(d*12)+'/yr) less than '+X(r[1].n)+'.':' — same price.')+tn+'</div>'}}
 function render(push=true){{const list=selected();const out=document.getElementById('builder-out');const st=document.getElementById('bstatus');
 if(list.length<2){{out.innerHTML='<div class="pick"><b>Pick at least 2 different tools to compare.</b><p class="small" style="margin-bottom:0">You have selected '+list.length+' tool'+(list.length==1?'':'s')+'. Choose '+(2-list.length)+' more above — comparisons work with 2 or 3 tools.</p></div>';if(push)history.replaceState(null,'',list.length?('?tools='+list.map(t=>t.s).join(',')):'/compare-builder.html');return}}
 const bv=bestValue(list);
@@ -935,8 +955,8 @@ group.forEach(x=>{{if(x.t.s!=keeper.t.s&&!act[x.t.s])act[x.t.s]={{kind:'cancel',
 valid.forEach(x=>{{const t=x.t;if(act[t.s])return;
 if(t.fr){{act[t.s]={{kind:'free',save:x.e,reason:t.n+' itself has a verified real free plan: '+t.f+'. Try the free tier first — if the free plan covers you, you could stop paying. Check its limits on the official pricing page (we do not state limits we have not verified).'}};return}}
 const B=x.r.billing=='annual'?'ma':'mm',BL=x.r.billing=='annual'?'billed-yearly':'monthly';
-let bestAlt=null;t.al.forEach(k=>{{const alt=byS[k];if(!alt)return;const v=alt[B];if(v==null||v>=x.e)return;if(!bestAlt||v<bestAlt.v||(v==bestAlt.v&&alt.n<bestAlt.alt.n))bestAlt={{alt:alt,v:v}}}});
-if(bestAlt){{const tn=(!!bestAlt.alt.lt)!=(!!t.lt)?' Different tier: compare features before switching'+(bestAlt.alt.lt?' ('+bestAlt.alt.lt+').':(t.lt?' ('+t.lt+').':'.')):'';act[t.s]={{kind:'switch',save:Math.round((x.e-bestAlt.v)*100)/100,alt:bestAlt.alt,reason:bestAlt.alt.n+' does the same main job ('+t.cl+') and its cheapest '+BL+' plan we checked is '+money(bestAlt.v)+'/mo (checked '+bestAlt.alt.k+'), lower than the '+money(x.e)+'/mo you told us you pay for '+t.n+' on '+BL+' billing.'+tn+' We count only the difference as potential saving.'}};return}}
+let bestAlt=null;t.al.forEach(k=>{{const alt=byS[k];if(!alt)return;const v=(B=='mm'&&alt.mf!=null&&!t.lt)?alt.mf:alt[B];if(v==null||v>=x.e)return;if(!bestAlt||v<bestAlt.v||(v==bestAlt.v&&alt.n<bestAlt.alt.n))bestAlt={{alt:alt,v:v}}}});
+if(bestAlt){{const sub=(B=='mm'&&bestAlt.alt.mf!=null&&!t.lt);const tn=!sub&&(!!bestAlt.alt.lt)!=(!!t.lt)?' Different tier: compare features before switching'+(bestAlt.alt.lt?' ('+bestAlt.alt.lt+').':(t.lt?' ('+t.lt+').':'.')):'';act[t.s]={{kind:'switch',save:Math.round((x.e-bestAlt.v)*100)/100,alt:bestAlt.alt,reason:bestAlt.alt.n+((B=='mm'&&bestAlt.alt.mf!=null&&!t.lt)?' ('+bestAlt.alt.mp+', the tier comparable to yours)':'')+' does the same main job ('+t.cl+') and its '+((B=='mm'&&bestAlt.alt.mf!=null&&!t.lt)?'comparable':'cheapest')+' '+BL+' plan we checked is '+money(bestAlt.v)+'/mo (checked '+bestAlt.alt.k+'), lower than the '+money(x.e)+'/mo you told us you pay for '+t.n+' on '+BL+' billing.'+tn+' We count only the difference as potential saving.'}};return}}
 act[t.s]={{kind:'keep',save:0,reason:'No like-for-like cheaper option checked: no overlap with your other tools, no real free plan on '+t.n+' itself, and no tool that does the same main job ('+t.cl+') has a cheaper '+(x.r.billing=='annual'?'billed-yearly':'monthly')+' price than what you told us. On verified data, keep it.'+(t.fa&&byS[t.fa]?' Free option that does the same job: '+byS[t.fa].n+' ('+byS[t.fa].f+').':'')}}}});
 return{{valid:valid,tot:info.tot,act:act}}}}
 function renderResults(scroll=false){{const out=document.getElementById('a-out');const res=audit();const valid=res.valid;
@@ -993,13 +1013,14 @@ const okN=v=>v===''||v==null?null:(/^\d+(\.\d{1,2})?$/.test(v)&&parseFloat(v)<=1
 parts.forEach(p=>{const b=p.split(':');const tool=byS[b[0]];if(!tool||t.includes(tool.s)||t.length>=MAX){bad++;return}t.push(tool.s);const m=okN(b[1]),a=okN(b[2]);const k=/^\d{4}-\d{2}-\d{2}$/.test(b[3]||'')?b[3]:null;seen[tool.s]=(m===undefined||a===undefined||!k)?snap(tool):{m:m,a:a,k:k}});
 if(!t.length){note='<b>This watchlist link is invalid.</b> None of its tools could be loaded. Add tools below to start your own.';return}
 if(bad)note='<b>This link was incomplete: '+bad+' tool'+(bad==1?'':'s')+' couldn\u2019t load.</b> The rest are shown below.';shared=true;W={t:t,seen:seen,last:null}})();
-function cheaper(t,key){let best=null;(t.al||[]).forEach(s=>{const o=byS[s];if(!o||o[key]==null||t[key]==null||o[key]>=t[key])return;if(!best||o[key]<best[key]||(o[key]==best[key]&&o.n<best.n))best=o});return best}
+const cv=(o,t,key)=>(key=='m'&&o.mf!=null&&!t.lt)?o.mf:o[key];
+function cheaper(t,key){let best=null,bv=null;(t.al||[]).forEach(s=>{const o=byS[s];if(!o)return;const v=cv(o,t,key);if(v==null||t[key]==null||v>=t[key])return;if(!best||v<bv||(v==bv&&o.n<best.n)){best=o;bv=v}});return best?{o:best,v:bv,tier:(key=='m'&&best.mf!=null&&!t.lt)?best.mp:null}:null}
 function priceTxt(m,a){return [m!=null?M(m)+'/mo monthly':'',a!=null?M(a)+'/mo billed yearly':''].filter(Boolean).join(' · ')||'no checked US-dollar price'}
 function status(t){const s=W.seen[t.s];if(!s)return{kind:'new',html:'Just added.'};
 const ch=(s.m!==t.m)||(s.a!==t.a);if(ch)return{kind:'changed',html:'<b>Price changed since you last looked.</b> Was '+X(priceTxt(s.m,s.a))+' (checked '+X(s.k)+'), now '+X(priceTxt(t.m,t.a))+' (checked '+X(t.k)+').'};
 if(s.k!==t.k)return{kind:'rechecked',html:'Re-checked on '+X(t.k)+': same price as when you last looked ('+X(s.k)+').'};return{kind:'same',html:'No change since you last looked (checked '+X(t.k)+').'}}
 function card(t){const st=status(t);const cm=cheaper(t,'m'),ca=cheaper(t,'a');const last=t.ch&&t.ch[0];
-const alt=[cm?'Monthly: <a href="'+cm.u+'">'+X(cm.n)+'</a> at '+M(cm.m)+'/mo, '+M(t.m-cm.m)+'/mo less':'',ca?'Billed yearly: <a href="'+ca.u+'">'+X(ca.n)+'</a> at '+M(ca.a)+'/mo, '+M(t.a-ca.a)+'/mo less':''].filter(Boolean);
+const alt=[cm?'Monthly: <a href="'+cm.o.u+'">'+X(cm.o.n)+(cm.tier?' ('+X(cm.tier)+')':'')+'</a> at '+M(cm.v)+'/mo, '+M(t.m-cm.v)+'/mo less':'',ca?'Billed yearly: <a href="'+ca.o.u+'">'+X(ca.o.n)+'</a> at '+M(ca.v)+'/mo, '+M(t.a-ca.v)+'/mo less':''].filter(Boolean);
 return `<article class="card wl-card${st.kind=='changed'?' wl-chg':''}"><div class="badges">${st.kind=='changed'?'<span class="badge b-best">PRICE CHANGED</span>':''}${t.fr?'<span class="badge b-free">FREE PLAN</span>':''}</div><h3 style="margin:4px 0"><a href="${t.u}">${X(t.n)}</a></h3><p class="small" style="margin:0">Main job: ${X(t.cl)}</p>
 <p class="wl-price"><b>${X(priceTxt(t.m,t.a))}</b></p><p class="small">${X(t.p)}<br>Checked ${X(t.k)} · <a href="${X(t.pr)}" rel="noopener" target="_blank">Official pricing page</a></p>
 <p class="wl-st" role="status">${st.html}</p>${last?`<p class="small">Last change we recorded: ${X(last.label)} on ${X(last.d)} — <a href="/price-changes.html#${last.d}-${t.s}">before and after</a></p>`:'<p class="small">No price change recorded since we started tracking.</p>'}
@@ -1027,7 +1048,7 @@ render();
 
 _wl = []
 for _v in sorted(_amap.values(), key=lambda x: x["n"].lower()):
-    _wl.append(dict(s=_v["s"], n=_v["n"], u=_v["u"], pr=_v["pr"], p=_v["p"], k=_v["k"], m=_v["mm"], a=_v["ma"], cl=_v["cl"], al=_v["al"], fr=_v["fr"],
+    _wl.append(dict(s=_v["s"], n=_v["n"], u=_v["u"], pr=_v["pr"], p=_v["p"], k=_v["k"], m=_v["mm"], a=_v["ma"], cl=_v["cl"], al=_v["al"], fr=_v["fr"], lt=bool(_v.get("lt")), mf=_v.get("mf"), mp=_v.get("mp"),
                     ch=[dict(d=c["date"], label=c["label"]) for c in CHANGES_BY_TOOL.get(_v["n"], [])]))
 _WLDATA = json.dumps(_wl).replace("</", "<\\/")
 _WLOPTS = "".join(f'<option value="{e(v["s"])}">{e(v["n"])}</option>' for v in _wl)
@@ -1061,7 +1082,7 @@ for _c in CATEGORIES:
         if _c["best"] == _t["name"]: _pmap[_k]["bc"].append(_c["id"])
 for _v in _pmap.values():
     _v["al"] = [slug(x["name"]) for x in samejob(_v["n"])]; _fa = free_alt(_v["n"]); _v["fa"] = slug(_fa["name"]) if _fa else None
-    _v["cap"] = cap_label(_v["n"]); _v["lt"] = _v["n"] in LOWER_TIER
+    _v["cap"] = cap_label(_v["n"]); _v["lt"] = _v["n"] in LOWER_TIER; _v["mf"] = TIER_MATCH[_v["n"]][1] if _v["n"] in TIER_MATCH else None; _v["mp"] = TIER_MATCH[_v["n"]][0] if _v["n"] in TIER_MATCH else None
 PCATS = json.dumps({c["id"]: c["name"] for c in CATEGORIES})
 PDATA = json.dumps(sorted(_pmap.values(), key=lambda x: x["n"].lower())).replace("</", "<\\/")
 POPTS = "".join(f'<option value="{e(v["s"])}">{e(v["n"])}</option>' for v in sorted(_pmap.values(), key=lambda x: x["n"].lower()))
@@ -1072,7 +1093,7 @@ const usd=v=>typeof v=='number'?v:null;
 const BL={m:'monthly',a:'yearly'};
 function priceOn(t,B){return usd(t[B])}
 function plan(v,B){return money(v)+'/mo'+(B=='a'?' (paid yearly)':' (paid monthly)')}
-function cheapOn(alts,B){return alts.map(x=>({x,v:priceOn(x,B)})).filter(z=>z.v!=null).sort((p,q)=>p.v-q.v||p.x.n.localeCompare(q.x.n))[0]||null}
+function cheapOn(alts,B,t){return alts.map(x=>({x,v:(t&&B=='m'&&x.mf!=null&&!t.lt)?x.mf:priceOn(x,B),tier:(t&&B=='m'&&x.mf!=null&&!t.lt)?x.mp:null})).filter(z=>z.v!=null).sort((p,q)=>p.v-q.v||p.x.n.localeCompare(q.x.n))[0]||null}
 function src(t){return `<span class="small">Checked ${X(t.k)} · <a href="${X(t.pr)}" rel="noopener" target="_blank">official pricing page</a></span>`}
 const out=()=>document.getElementById('pl-out');
 const billEl=()=>document.getElementById('pl-bill');
@@ -1084,20 +1105,20 @@ function note(t){const B=billEl().value,v=usd(t[B]);document.getElementById('pl-
 function run(){const s=document.getElementById('pl-tool').value,raw=document.getElementById('pl-pay').value.trim(),o=out();share(s,raw);
 if(!s){o.innerHTML='<div class="pick" role="status"><b>Pick the tool you pay for to see your answer.</b><p class="small" style="margin-bottom:0">Try an example: <a href="/pay-less.html?tool=descript&amp;pay=24">Descript at $24 a month</a> · <a href="/pay-less.html?tool=descript&amp;pay=16&amp;bill=yearly">Descript at $16 a month, paid yearly</a> · <a href="/pay-less.html?tool=elevenlabs&amp;pay=6">ElevenLabs at $6</a></p></div>';return}
 const t=byS[s];const B=billEl().value,O=B=='m'?'a':'m';const pay=raw===''?null:parseFloat(raw);const bad=raw!==''&&(isNaN(pay)||pay<0);
-const alts=t.al.map(k=>byS[k]).filter(Boolean);const TN=x=>x&&x.lt!=t.lt?' <span class="small"><b>Different tier: compare features before switching.</b></span>':'';
-const cheap=cheapOn(alts,B);const cheapO=cheapOn(alts,O);
+const alts=t.al.map(k=>byS[k]).filter(Boolean);const TN=(x,z)=>x&&x.lt!=t.lt&&!(z&&z.tier)?' <span class="small"><b>Different tier: compare features before switching.</b></span>':'';
+const cheap=cheapOn(alts,B,t);const cheapO=cheapOn(alts,O,t);
 const free=t.fa?byS[t.fa]:null;
 const cats=t.cap;let h='';const per=B=='a'?'/mo paid yearly':'/mo';
 if(bad){o.innerHTML='<div class="pick" role="status"><b>Please type what you pay as a number, like 24 or 19.99.</b></div>';return}
 if(pay==null){h+=`<div class="pick" role="status"><b>Type what you pay for ${X(t.n)} per month to see your saving.</b> The options below still show what we checked.</div>`}
 const cheaper=cheap&&pay!=null&&cheap.v<pay,ownFree=t.fr;
-if(pay!=null){if(cheaper)h+=`<div class="pick pl-ans"><span class="badge b-best">YOU CAN PAY LESS</span> <b>${X(cheap.x.n)} costs ${plan(cheap.v,B)}</b> — ${money(pay-cheap.v)}/mo less than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} (${money((pay-cheap.v)*12)}/yr). Both prices are ${BL[B]} billing.${TN(cheap.x)}${ownFree?` Or try ${X(t.n)}\u2019s own free plan first.`:''}</div>`;
+if(pay!=null){if(cheaper)h+=`<div class="pick pl-ans"><span class="badge b-best">YOU CAN PAY LESS</span> <b>${X(cheap.x.n)+(cheap.tier?' ('+X(cheap.tier)+')':'')} costs ${plan(cheap.v,B)}</b> — ${money(pay-cheap.v)}/mo less than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} (${money((pay-cheap.v)*12)}/yr). Both prices are ${BL[B]} billing.${TN(cheap.x,cheap)}${ownFree?` Or try ${X(t.n)}\u2019s own free plan first.`:''}</div>`;
 else if(ownFree)h+=`<div class="pick pl-ans"><span class="badge b-free">TRY YOUR FREE PLAN</span> <b>${alts.length?'No cheaper '+BL[B]+' plan we checked':'No like-for-like cheaper option checked'} — but ${X(t.n)} has its own free plan.</b> If it covers what you do, you could pay $0 and save ${money(pay)}/mo (${money(pay*12)}/yr).<p class="small" style="margin:6px 0 0">Free plan: ${X(t.f)} · ${src(t)}</p></div>`;
 else h+=`<div class="pick pl-ans"><span class="badge b-rank">STAY PUT</span> <b>${alts.length?'Nothing cheaper that we checked.':'No like-for-like cheaper option checked.'}</b> No other tool that does the same main job (${X(cats)}) in our list has a checked ${BL[B]} price below the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''} for ${X(t.n)}, so keep it.${free?` The only way to pay less is a free plan with limits, like ${X(free.n)}\u2019s below.`:''}</div>`}
 const card=(lab,cls,x,body)=>`<article class="card" style="margin:12px 0"><div class="badges"><span class="badge ${cls}">${lab}</span></div><h3 style="margin:4px 0"><a href="${x.u}">${X(x.n)}</a></h3>${body}<p class="small">${src(x)} · <a href="/compare-builder.html?tools=${t.s},${x.s}">Compare with ${X(t.n)} →</a></p></article>`;
 h+=`<h2>Cheapest plan we checked (${BL[B]} billing)</h2>`;
-h+=cheap?card(cheaper?'CHEAPER':'CHEAPEST OTHER','b-best',cheap.x,`<p class="price">${plan(cheap.v,B)}</p><p class="small">${X(cheap.x.p)}</p>${TN(cheap.x)}<p>${pay==null?'Type what you pay to see the difference.':cheaper?`You would save <b>${money(pay-cheap.v)}/mo</b> (<b>${money((pay-cheap.v)*12)}/yr</b>) compared with the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}.`:`This is not cheaper than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}, so it would not save you money.`}</p>`):`<p>${alts.length?`We have no checked ${BL[B]} dollar price for another tool that does the same main job (${X(cats)}).`:'No like-for-like cheaper option checked: no other tool in our list does the same main job ('+X(cats)+').'}</p>`;
-const tO=usd(t[O]);if(tO!=null&&cheapO){const d=Math.round((tO-cheapO.v)*100)/100;h+=`<div class="bnote"><p style="margin:0"><b>On ${BL[O]} billing instead:</b> ${X(t.n)} is ${plan(tO,O)} and the cheapest other is ${X(cheapO.x.n)} at ${plan(cheapO.v,O)} — ${d>0?`${money(d)}/mo less (${money(d*12)}/yr)`:'not cheaper'}. We only compare ${BL[O]} with ${BL[O]}.</p></div>`}
+h+=cheap?card(cheaper?'CHEAPER':'CHEAPEST OTHER','b-best',cheap.x,`<p class="price">${plan(cheap.v,B)}</p><p class="small">${X(cheap.x.p)}</p>${TN(cheap.x,cheap)}<p>${pay==null?'Type what you pay to see the difference.':cheaper?`You would save <b>${money(pay-cheap.v)}/mo</b> (<b>${money((pay-cheap.v)*12)}/yr</b>) compared with the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}.`:`This is not cheaper than the ${money(pay)}/mo you pay${B=='a'?' (yearly billing)':''}, so it would not save you money.`}</p>`):`<p>${alts.length?`We have no checked ${BL[B]} dollar price for another tool that does the same main job (${X(cats)}).`:'No like-for-like cheaper option checked: no other tool in our list does the same main job ('+X(cats)+').'}</p>`;
+const tO=usd(t[O]);if(tO!=null&&cheapO){const d=Math.round((tO-cheapO.v)*100)/100;h+=`<div class="bnote"><p style="margin:0"><b>On ${BL[O]} billing instead:</b> ${X(t.n)} is ${plan(tO,O)} and the cheapest other is ${X(cheapO.x.n)+(cheapO.tier?' ('+X(cheapO.tier)+')':'')} at ${plan(cheapO.v,O)} — ${d>0?`${money(d)}/mo less (${money(d*12)}/yr)`:'not cheaper'}. We only compare ${BL[O]} with ${BL[O]}.</p></div>`}
 h+='<h2>Best free option</h2>';
 h+=free?card('FREE PLAN','b-free',free,`<p>${X(free.f)}</p><p>${pay==null?'':`If the free plan covers you, you would save <b>${money(pay)}/mo</b> (<b>${money(pay*12)}/yr</b>). Free plans have limits — check them on the official page.`}</p>`):`<p>No other tool that does the same main job (${X(cats)}) has a real free plan (free trials and one-time credits do not count).</p>`;
 h+=`<p class="small">What we compared against: <a href="${t.u}">${X(t.n)}</a> — ${X(t.p)} · ${src(t)}. Same job means the same main job (${X(cats)}), based on what each tool’s official site says it does; features differ, so check the tool fits before you switch. <a href="/cost-calculator.html?tool=${t.s}&amp;seats=1&amp;billing=monthly">See the full cost of ${X(t.n)} →</a>${usd(t.m)!=null&&usd(t.a)!=null?` · <a href="/monthly-or-yearly.html?tool=${t.s}">Monthly or yearly for ${X(t.n)}? →</a>`:''}</p>`;
