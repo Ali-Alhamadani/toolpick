@@ -60,7 +60,7 @@ CSS += ".fpick{border-width:2px}.factions{display:flex;flex-wrap:wrap;gap:8px;ma
 
 CSS += ".mnav{display:none}nav.top{flex-wrap:nowrap}nav.top>a,nav.top summary{white-space:nowrap}.hstick{position:static!important}@media(max-width:760px){nav.top .dn{display:none}.mnav{display:block;margin-left:auto}nav.top{width:auto!important;margin-left:auto!important}.mnav .menu{right:0;left:auto!important;max-height:75vh;overflow:auto}}.pcba{display:grid;gap:8px;margin:8px 0}.pcba div{background:var(--sf2);border-radius:10px;padding:10px 12px;font-size:1rem;line-height:1.5;color:var(--tx)}.pcba b{display:block;font-size:.85rem;color:var(--mu);text-transform:uppercase;letter-spacing:.02em}"
 
-FOOT = f"""<footer class="site small"><div class="wrap"><p><a href="/sponsor.html">Sponsor ToolPick</a> · <a href="/newsletter.html">Newsletter</a> · <a href="/embed.html">Embed price cards</a> · <a href="/llms.txt">llms.txt</a></p>Some links may become affiliate links in future; that never changes our picks. Prices copied from each tool's official pricing page; every tool shows its own checked date and pricing link (USD unless shown; yearly-billing prices in parentheses). "check site" = we could not verify the price, so we don't guess. Prices change — always confirm on the official page.</div></footer>"""
+FOOT = f"""<footer class="site small"><div class="wrap"><p><a href="/how-we-pick.html">How we pick</a> · <a href="/sponsor.html">Sponsor ToolPick</a> · <a href="/newsletter.html">Newsletter</a> · <a href="/embed.html">Embed price cards</a> · <a href="/llms.txt">llms.txt</a></p>Some links may become affiliate links in future; that never changes our picks. Prices copied from each tool's official pricing page; every tool shows its own checked date and pricing link (USD unless shown; yearly-billing prices in parentheses). "check site" = we could not verify the price, so we don't guess. Prices change — always confirm on the official page.</div></footer>"""
 def page(path, title, desc, body, ld=None):
     lds = "".join(f'<script type="application/ld+json">{json.dumps(x)}</script>' for x in (ld or []))
     full = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -118,13 +118,76 @@ def dom(u): return urlparse(u).netloc.replace("www.","")
 def logo(t):
     return f'<span class="logo" aria-hidden="false"><img src="https://www.google.com/s2/favicons?domain={dom(t["url"])}&amp;sz=64" alt="{e(t["name"])} logo" width="28" height="28" loading="lazy" decoding="async" onerror="this.replaceWith(document.createTextNode(\'{e(t["name"][0])}\'))"></span>'
 def turl(n): return f"/tools/{slug(n)}.html"
+# --- v35: Trust badge per pick (MarketLens backlog #6). Every fact comes from saved verified data: official pricing-page
+# text + checked date, our dated price snapshots (price_history.json), affiliate field. We say plainly that picks are
+# not hands-on tested. One limitation per tool is derived only from verified pricing-page text, never written freehand.
+_PH = json.load(open("price_history.json"))
+_PH_DATES = sorted(_PH)
+def price_hist(t):
+    n = t["name"]; seen = [d for d in _PH_DATES if n in _PH[d]]
+    if not seen: return f"First recorded in our checks on {t.get('checked', CHECKED)}."
+    first = seen[0]; texts = [_PH[d][n].get("price") for d in seen]
+    chg = [seen[i] for i in range(1, len(seen)) if texts[i] != texts[i-1]]
+    cur_diff = t["price"] != texts[-1]
+    if len(seen) == 1 and not cur_diff: return f"First recorded in our checks on {first}."
+    if not chg and not cur_diff: return f"Same listed price in every check since {first} ({len(seen)} checks)."
+    parts = []
+    if chg: parts.append("listed price changed on " + ", ".join(chg))
+    if cur_diff: parts.append(f"current price text confirmed on {t.get('checked', CHECKED)}")
+    return f"Tracked since {first}; " + "; ".join(parts) + "."
+_LIM_FREE = _re.compile(r"watermark|\blimit(ed|s)?\b|credit|no commercial|per (day|month|week)|minutes?|/mo\b|/day\b|exports?|resolution|720p|480p|queue|daily", _re.I)
+_SEAT = _re.compile(r"per (seat|user|member|editor)|/seat|/user", _re.I)
+def limitation(t):
+    n, p, f, po = t["name"], t["price"], t["free"], t.get("per_output") or ""
+    if p == "check site": return "We could not verify a price on the official pricing page, so we don't show one."
+    if f == "check site": return "We could not verify the free-plan details on the official page, so we don't claim a free plan."
+    if _re.search(r"AI trial", f, _re.I): return f"The free plan includes AI features only as a trial ({f.rstrip('.')})."
+    if _re.search(r"self-hosted", f, _re.I): return f"Free only if you host it yourself; the cloud version is not free ({f.rstrip('.')})."
+    if f.lower().startswith("no free"):
+        _r = _re.sub(r"^no free plan( (shown|listed)( on (the )?pricing page)?)?[;,]?\s*", "", f.rstrip("."), flags=_re.I).strip("() ")
+        return "No free plan on the pricing page we checked" + (f" ({_r})." if _r else ".")
+    if _re.search(r"trial", f, _re.I) and not realfree(t): return f"No permanent free plan, only a trial ({f.rstrip('.')})."
+    if _re.search(r"one-time|free (api )?credit|in free credits", f, _re.I): return f"The free option is one-time credits, not an ongoing free plan ({f.rstrip('.')})."
+    if n in LOWER_TIER: return "The lowest price is a lighter tier: " + LOWER_TIER[n].rstrip(".") + "."
+    if _re.search(r"€|£", p) and "$" not in p: return "Prices are listed in euros or pounds, not US dollars, so your cost depends on the exchange rate."
+    if t.get("monthly") is None and t.get("annual") is not None: return "The price we checked is billed yearly; we could not confirm a monthly price, so expect to pay a year upfront."
+    if po:
+        if _re.search(r"per channel", po, _re.I): return "Priced per social channel, so the cost grows with every account you connect."
+        if _re.search(r"free", po, _re.I): return f"The free plan has limits: {po.rstrip('.')}."
+        return f"Usage costs can add up beyond the plan: {po.rstrip('.')}."
+    if realfree(t) and _LIM_FREE.search(f) and len(f) > 14: return f"The free plan has limits: {f.rstrip('.')}."
+    segs = [x.strip() for x in p.split(";")]
+    if any(x.lower() == "per seat" for x in segs) or (segs and _SEAT.search(segs[0])): return "Priced per seat, so the cost multiplies with team size."
+    if _SEAT.search(p): return "Team plans are priced per seat, so team costs multiply with headcount."
+    if _re.search(r"credit", p, _re.I): return "Plans are credit-based: heavy use can push you to a higher tier."
+    if not realfree(t): return f"No free plan listed ({f.rstrip('.')})."
+    return "We haven't recorded a specific usage limit for this tool yet; check the limits on the official pricing page before paying."
+def earn(t):
+    return ("Affiliate link: ToolPick may earn a commission if you buy. It never changes our pick or the price shown." if t.get("affiliate")
+            else "We earn nothing from this pick: no affiliate link, no sponsorship, no payment from the vendor.")
+HOW_PICKED = "Picked from the tool's official pricing page and stated features, compared with other tools that do the same main job. Not hands-on tested by ToolPick."
+def trust_rows(t):
+    ck = t.get("checked", CHECKED)
+    return [("How we picked", HOW_PICKED), (f"Price on {ck}", t["price"] + f" (from the official pricing page)"),
+            ("Price history", price_hist(t)), ("Money", earn(t)), ("One real limitation", limitation(t))]
+TB_CSS = ".tb{margin-top:8px;font-size:.88rem}.tb summary{cursor:pointer;color:var(--ac);font-weight:600;min-height:24px;list-style-position:inside}.tb dl{margin:6px 0 0;display:grid;gap:4px}.tb dt{font-weight:700;color:var(--tx)}.tb dd{margin:0 0 4px;color:var(--mu)}.tbl{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.8rem;color:var(--mu);margin-top:6px}.tbl span::before{content:'\\2713 ';color:#15803d;font-weight:700}.tbp dl{display:grid;grid-template-columns:minmax(120px,190px) 1fr;gap:6px 14px;margin:0}.tbp dt{font-weight:700}.tbp dd{margin:0}@media(max-width:560px){.tbp dl{grid-template-columns:1fr}.tbp dd{margin-bottom:6px}}"
+def trust_mini(t):
+    ck = t.get("checked", CHECKED)
+    return (f'<div class="tbl" aria-label="Trust summary"><span>Price checked {ck}</span><span>{"Affiliate link" if t.get("affiliate") else "We earn $0"}</span><span>Not paid placement</span></div>'
+            f'<details class="tb"><summary>Why trust this pick?</summary><dl>' + "".join(f"<dt>{e(k)}</dt><dd>{e(v)}</dd>" for k, v in trust_rows(t)) +
+            '</dl><p class="small" style="margin:4px 0 0"><a href="/how-we-pick.html">How we pick</a></p></details>')
+def trust_panel(t):
+    return (f'<section class="card tbp" aria-labelledby="tbh"><h2 id="tbh" style="margin:0 0 8px;font-size:1.1rem">Why trust this pick</h2><dl>' +
+            "".join(f"<dt>{e(k)}</dt><dd>{e(v)}</dd>" for k, v in trust_rows(t)) +
+            f'</dl><p class="small" style="margin:8px 0 0"><a href="{e(t["pricing"])}" rel="noopener" target="_blank">Check the official pricing page</a> · <a href="/how-we-pick.html">How we pick</a> · <a href="/price-changes.html">Price changes log</a></p></section>')
+CSS += TB_CSS
 def card(t, c):
     best = t["name"] == c["best"]; free = t["name"] in c["free"]
     badges = ("<span class='badge b-best'>BEST VALUE</span>" if best else "") + ("<span class='badge b-free'>FREE OPTION</span>" if free else "")
     pc = "price check" if t["price"] == "check site" else "price"
     return f"""<article class="card{' best' if best else ''}"><div class="th">{logo(t)}<div><div class="badges">{badges}</div><h3><a href="{turl(t['name'])}">{e(t['name'])}</a></h3></div></div><p>{e(t['about'])}</p>
 <p class="{pc}">{e(t['price'])}</p><p class="small">{e(t["free"])}</p>
-<p class="small meta"><a href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Official site</a> · <a href="{e(t['pricing'])}" rel="noopener" target="_blank">Pricing page</a> · checked {t.get('checked', CHECKED)}</p>{DISCLOSURE if t.get('affiliate') else ''}</article>"""
+<p class="small meta"><a href="{e(t.get('affiliate') or t['url'])}" rel="{'sponsored noopener' if t.get('affiliate') else 'noopener'}" target="_blank">Official site</a> · <a href="{e(t['pricing'])}" rel="noopener" target="_blank">Pricing page</a> · checked {t.get('checked', CHECKED)}</p>{DISCLOSURE if t.get('affiliate') else ''}{trust_mini(t)}</article>"""
 def picks(c):
     b = next(t for t in c["tools"] if t["name"] == c["best"])
     return f"""<div class="pick"><span class="badge b-best">BEST VALUE</span><b><a href="{turl(b['name'])}">{e(b['name'])}</a></b> — {e(b.get('why',''))}</div>
@@ -1640,7 +1703,7 @@ ll = [f"# ToolPick", f"> Needs-based AI tool finder. {total_tools} tools, prices
 ll += [f"- [{c['name']}]({BASE}/best-ai-{c['id']}-tools.html): best value {c['best']}; free options {', '.join(c['free'])}" for c in CATEGORIES]
 ll += ["", "## Tools"] + [f"- [{n}]({BASE}{turl(n)}): {find(n)['price']} | free: {find(n)['free']}" for n in tool_pages]
 ll += ["", "## Comparisons"] + [f"- [{t}]({BASE}/compare/{s}.html)" for s,t,*_ in COMPARISONS] + ["", "## Best tool for a job"] + [f"- [{j[1]}]({BASE}/best-ai-tool-for-{j[0]}.html)" for j in JOBS]
-ll += ["", "## Subscription Audit", f"- [AI Subscription Audit]({BASE}/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly", "", "## New SEO guides", f"- [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)", f"- [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)", f"- [Best AI video tools under $20]({BASE}/best-ai-video-tools-under-20.html): verified entry under $20/mo, each tool's main job shown; cheapest only compared within a job", "", "## Help me choose", f"- [Help me choose wizard]({BASE}/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any", "", "## Compare builder", f"- [Compare builder]({BASE}/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen", "", "## Cost calculator", f"- [Cost calculator]({BASE}/cost-calculator.html): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly", "", "## Browse all tools", f"- [Browse all tools directory]({BASE}/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price", "", "", "## Renewal reminders", f"- [Renewal reminders]({BASE}/renewal-reminders.html): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20", "", "## Embed price cards", f"- [Embed live price cards]({BASE}/embed.html): free iframe price cards per tool ({BASE}/embed/claude.html) and per comparison ({BASE}/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating", f"Data: {BASE}/tools.json"]
+ll += ["", "## Subscription Audit", f"- [AI Subscription Audit]({BASE}/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly", "", "## New SEO guides", f"- [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)", f"- [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)", f"- [Best AI video tools under $20]({BASE}/best-ai-video-tools-under-20.html): verified entry under $20/mo, each tool's main job shown; cheapest only compared within a job", "", "## Help me choose", f"- [Help me choose wizard]({BASE}/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any", "", "## Compare builder", f"- [Compare builder]({BASE}/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen", "", "## Cost calculator", f"- [Cost calculator]({BASE}/cost-calculator.html): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly", "", "## Browse all tools", f"- [Browse all tools directory]({BASE}/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price", "", "", "## How we pick", f"- [How we pick]({BASE}/how-we-pick.html): every pick shows how it was picked (official pricing data, not hands-on tested), price on its checked date, price history, earn disclosure (no affiliate links) and one real limitation", "", "## Renewal reminders", f"- [Renewal reminders]({BASE}/renewal-reminders.html): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20", "", "## Embed price cards", f"- [Embed live price cards]({BASE}/embed.html): free iframe price cards per tool ({BASE}/embed/claude.html) and per comparison ({BASE}/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating", f"Data: {BASE}/tools.json"]
 open("public/llms.txt","w").write("\n".join(ll)+"\n")
 # OG image
 try:
@@ -1758,6 +1821,36 @@ for _x in EMBED_TOOLS + EMBED_CMP:
     if "/embed.html?card=" not in _h:
         open(_fp, "w").write(_h.replace("</main>", f'<p class="small">Writing about this? <a href="/embed.html?card={_x["s"]}">Embed this price card</a> — it updates when we re-check prices.</p></main>', 1))
 
+# v35: trust panel on every tool page + How we pick page
+for _n in tool_pages:
+    _fp = "public" + turl(_n); _h = open(_fp).read(); _i = _h.find('<section class="verdict card best"')
+    if _i < 0 or 'id="tbh"' in _h: continue
+    _j = _h.index("</section>", _i) + len("</section>")
+    open(_fp, "w").write(_h[:_j] + trust_panel(find(_n)) + _h[_j:])
+_aff = sum(1 for c in CATEGORIES for t in c["tools"] if t.get("affiliate"))
+HWP_DATE = "2026-10-20"
+_ih = open("public/index.html").read()
+_out, _pos = [], 0
+for _m in _re.finditer(r'(?s)<article class="card[^"]*">.*?</article>', _ih):
+    _a = _m.group(0); _sl = _re.search(r'href="/tools/([^"]+)\.html"', _a)
+    if _sl: _a = _re.sub(r'(?s)<details class="tb">.*?</details>', '<p class="small" style="margin:6px 0 0"><a href="/tools/' + _sl.group(1) + '.html#tbh">Why trust this pick?</a></p>', _a)
+    _out.append(_ih[_pos:_m.start()] + _a); _pos = _m.end()
+open("public/index.html", "w").write("".join(_out) + _ih[_pos:])
+_hw_body = f"""<p class="small"><a href="/">ToolPick</a> › How we pick</p><h1>How ToolPick picks AI tools</h1>
+<p class="tag">Many "best AI tools" lists are written or paid for by the vendors they rank. Here is exactly how our picks are made, what we check, and what we don't do, so you can judge every pick for yourself.</p>
+<section class="card"><h2 style="margin-top:0">What every pick shows</h2><p>Every tool card and tool page has a <b>“Why trust this pick”</b> box with five facts:</p><ol>
+<li><b>How we picked.</b> {e(HOW_PICKED)}</li>
+<li><b>The price on the date we checked it</b>, copied from the tool's official pricing page, with a link to that page.</li>
+<li><b>Price history</b> from our dated checks ({", ".join(_PH_DATES)}), so you can see whether a price has moved.</li>
+<li><b>Money.</b> Whether we earn anything if you buy. Right now {"no tool on ToolPick has an affiliate link" if not _aff else f"{_aff} tools have affiliate links, each labelled"}, and no vendor pays for placement.</li>
+<li><b>One real limitation</b>, taken from the pricing page we checked: no free plan or trial only, one-time credits, a lighter entry tier, yearly-only billing, usage costs, per-seat pricing, or limits on the free plan. If we haven't recorded one, we say so instead of inventing one.</li></ol></section>
+<h2>What we compare, and how</h2><ul><li><b>Same job only.</b> A tool is only called cheaper than another if both do the same main job.</li><li><b>Same billing.</b> Monthly prices are compared with monthly prices, and billed-yearly prices with billed-yearly prices.</li><li><b>Same tier.</b> Lighter entry tiers (like Google AI Plus or ChatGPT Go) are compared with each other; against full plans like Claude Pro we use the comparable tier (like Google AI Pro).</li><li><b>No guessing.</b> If we can't verify a price, the tool shows “check site” and is never counted in a total or a “cheapest” claim.</li><li><b>Best Value is separate from price.</b> It's our overall-value pick for a category and never replaces the price answer.</li></ul>
+<h2>What we don't do</h2><ul><li>We don't hands-on test every tool, and we don't claim to. We don't publish star ratings or reviews.</li><li>We don't accept payment for placement or rankings.</li><li>We don't show prices we haven't checked on the official page.</li></ul>
+<h2>Keep us honest</h2><p>Prices change. Each pick links to the official pricing page so you can confirm before you buy. See every recorded change on the <a href="/price-changes.html">price changes log</a>, or watch the tools you pay for with the <a href="/watchlist.html">price watchlist</a>.</p>"""
+page("/how-we-pick.html", "How ToolPick Picks AI Tools — Checked Prices, No Paid Rankings | ToolPick",
+     "How ToolPick picks AI tools: official pricing pages with checked dates, same-job and same-billing comparisons, price history, earn disclosure and one real limitation per tool. Not paid placement.",
+     _hw_body, [crumbs([("ToolPick", "/"), ("How we pick", "/how-we-pick.html")])])
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -1783,6 +1876,7 @@ _lm["/stacks.html"] = STACK_BUILD_DATE
 _lm[PAYLESS_PATH] = PAYLESS_DATE
 _lm[MY_PATH] = MY_DATE
 _lm["/save-money.html"] = "2026-10-20"
+_lm["/how-we-pick.html"] = HWP_DATE
 _lm["/renewal-reminders.html"] = RR_DATE
 _lm["/embed.html"] = EMBED_DATE
 PC_BUILD_DATE = "2026-10-20"  # tracker page + its tool-page boxes redesigned (v18)

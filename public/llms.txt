@@ -226,6 +226,9 @@
 - [Browse all tools directory](https://toolpick-ai.vercel.app/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price
 
 
+## How we pick
+- [How we pick](https://toolpick-ai.vercel.app/how-we-pick.html): every pick shows how it was picked (official pricing data, not hands-on tested), price on its checked date, price history, earn disclosure (no affiliate links) and one real limitation
+
 ## Renewal reminders
 - [Renewal reminders](https://toolpick-ai.vercel.app/renewal-reminders.html): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20
 
