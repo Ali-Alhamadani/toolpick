@@ -513,3 +513,15 @@ TIER_MATCH = {"Google Gemini": ("Google AI Pro", 19.99), "ChatGPT": ("Plus", 20)
 # ($19.99/mo, same saved check). Treated like the other lower tiers so it is not ranked against Claude Pro-class plans.
 LOWER_TIER["Microsoft Copilot"] = "$9.99/mo is Microsoft 365 Personal, below Microsoft 365 Premium ($19.99/mo)"
 TIER_MATCH["Microsoft Copilot"] = ("Microsoft 365 Premium", 19.99)
+
+# v32 (2026-10-20): Microsoft Copilot re-verified on https://www.microsoft.com/en-us/microsoft-365/buy/compare-all-microsoft-365-products (en-us):
+# "Microsoft 365 Personal $9.99/month $99.99/year" · "Microsoft 365 Family $12.99/month $129.99/year" ·
+# "Microsoft 365 Premium $19.99/month $199.99/year Everything in Microsoft 365 Family, plus: Advanced Copilot chat ...".
+# Copilot Pro: Microsoft blog 2025-10-01 (microsoft.com/en-us/copilot/blog/2025/10/01/meet-microsoft-365-premium-your-ai-and-productivity-powerhouse/):
+# "we'll no longer sell Copilot Pro -- Copilot Pro subscribers can switch to Microsoft 365 Premium". Prices unchanged vs saved data.
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] == "Microsoft Copilot":
+            _t["pricing"] = "https://www.microsoft.com/en-us/microsoft-365/buy/compare-all-microsoft-365-products"
+            _t["price"] = "Copilot Pro no longer sold; Microsoft 365 Personal $9.99/mo ($99.99/yr); Microsoft 365 Premium $19.99/mo ($199.99/yr), advanced Copilot (US prices)"
+            _t["checked"] = "2026-10-20"

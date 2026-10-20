@@ -67,7 +67,7 @@
 - [Gamma](https://toolpick-ai.vercel.app/tools/gamma.html): Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat | free: Free plan available
 - [Le Chat (Mistral)](https://toolpick-ai.vercel.app/tools/le-chat-mistral.html): Pro $14.99/mo; Team $24.99/user/mo (excl. tax) | free: Free plan with limited access
 - [Perplexity](https://toolpick-ai.vercel.app/tools/perplexity.html): Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown | free: Free tier available
-- [Microsoft Copilot](https://toolpick-ai.vercel.app/tools/microsoft-copilot.html): Copilot Pro appears discontinued; Microsoft 365 Personal $9.99/mo; Microsoft 365 Premium $19.99/mo ($199.99/yr) | free: Free Copilot available
+- [Microsoft Copilot](https://toolpick-ai.vercel.app/tools/microsoft-copilot.html): Copilot Pro no longer sold; Microsoft 365 Personal $9.99/mo ($99.99/yr); Microsoft 365 Premium $19.99/mo ($199.99/yr), advanced Copilot (US prices) | free: Free Copilot available
 - [Buffer](https://toolpick-ai.vercel.app/tools/buffer.html): Essentials $5/mo per channel ($60/yr billed yearly); Team $10/mo per channel | free: Free plan available
 - [Surfer](https://toolpick-ai.vercel.app/tools/surfer.html): Discovery $49/mo; AI Search Analytics $82/mo; Standard $99/mo; Pro $182/mo; Peace of Mind $299/mo (all billed yearly) | free: Start for free
 - [Writesonic](https://toolpick-ai.vercel.app/tools/writesonic.html): Starter $79/mo billed annually; $199; $399 | free: Start free
@@ -225,4 +225,7 @@
 ## Browse all tools
 - [Browse all tools directory](https://toolpick-ai.vercel.app/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price
 
+
+## Embed price cards
+- [Embed live price cards](https://toolpick-ai.vercel.app/embed.html): free iframe price cards per tool (https://toolpick-ai.vercel.app/embed/claude.html) and per comparison (https://toolpick-ai.vercel.app/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating
 Data: https://toolpick-ai.vercel.app/tools.json

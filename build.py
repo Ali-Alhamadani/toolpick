@@ -60,7 +60,7 @@ CSS += ".fpick{border-width:2px}.factions{display:flex;flex-wrap:wrap;gap:8px;ma
 
 CSS += ".mnav{display:none}nav.top{flex-wrap:nowrap}nav.top>a,nav.top summary{white-space:nowrap}.hstick{position:static!important}@media(max-width:760px){nav.top .dn{display:none}.mnav{display:block;margin-left:auto}nav.top{width:auto!important;margin-left:auto!important}.mnav .menu{right:0;left:auto!important;max-height:75vh;overflow:auto}}.pcba{display:grid;gap:8px;margin:8px 0}.pcba div{background:var(--sf2);border-radius:10px;padding:10px 12px;font-size:1rem;line-height:1.5;color:var(--tx)}.pcba b{display:block;font-size:.85rem;color:var(--mu);text-transform:uppercase;letter-spacing:.02em}"
 
-FOOT = f"""<footer class="site small"><div class="wrap"><p><a href="/sponsor.html">Sponsor ToolPick</a> · <a href="/newsletter.html">Newsletter</a> · <a href="/llms.txt">llms.txt</a></p>Some links may become affiliate links in future; that never changes our picks. Prices copied from each tool's official pricing page; every tool shows its own checked date and pricing link (USD unless shown; yearly-billing prices in parentheses). "check site" = we could not verify the price, so we don't guess. Prices change — always confirm on the official page.</div></footer>"""
+FOOT = f"""<footer class="site small"><div class="wrap"><p><a href="/sponsor.html">Sponsor ToolPick</a> · <a href="/newsletter.html">Newsletter</a> · <a href="/embed.html">Embed price cards</a> · <a href="/llms.txt">llms.txt</a></p>Some links may become affiliate links in future; that never changes our picks. Prices copied from each tool's official pricing page; every tool shows its own checked date and pricing link (USD unless shown; yearly-billing prices in parentheses). "check site" = we could not verify the price, so we don't guess. Prices change — always confirm on the official page.</div></footer>"""
 def page(path, title, desc, body, ld=None):
     lds = "".join(f'<script type="application/ld+json">{json.dumps(x)}</script>' for x in (ld or []))
     full = f"""<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -480,6 +480,7 @@ for _c in CHANGES: CHANGES_BY_TOOL.setdefault(_c["name"], []).append(_c)
 # 4) else "No cheaper checked option". Free alternative: category Best Value if real-free, else first of c["free"], else first real-free.
 def _num(v): return v if isinstance(v, (int, float)) else None
 def _usd(v): r = round(v, 2); return "$" + (f"{int(r):,}" if r == int(r) else f"{r:,.2f}")
+TV_TEXT = {}; CMP_TXT = {}
 def tool_verdict(name, cats, t):
     m, a = _num(t["monthly"]), _num(t["annual"])
     cm, ca = cheaper_alt(name, "monthly"), cheaper_alt(name, "annual")
@@ -499,6 +500,7 @@ def tool_verdict(name, cats, t):
     if bv: verdict += ". " + bv
     if name in LOWER_TIER and m is not None: verdict += ". Tier note: " + LOWER_TIER[name].rstrip(".") + (f"; against full-tier plans like Claude Pro we compare its {TIER_MATCH[name][0]} plan ({_usd(TIER_MATCH[name][1])}/mo)" if name in TIER_MATCH else "")
     if tn: verdict += ". " + tn.rstrip(".")
+    TV_TEXT[name] = dict(v=verdict, m=m, a=a)
     s = slug(name); rows = []
     rows.append(("Cheapest plan we checked", " · ".join(x for x in [f"{_usd(m)}/mo monthly" if m is not None else "", f"{_usd(a)}/mo paid yearly" if a is not None else ""] if x) or "Not checked in US dollars — see the official page"))
     rows.append(("All plans we listed", e(PLANS_SHORT.get(name, t["price"]))))
@@ -623,6 +625,7 @@ for x in COMPARISONS:
     title = f"{title0} ({CHECKED[:4]}): Price, Free Plan & Which to Pick"
     d = f"{' vs '.join(N)} compared with prices from official pricing pages (per-tool checked dates): plans, free tiers and which is better value."
     vhtml, vtxt = compare_verdict(N, TT, c)
+    CMP_TXT[s_] = vtxt
     row = lambda lab, f: f"<tr><th>{lab}</th>" + "".join(f"<td>{f(t)}</td>" for t in TT) + "</tr>"
     _rel = [y for y in comps_for(N) if y[0] != s_][:8]
     body = (f'<h1>{e(title0)}</h1><p class="tag">{e(d)}</p>{vhtml}<div class="tw"><table><tr><th></th>' + "".join(f'<th><a href="{turl(n)}">{e(n)}</a></th>' for n in N) + "</tr>"
@@ -1488,7 +1491,7 @@ for c in CATEGORIES:
 
 # guides hub
 page("/guides.html", "AI tool guides: best tool for every job & free alternatives", "Every ToolPick guide: best AI tool for a job, free alternatives and head-to-head comparisons.",
-  "<h1>Guides</h1><h2>New guides</h2><ul><li><a href='/free-alternative-to-recraft.html'>Free alternative to Recraft</a></li><li><a href='/free-alternative-to-rytr.html'>Free alternative to Rytr</a></li><li><a href='/best-ai-video-tools-under-20.html'>Best AI video tools under $20</a></li></ul><h2>Best AI tool for…</h2><ul>" + "".join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS) + "</ul><h2>Free tools</h2><ul>" + "".join(f'<li><a href="/best-free-ai-{c["id"]}-tools.html">Best free AI {e(c["name"].lower())} tools</a></li>' for c in CATEGORIES) + "</ul><h2>Free alternatives</h2><ul>" +
+  "<h1>Guides</h1><h2>New guides</h2><ul><li><a href='/embed.html'>Embed live AI price cards on your site</a></li><li><a href='/free-alternative-to-recraft.html'>Free alternative to Recraft</a></li><li><a href='/free-alternative-to-rytr.html'>Free alternative to Rytr</a></li><li><a href='/best-ai-video-tools-under-20.html'>Best AI video tools under $20</a></li></ul><h2>Best AI tool for…</h2><ul>" + "".join(f'<li><a href="/best-ai-tool-for-{j[0]}.html">{e(j[1])}</a></li>' for j in JOBS) + "</ul><h2>Free tools</h2><ul>" + "".join(f'<li><a href="/best-free-ai-{c["id"]}-tools.html">Best free AI {e(c["name"].lower())} tools</a></li>' for c in CATEGORIES) + "</ul><h2>Free alternatives</h2><ul>" +
   "".join(f'<li><a href="{p}">Free alternative to {e(n)}</a></li>' for n,p in FREE_ALT_URLS) + "</ul>" + complinks(COMPARISONS))
 # price changes tracker page (v18) — data from CHANGES above
 _PCO = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES if any(c["id"] in x["cats"] for x in CHANGES))
@@ -1522,7 +1525,7 @@ ll = [f"# ToolPick", f"> Needs-based AI tool finder. {total_tools} tools, prices
 ll += [f"- [{c['name']}]({BASE}/best-ai-{c['id']}-tools.html): best value {c['best']}; free options {', '.join(c['free'])}" for c in CATEGORIES]
 ll += ["", "## Tools"] + [f"- [{n}]({BASE}{turl(n)}): {find(n)['price']} | free: {find(n)['free']}" for n in tool_pages]
 ll += ["", "## Comparisons"] + [f"- [{t}]({BASE}/compare/{s}.html)" for s,t,*_ in COMPARISONS] + ["", "## Best tool for a job"] + [f"- [{j[1]}]({BASE}/best-ai-tool-for-{j[0]}.html)" for j in JOBS]
-ll += ["", "## Subscription Audit", f"- [AI Subscription Audit]({BASE}/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly", "", "## New SEO guides", f"- [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)", f"- [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)", f"- [Best AI video tools under $20]({BASE}/best-ai-video-tools-under-20.html): verified entry under $20/mo, each tool's main job shown; cheapest only compared within a job", "", "## Help me choose", f"- [Help me choose wizard]({BASE}/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any", "", "## Compare builder", f"- [Compare builder]({BASE}/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen", "", "## Cost calculator", f"- [Cost calculator]({BASE}/cost-calculator.html): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly", "", "## Browse all tools", f"- [Browse all tools directory]({BASE}/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price", "", f"Data: {BASE}/tools.json"]
+ll += ["", "## Subscription Audit", f"- [AI Subscription Audit]({BASE}/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly", "", "## New SEO guides", f"- [Free alternatives to Recraft]({BASE}/free-alternative-to-recraft.html)", f"- [Free alternatives to Rytr]({BASE}/free-alternative-to-rytr.html)", f"- [Best AI video tools under $20]({BASE}/best-ai-video-tools-under-20.html): verified entry under $20/mo, each tool's main job shown; cheapest only compared within a job", "", "## Help me choose", f"- [Help me choose wizard]({BASE}/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any", "", "## Compare builder", f"- [Compare builder]({BASE}/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen", "", "## Cost calculator", f"- [Cost calculator]({BASE}/cost-calculator.html): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly", "", "## Browse all tools", f"- [Browse all tools directory]({BASE}/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price", "", "", "## Embed price cards", f"- [Embed live price cards]({BASE}/embed.html): free iframe price cards per tool ({BASE}/embed/claude.html) and per comparison ({BASE}/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating", f"Data: {BASE}/tools.json"]
 open("public/llms.txt","w").write("\n".join(ll)+"\n")
 # OG image
 try:
@@ -1556,6 +1559,90 @@ open("public/robots.txt","w").write(f"User-agent: *\nAllow: /\nSitemap: {BASE}/s
 # - /tools.html (new directory): 2026-10-19, its actual build/ship date (America/New_York)
 # - every other static/feature page (home, builder, calculator, wizard, guides, price-changes,
 #   sponsor, newsletter): OMIT lastmod rather than inventing a date.
+# --- v32: Embeddable live price cards (/embed.html generator + /embed/<tool>.html, /embed/compare/<slug>.html) ---
+# Cards reuse the exact same verdict text as tool/compare pages (TV_TEXT / CMP_TXT), so like-for-like tier and billing
+# rules are identical. Only checked prices are shown; each card shows its checked date and official pricing link.
+EMBED_DATE = "2026-10-20"
+EMBED_CSS = """*{box-sizing:border-box}html,body{margin:0;background:transparent}body{font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f172a}
+.c{--bg:#fff;--tx:#0f172a;--mu:#475569;--bd:#e2e8f0;--sf:#f1f5f9;--ac:#1d4ed8;background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;max-width:100%}
+.dark .c{--bg:#0f172a;--tx:#f1f5f9;--mu:#cbd5e1;--bd:#334155;--sf:#1e293b;--ac:#93c5fd}
+@media(prefers-color-scheme:dark){.auto .c{--bg:#0f172a;--tx:#f1f5f9;--mu:#cbd5e1;--bd:#334155;--sf:#1e293b;--ac:#93c5fd}}
+.h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}.h b{font-size:1.05rem}.br{font-size:.78rem;color:var(--mu);text-decoration:none}.br i{font-style:normal;background:#1d4ed8;color:#fff;border-radius:4px;padding:0 5px;margin-right:4px;font-weight:700}
+.j{color:var(--mu);font-size:.85rem;margin:2px 0 8px}.r{background:var(--sf);border-radius:8px;padding:7px 10px;margin:6px 0}.r span{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:var(--mu)}
+.v{margin:8px 0;font-weight:600}.f{font-size:.78rem;color:var(--mu);margin-top:8px}a{color:var(--ac)}.cta{display:inline-block;margin-top:6px;font-weight:600}
+.g{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}"""
+EMBED_JS = "<script>var t=new URLSearchParams(location.search).get('theme');document.documentElement.className=(t==='dark'||t==='light')?t:'auto';</script>"
+def _embed_doc(title, canon, inner):
+    return f'<!doctype html><html lang="en" class="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{e(title)}</title><meta name="robots" content="noindex"><link rel="canonical" href="{BASE}{canon}"><base target="_blank">{EMBED_JS}<meta name="description" content="{e(title)}: checked prices and like-for-like verdict."><style>{EMBED_CSS}</style></head><body><main class="c">{inner}</main></body></html>'
+_BR = f'<a class="br" href="{BASE}/?utm_source=embed" rel="noopener"><i>T</i>ToolPick</a>'
+def _cheap_line(n):
+    d = TV_TEXT.get(n, {}); m, a = d.get("m"), d.get("a")
+    return " · ".join(x for x in [f"{_usd(m)}/mo monthly" if m is not None else "", f"{_usd(a)}/mo paid yearly" if a is not None else ""] if x) or "Not checked in US dollars — see the official page"
+EMBED_TOOLS, _seen = [], set()
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _seen: continue
+        _seen.add(_t["name"]); _n = _t["name"]; _s = slug(_n); _ck = _t.get("checked", CHECKED)
+        _v = TV_TEXT.get(_n, {}).get("v", "")
+        _inner = (f'<div class="h"><b>{e(_n)} pricing</b>{_BR}</div><div class="j">Main job: {e(cap_label(_n))}</div>'
+            f'<div class="r"><span>Cheapest plan checked</span>{e(_cheap_line(_n))}</div>'
+            f'<div class="r"><span>Plans</span>{e(PLANS_SHORT.get(_n, _t["price"]))}</div>'
+            f'<div class="r"><span>Free plan</span>{("Yes — " + e(_t["free"])) if realfree(_t) else "No (" + e(_t["free"]) + ")"}</div>'
+            + (f'<div class="v">{e(_v)}</div>' if _v else "") +
+            f'<a class="cta" href="{BASE}{turl(_n)}?utm_source=embed" rel="noopener">Compare like-for-like alternatives on ToolPick →</a>'
+            f'<div class="f">Checked {_ck} on the <a href="{e(_t["pricing"])}" rel="noopener">official pricing page</a>. USD; prices change, confirm before buying.</div>')
+        os.makedirs("public/embed", exist_ok=True)
+        open(f"public/embed/{_s}.html", "w").write(_embed_doc(f"{_n} price card · ToolPick", turl(_n), _inner))
+        EMBED_TOOLS.append(dict(s=_s, n=_n, k="t", ck=_ck))
+EMBED_CMP = []
+for _x in COMPARISONS:
+    _s, _ti, _N = _x[0], _x[1], cnames(_x)
+    if _s not in CMP_TXT: continue
+    _TT = [find(n) for n in _N]; _ck = max(t.get("checked", CHECKED) for t in _TT)
+    _sw = any(n not in LOWER_TIER for n in _N)
+    def _pc(n): return f'<br><b>Plan compared here: {e(TIER_MATCH[n][0])} {_usd(TIER_MATCH[n][1])}/mo</b> (the tier comparable to the other plan)' if _sw and n in TIER_MATCH and n in LOWER_TIER else ""
+    _cols = "".join(f'<div class="r"><span>{e(t["name"])}</span>{e(_cheap_line(t["name"]))}{_pc(t["name"])}<br><small>{e(PLANS_SHORT.get(t["name"], t["price"]))}</small></div>' for t in _TT)
+    _inner = (f'<div class="h"><b>{e(_ti)}: price check</b>{_BR}</div><div class="g">{_cols}</div><div class="v">{e(CMP_TXT[_s])}</div>'
+        f'<a class="cta" href="{BASE}/compare/{_s}.html?utm_source=embed" rel="noopener">Full like-for-like comparison on ToolPick →</a>'
+        f'<div class="f">Checked {", ".join(sorted(set(t.get("checked", CHECKED) for t in _TT)))} on each official pricing page (' + " · ".join(f'<a href="{e(t["pricing"])}" rel="noopener">{e(t["name"])}</a>' for t in _TT) + '). USD; prices change, confirm before buying.</div>')
+    os.makedirs("public/embed/compare", exist_ok=True)
+    open(f"public/embed/compare/{_s}.html", "w").write(_embed_doc(f"{_ti} price card · ToolPick", f"/compare/{_s}.html", _inner))
+    EMBED_CMP.append(dict(s="compare/" + _s, n=_ti, k="c", ck=_ck))
+_ED = json.dumps(EMBED_TOOLS + EMBED_CMP)
+_opts = ('<optgroup label="Single tool">' + "".join(f'<option value="{x["s"]}">{e(x["n"])}</option>' for x in sorted(EMBED_TOOLS, key=lambda x: x["n"].lower())) + '</optgroup>'
+         '<optgroup label="Comparison">' + "".join(f'<option value="{x["s"]}">{e(x["n"])}</option>' for x in EMBED_CMP) + '</optgroup>')
+EMBED_BODY = f"""<h1>Embed live AI price cards</h1>
+<p class="tag">Writing about AI tools? Put a price card in your post or newsletter page. It shows the checked price, the free plan and our like-for-like verdict, and it updates itself whenever we re-check the official pricing page — so your post never shows a stale price.</p>
+<section class="card" aria-labelledby="eb-h"><h2 id="eb-h">1. Pick a card</h2>
+<p><label for="eb-t">Tool or comparison</label><br><select id="eb-t" style="max-width:100%">{_opts}</select></p>
+<p><label for="eb-th">Theme</label><br><select id="eb-th"><option value="auto">Match reader's light/dark setting</option><option value="light">Light</option><option value="dark">Dark</option></select>
+ <label for="eb-w" style="margin-left:8px">Width</label> <select id="eb-w"><option value="480">480px (sidebar / post)</option><option value="360">360px (narrow)</option><option value="640">640px (wide)</option></select></p>
+<h2>2. Preview</h2><div id="eb-pv" style="max-width:100%;overflow:auto"><iframe id="eb-f" title="Price card preview" style="border:0;width:480px;max-width:100%;height:320px" loading="lazy"></iframe></div>
+<p class="small" id="eb-ck"></p>
+<h2>3. Copy the code</h2><p><label for="eb-c">Paste this into your page's HTML</label> <span class="small">(height is sized for narrow phone screens, so nothing gets cut off)</span></p><textarea id="eb-c" rows="5" readonly style="width:100%;font:13px ui-monospace,monospace"></textarea>
+<p><button type="button" class="btn" id="eb-cp">Copy embed code</button> <span id="eb-ok" role="status" class="small"></span></p>
+<p class="small">Can't paste HTML (e.g. some newsletter tools)? Use the plain link instead: <a id="eb-l" href="/">link</a></p></section>
+<h2>How the cards stay honest</h2><ul><li>Only prices copied from each tool's official pricing page, with the checked date on the card. Unverified prices show "check site", never a guess.</li><li>The verdict uses the same like-for-like rule as every ToolPick page: same main job, same billing (monthly with monthly, yearly with yearly), lighter entry tiers compared at their comparable tier.</li><li>No tracking scripts inside the card, no ads, free to use. Each card links to the full page on ToolPick.</li></ul>
+<p class="small">Other ways to keep up with prices: <a href="/watchlist.html">Price watchlist</a> · <a href="/price-changes.html">Price changes log</a> (<a href="/price-changes.xml">RSS</a>).</p>
+<script>(function(){{var D={_ED},B={json.dumps(BASE)},q=new URLSearchParams(location.search),T=document.getElementById('eb-t'),H=document.getElementById('eb-th'),W=document.getElementById('eb-w'),F=document.getElementById('eb-f'),C=document.getElementById('eb-c');
+if(q.get('card')&&D.some(function(x){{return x.s===q.get('card')}}))T.value=q.get('card');if(['light','dark'].indexOf(q.get('theme'))>=0)H.value=q.get('theme');
+function cur(){{for(var i=0;i<D.length;i++)if(D[i].s===T.value)return D[i]}}
+function code(h){{var x=cur(),u=B+'/embed/'+x.s+'.html'+(H.value==='auto'?'':'?theme='+H.value),pg=B+(x.k==='t'?'/tools/'+x.s+'.html':'/'+x.s+'.html');
+C.value='<iframe src="'+u+'" title="'+x.n.replace(/"/g,'&quot;')+' price card by ToolPick" width="'+W.value+'" height="'+h+'" style="border:0;max-width:100%" loading="lazy"></iframe>\\n<p style="font-size:12px"><a href="'+pg+'">'+x.n.replace(/</g,'&lt;')+' pricing on ToolPick</a></p>';
+var L=document.getElementById('eb-l');L.href=pg;L.textContent=pg;document.getElementById('eb-ck').textContent='Prices on this card checked '+x.ck+'. The card updates automatically when we re-check.'}}
+function fit(){{try{{var d=F.contentDocument,w=F.style.width;F.style.width='340px';F.style.height='10px';var hn=Math.ceil(d.documentElement.scrollHeight)+4;F.style.width=w;var h=Math.ceil(d.documentElement.scrollHeight)+4;F.style.height=h+'px';code(Math.max(h,hn))}}catch(err){{code(560)}}}}
+function go(){{var x=cur();F.style.width=W.value+'px';F.src='/embed/'+x.s+'.html'+(H.value==='auto'?'':'?theme='+H.value);code(340);history.replaceState(null,'','?card='+encodeURIComponent(x.s)+(H.value==='auto'?'':'&theme='+H.value))}}
+F.addEventListener('load',fit);[T,H,W].forEach(function(el){{el.addEventListener('change',go)}});
+document.getElementById('eb-cp').addEventListener('click',function(){{C.select();var ok=document.getElementById('eb-ok');(navigator.clipboard?navigator.clipboard.writeText(C.value):Promise.reject()).then(function(){{ok.textContent='Copied.'}},function(){{try{{document.execCommand('copy');ok.textContent='Copied.'}}catch(x){{ok.textContent='Select the code and copy it.'}}}})}});go()}})();</script>"""
+page("/embed.html", "Embed live AI tool price cards on your site · ToolPick", "Free embeddable price cards for 82 AI tools and every ToolPick comparison: checked prices, free plans and like-for-like verdicts that update themselves.", EMBED_BODY,
+     [crumbs([("Home", "/"), ("Embed price cards", "/embed.html")])])
+# link the card from every tool and compare page
+for _x in EMBED_TOOLS + EMBED_CMP:
+    _fp = "public" + (turl(_x["n"]) if _x["k"] == "t" else "/" + _x["s"] + ".html")
+    _h = open(_fp).read()
+    if "/embed.html?card=" not in _h:
+        open(_fp, "w").write(_h.replace("</main>", f'<p class="small">Writing about this? <a href="/embed.html?card={_x["s"]}">Embed this price card</a> — it updates when we re-check prices.</p></main>', 1))
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -1581,6 +1668,7 @@ _lm["/stacks.html"] = STACK_BUILD_DATE
 _lm[PAYLESS_PATH] = PAYLESS_DATE
 _lm[MY_PATH] = MY_DATE
 _lm["/save-money.html"] = "2026-10-20"
+_lm["/embed.html"] = EMBED_DATE
 PC_BUILD_DATE = "2026-10-20"  # tracker page + its tool-page boxes redesigned (v18)
 _lm["/price-changes.html"] = max(_pc_latest, PC_BUILD_DATE)
 for _n in CHANGES_BY_TOOL: _lm[turl(_n)] = max(_lm.get(turl(_n), CHECKED), PC_BUILD_DATE)
