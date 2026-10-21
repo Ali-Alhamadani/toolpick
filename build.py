@@ -1972,6 +1972,81 @@ for _n in list(VO) + ["Murf"]:
 _fp = "public/best-ai-audio-tools.html"; _h = open(_fp).read()
 open(_fp, "w").write(_h.replace("</h1>", '</h1><p class="pick">Voice plans are sold in characters. <a href="/ai-voice-cost.html">See what a minute of AI voice really costs →</a></p>', 1))
 
+# --- v41: high-intent coding pages (prices re-verified 2026-10-21 on official pages) ---
+CD = _tm0.CODING_V41; CODING_CHECKED = _tm0.CODING_CHECKED
+def _cl(t): return t.get("label", t["n"])
+def _pl(x): return f'{e(x[0])} ${x[1]}/mo' + (f' <span class="small">({e(x[2])})</span>' if len(x) > 2 and x[2] else "")
+def _src(t): return f'<a href="{e(t["pr"])}" rel="noopener" target="_blank">official pricing</a>'
+_V41_PAGES = []
+_cur = next(t for t in CD if t["n"] == "Cursor")
+_rows = "".join(f"<tr><th scope='row'><a href='{turl(t['n'])}'>{e(_cl(t))}</a></th><td>{e(t['free'])}</td><td>{_pl(t['entry'])}</td><td>{_pl(t['main']) if t['main'] != t['entry'] else '—'}</td><td>{('$%d/mo (%s, billed yearly)' % (t['yearly'][1], e(t['yearly'][0]))) if t['yearly'] else 'not shown'}</td><td>{_src(t)}</td></tr>" for t in CD)
+_tbl = f"""<div class="tw"><table><caption class="small" style="text-align:left">Individual plans, monthly billing, from each official pricing page on {CODING_CHECKED}. Yearly prices are shown separately and never mixed into the monthly ranking.</caption><tr><th scope="col">Tool</th><th scope="col">Free plan</th><th scope="col">Cheapest paid plan</th><th scope="col">Main plan (if different)</th><th scope="col">Yearly option</th><th scope="col">Source</th></tr>{_rows}</table></div>"""
+_left = "".join(f"<li><a href='{turl(n)}'>{e(n)}</a>: {e(r)}.</li>" for n, r in _tm0.CODING_LEFT_OUT)
+_how = f"""<h2>How we compare</h2><ul><li><b>Monthly billing</b>, individual plans only. Team plans (Cursor Teams $30+/user, Windsurf Teams $80 + $40/seat) aren't ranked against individual plans.</li><li><b>Usage limits differ</b> between tools and aren't published in the same unit, so we compare plan prices and say what each plan includes; we don't guess usage.</li><li><b>Prices re-checked {CODING_CHECKED}</b> on each official pricing page. If a price couldn't be checked, the tool is left out.</li></ul><h2>Left out</h2><ul>{_left}</ul>"""
+def _ld_list(name, path, items): return [{"@context": "https://schema.org", "@type": "ItemList", "name": name, "url": BASE + path, "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": n, "url": BASE + turl(n)} for i, n in enumerate(items)]}]
+def _ld_faq(qas): return {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in qas]}
+def _faq(qas): return "<h2>FAQ</h2>" + "".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q, a in qas)
+# A) Cursor alternatives
+_alts = [t for t in CD if t["n"] != "Cursor"]
+_cmp = "".join(f"<li><a href='{turl(t['n'])}'>{e(_cl(t))}</a>: {_pl(t['entry'])} — ${_cur['main'][1] - t['entry'][1]}/mo less than Cursor Premium (${_cur['main'][1]}/mo).</li>" for t in sorted(_alts, key=lambda t: t["entry"][1]))
+_qa_a = [("What is the cheapest alternative to Cursor?", f"GitHub Copilot Pro at $10/mo (monthly billing, checked {CODING_CHECKED}). Cursor's own Plus plan is $8/mo but only includes Grok models."),
+         ("Is Claude Code included in Claude Pro?", f"Yes. Claude's pricing page lists Claude Code in Pro ($20/mo billed monthly, $17/mo billed yearly), but not in the Free plan (checked {CODING_CHECKED}).")]
+_a_body = f"""<p class="small"><a href="/best-ai-coding-tools.html">AI coding tools</a> › Cursor alternatives</p><h1>Cursor alternatives, with prices checked today</h1>
+<p class="tag">Cursor Premium is ${_cur['main'][1]}/mo. Here is what GitHub Copilot, Windsurf, Claude Code and Warp cost instead, from each official pricing page ({CODING_CHECKED}).</p>
+<p class="pick"><b>Cheapest paid alternative:</b> <a href="{turl('GitHub Copilot')}">GitHub Copilot Pro</a> at $10/mo. Cursor's own Plus plan is $8/mo, but its pricing page says only Grok models are available on it.</p>
+<h2>Alternatives vs Cursor Premium (${_cur['main'][1]}/mo)</h2><ul>{_cmp}</ul><h2>All plans side by side</h2>{_tbl}{_how}{_faq(_qa_a)}
+<p class="small">Related: <a href="/compare/cursor-vs-claude-code.html">Cursor vs Claude Code</a> · <a href="/cheapest-ai-coding-assistant.html">Cheapest AI coding assistant</a> · <a href="/compare/github-copilot-vs-cursor.html">GitHub Copilot vs Cursor</a> · <a href="/compare/cursor-vs-windsurf.html">Cursor vs Windsurf</a></p>"""
+page("/cursor-alternatives.html", f"Cursor Alternatives ({CODING_CHECKED[:4]}): Copilot, Windsurf, Claude Code, Warp Prices | ToolPick",
+     f"Cheaper alternatives to Cursor with prices checked {CODING_CHECKED} on official pages: GitHub Copilot Pro $10/mo, Windsurf Pro $20, Claude Pro (Claude Code) $20, Warp Build $20, vs Cursor Premium $30.",
+     _a_body, _ld_list("Cursor alternatives", "/cursor-alternatives.html", [t["n"] for t in _alts]) + [_ld_faq(_qa_a), crumbs([("ToolPick", "/"), ("AI coding tools", "/best-ai-coding-tools.html"), ("Cursor alternatives", "/cursor-alternatives.html")])])
+_V41_PAGES.append("/cursor-alternatives.html")
+# B) Cursor vs Claude Code
+_cc = next(t for t in CD if t["n"] == "Claude")
+_b_rows = "".join(f"<tr><th scope='row'>{a}</th><td>{b}</td><td>{c}</td></tr>" for a, b, c in [
+  ("Free plan", "Free $0 (limited AI usage)", "Free $0, but Claude Code isn't included"),
+  ("Cheapest paid", "Plus $8/mo (only Grok models)", "Pro $20/mo (includes Claude Code)"),
+  ("Main plan", "Premium $30/mo (most popular)", "Pro $20/mo"),
+  ("Higher tier", "Super $100/mo · Ultra $200/mo", "Max from $100/mo"),
+  ("Yearly billing", "not shown on the pricing page", "Pro $17/mo ($200 billed up front)"),
+  ("What it is", "An AI code editor", "A coding agent included with a Claude subscription, alongside the Claude chat app")])
+_qa_b = [("Is Claude Code cheaper than Cursor?", f"On monthly billing, Claude Pro (which includes Claude Code) is $20/mo and Cursor Premium is $30/mo. Cursor Plus is $8/mo but only includes Grok models (checked {CODING_CHECKED})."),
+         ("Does the free Claude plan include Claude Code?", "No. Claude's pricing page lists Claude Code from the Pro plan up.")]
+_b_body = f"""<p class="small"><a href="/best-ai-coding-tools.html">AI coding tools</a> › Cursor vs Claude Code</p><h1>Cursor vs Claude Code: price comparison</h1>
+<p class="tag">Plans and prices from Cursor's and Claude's official pricing pages, checked {CODING_CHECKED}. Monthly billing unless marked.</p>
+<p class="pick"><b>Verdict on price:</b> on monthly billing, the main plans are Claude Pro at $20/mo (with Claude Code) and Cursor Premium at $30/mo, so Claude Pro costs $10/mo less. Cursor Plus ($8/mo) is cheaper, but limited to Grok models.</p>
+<div class="tw"><table><caption class="small" style="text-align:left">Cursor and Claude Code plans, checked {CODING_CHECKED}</caption><tr><th scope="col"></th><th scope="col"><a href="{turl('Cursor')}">Cursor</a></th><th scope="col"><a href="{turl('Claude')}">Claude Code</a></th></tr>{_b_rows}</table></div>
+<p class="small">Sources: <a href="{e(_cur['pr'])}" rel="noopener" target="_blank">cursor.com/pricing</a> · <a href="{e(_cc['pr'])}" rel="noopener" target="_blank">claude.com/pricing</a>. Usage limits are set differently on each plan and aren't published in the same unit, so we don't compare usage.</p>{_faq(_qa_b)}
+<p class="small">Related: <a href="/cursor-alternatives.html">Cursor alternatives</a> · <a href="/cheapest-ai-coding-assistant.html">Cheapest AI coding assistant</a> · <a href="/compare/github-copilot-vs-cursor.html">GitHub Copilot vs Cursor</a></p>"""
+page("/compare/cursor-vs-claude-code.html", f"Cursor vs Claude Code ({CODING_CHECKED[:4]}): Pricing Compared | ToolPick",
+     f"Cursor vs Claude Code prices checked {CODING_CHECKED}: Cursor Plus $8 (Grok models only), Premium $30; Claude Pro with Claude Code $20/mo or $17/mo yearly; Max from $100.",
+     _b_body, _ld_list("Cursor vs Claude Code", "/compare/cursor-vs-claude-code.html", ["Cursor", "Claude"]) + [_ld_faq(_qa_b), crumbs([("ToolPick", "/"), ("Compare", "/compare-builder.html"), ("Cursor vs Claude Code", "/compare/cursor-vs-claude-code.html")])])
+_V41_PAGES.append("/compare/cursor-vs-claude-code.html")
+# C) Cheapest AI coding assistant
+_rank = sorted(CD, key=lambda t: t["entry"][1])
+_c_list = "".join(f"<li><a href='{turl(t['n'])}'>{e(_cl(t))}</a>: {_pl(t['entry'])} · {_src(t)}</li>" for t in _rank)
+_qa_c = [("What is the cheapest AI coding assistant?", f"Free: GitHub Copilot, Cursor, Windsurf and Warp all have $0 plans. Cheapest paid on monthly billing: Cursor Plus at $8/mo (Grok models only), then GitHub Copilot Pro at $10/mo (checked {CODING_CHECKED})."),
+         ("Is yearly billing cheaper?", "Where the official page shows it: Claude Pro is $17/mo billed yearly ($20 monthly), and Warp Build is $18/mo yearly ($20 monthly).")]
+_c_body = f"""<p class="small"><a href="/best-ai-coding-tools.html">AI coding tools</a> › Cheapest AI coding assistant</p><h1>The cheapest way to get an AI coding assistant</h1>
+<p class="tag">Free plans first, then the cheapest paid plans on monthly billing, from each official pricing page ({CODING_CHECKED}).</p>
+<p class="pick"><b>Free:</b> GitHub Copilot, Cursor, Windsurf and Warp have $0 plans with limited usage (Claude's free plan doesn't include Claude Code). <b>Cheapest paid:</b> Cursor Plus $8/mo (Grok models only), or GitHub Copilot Pro $10/mo.</p>
+<h2>Cheapest paid plan per tool (monthly billing)</h2><ol>{_c_list}</ol><h2>All plans side by side</h2>{_tbl}{_how}{_faq(_qa_c)}
+<p class="small">Related: <a href="/cursor-alternatives.html">Cursor alternatives</a> · <a href="/compare/cursor-vs-claude-code.html">Cursor vs Claude Code</a> · <a href="/pay-less.html">Pay less for a tool</a></p>"""
+page("/cheapest-ai-coding-assistant.html", f"Cheapest AI Coding Assistant ({CODING_CHECKED[:4]}): Free & Paid Plans Compared | ToolPick",
+     f"The cheapest AI coding assistants, checked {CODING_CHECKED}: free plans from Copilot, Cursor, Windsurf, Warp; paid from Cursor Plus $8 (Grok only) and GitHub Copilot Pro $10/mo.",
+     _c_body, _ld_list("Cheapest AI coding assistants", "/cheapest-ai-coding-assistant.html", [t["n"] for t in _rank]) + [_ld_faq(_qa_c), crumbs([("ToolPick", "/"), ("AI coding tools", "/best-ai-coding-tools.html"), ("Cheapest AI coding assistant", "/cheapest-ai-coding-assistant.html")])])
+_V41_PAGES.append("/cheapest-ai-coding-assistant.html")
+# one-line links from tool and compare pages
+_V41_LINE = '<p class="pick small v41">Coding plans checked {d}: <a href="/cursor-alternatives.html">Cursor alternatives</a> · <a href="/compare/cursor-vs-claude-code.html">Cursor vs Claude Code</a> · <a href="/cheapest-ai-coding-assistant.html">Cheapest AI coding assistant</a></p>'.format(d=CODING_CHECKED)
+V41_CHANGED = list(_V41_PAGES)
+for _n in ["Cursor", "GitHub Copilot", "Windsurf", "Claude", "Warp"]:
+    _fp = "public" + turl(_n); _h = open(_fp).read()
+    if 'class="pick small v41"' not in _h: open(_fp, "w").write(_h.replace('<section class="card tbp"', _V41_LINE + '<section class="card tbp"', 1)); V41_CHANGED.append(turl(_n))
+for _x in COMPARISONS:
+    if any(n in ("Cursor", "Claude", "GitHub Copilot", "Windsurf", "Warp") for n in cnames(_x)) and any(n in ("Cursor", "GitHub Copilot", "Windsurf", "Warp") for n in cnames(_x)):
+        _fp = f"public/compare/{_x[0]}.html"; _h = open(_fp).read()
+        if 'v41"' not in _h: open(_fp, "w").write(_h.replace("</h1>", "</h1>" + _V41_LINE, 1)); V41_CHANGED.append(f"/compare/{_x[0]}.html")
+open("public/llms.txt", "a").write(f"\n## AI coding prices\n- [Cursor alternatives]({BASE}/cursor-alternatives.html): GitHub Copilot, Windsurf, Claude Code, Warp vs Cursor, monthly prices checked {CODING_CHECKED}\n- [Cursor vs Claude Code]({BASE}/compare/cursor-vs-claude-code.html): plan-by-plan prices from both official pages\n- [Cheapest AI coding assistant]({BASE}/cheapest-ai-coding-assistant.html): free plans and cheapest paid monthly plans, yearly shown separately\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2052,6 +2127,8 @@ page("/my-ai-costs.html", "My AI Costs — Audit, Watchlist, Reminders, Calculat
 for p in _MAP:
     if p in URLS: URLS.remove(p)
 _lm["/my-ai-costs.html"] = V39_DATE
+for _u in V41_CHANGED: _lm[_u] = CODING_CHECKED
+open("/tmp/v41-changed.txt","w").write("\n".join(V41_CHANGED))
 for _n in dict.fromkeys(list(VC) + list(VO) + ["Murf"]):
     _fp = "public" + turl(_n); _h = open(_fp).read()
     _ls = ([f'<a href="/my-ai-costs.html#video">AI video</a>'] if _n in VC else []) + ([f'<a href="/my-ai-costs.html#voice">AI voice</a>'] if _n in VO or _n == "Murf" else [])

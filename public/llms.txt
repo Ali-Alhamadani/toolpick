@@ -242,6 +242,11 @@
 - [Embed live price cards](https://toolpick-ai.vercel.app/embed.html): free iframe price cards per tool (https://toolpick-ai.vercel.app/embed/claude.html) and per comparison (https://toolpick-ai.vercel.app/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating
 Data: https://toolpick-ai.vercel.app/tools.json
 
+## AI coding prices
+- [Cursor alternatives](https://toolpick-ai.vercel.app/cursor-alternatives.html): GitHub Copilot, Windsurf, Claude Code, Warp vs Cursor, monthly prices checked 2026-10-21
+- [Cursor vs Claude Code](https://toolpick-ai.vercel.app/compare/cursor-vs-claude-code.html): plan-by-plan prices from both official pages
+- [Cheapest AI coding assistant](https://toolpick-ai.vercel.app/cheapest-ai-coding-assistant.html): free plans and cheapest paid monthly plans, yearly shown separately
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.

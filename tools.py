@@ -576,3 +576,24 @@ VOICE_COSTS = {
 VOICE_LEFT_OUT = [("Murf","its pricing page shows only pay-as-you-go API rates ($0.03 per 1,000 characters), not a monthly plan quota"),
                   ("Speechify","it's a read-aloud app with unlimited listening, not a voice-generation quota"),
                   ("Descript","its plans count media minutes for editing and transcription, not a text-to-speech character quota")]
+
+# v41 (2026-10-21): AI coding plan prices re-verified today on each official pricing page (monthly billing unless marked).
+# Cursor https://cursor.com/pricing : "Free $0 /month", "Plus $8 /month ... *Only Grok models are available on this plan", "Premium Most popular $30 /month",
+#   "Super $100 /month", "Ultra $200/month", "Teams $30+/user/month".
+# GitHub Copilot https://github.com/features/copilot/plans : "Free $0", "Pro $10 per month", "Pro+ $39 per month", "Max $100 per month".
+# Windsurf https://windsurf.com/pricing : "Free $0", "Pro POPULAR $20 PER MONTH", "Max NEW $200 PER MONTH", "Teams $80 /MONTH FOR TEAM PLAN + $40/MO PER FULL DEV SEAT".
+# Claude https://claude.com/pricing : Pro "$17 Per month with annual subscription discount ($200 billed up front). $20 if billed monthly."; FAQ: Pro "includes Claude Code";
+#   features table "Claude Code No Yes Yes Yes" (Free/Pro/Max 5x/Max 20x); Max "From $100".
+# Warp https://www.warp.dev/pricing : "Free $0/mo", "Build Starts at $20/mo" ("$18 /month" annual plan), "$20 of agent usage included each month", "Max Starts at $200/mo".
+# Left out: Replit (https://replit.com/pricing showed a Cloudflare "Performing security verification" page today, price not verifiable);
+#   Qodo (https://www.qodo.ai/pricing/ is a team PR-review plan, "Pro Team" on credits at "$.012/credit", a different job and billing).
+CODING_CHECKED = "2026-10-21"
+CODING_V41 = [
+ dict(n="Cursor", pr="https://cursor.com/pricing", free="Free $0 (limited AI usage)", entry=("Plus", 8, "only Grok models on this plan"), main=("Premium", 30, "most popular plan"), top=("Super", 100, ""), yearly=None),
+ dict(n="GitHub Copilot", pr="https://github.com/features/copilot/plans", free="Free $0 (limited chat and agent usage)", entry=("Pro", 10, ""), main=("Pro+", 39, ""), top=("Max", 100, ""), yearly=None),
+ dict(n="Windsurf", pr="https://windsurf.com/pricing", free="Free $0 (light agent quota, unlimited Tab completions)", entry=("Pro", 20, ""), main=("Pro", 20, ""), top=("Max", 200, ""), yearly=None),
+ dict(n="Claude", label="Claude Code (Claude Pro)", pr="https://claude.com/pricing", free="Free plan $0, but no Claude Code", entry=("Pro", 20, "includes Claude Code"), main=("Pro", 20, "includes Claude Code"), top=("Max", 100, "from $100"), yearly=("Pro", 17)),
+ dict(n="Warp", pr="https://www.warp.dev/pricing", free="Free $0", entry=("Build", 20, "includes $20 of agent usage a month"), main=("Build", 20, "includes $20 of agent usage a month"), top=("Max", 200, ""), yearly=("Build", 18)),
+]
+CODING_LEFT_OUT = [("Replit", "its pricing page showed a security check today, so we couldn't verify the price"),
+                   ("Qodo", "it's a team code-review product billed in credits, a different job and billing")]
