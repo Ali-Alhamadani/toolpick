@@ -206,7 +206,7 @@
 - [email & inbox help](https://toolpick-ai.vercel.app/best-ai-tool-for-email-assistant.html)
 
 ## Subscription Audit
-- [AI Subscription Audit](https://toolpick-ai.vercel.app/subscription-audit.html): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly
+- [AI Subscription Audit](https://toolpick-ai.vercel.app/my-ai-costs.html#audit): list tools you pay for, get keep/cancel/try-free-tier checklist with potential saving from verified data only, e.g. ?tools=elevenlabs:6:monthly,descript:16:monthly
 
 ## New SEO guides
 - [Free alternatives to Recraft](https://toolpick-ai.vercel.app/free-alternative-to-recraft.html)
@@ -220,7 +220,7 @@
 - [Compare builder](https://toolpick-ai.vercel.app/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen
 
 ## Cost calculator
-- [Cost calculator](https://toolpick-ai.vercel.app/cost-calculator.html): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly
+- [Cost calculator](https://toolpick-ai.vercel.app/my-ai-costs.html#calculator): true monthly/yearly cost by tool or category, seats and billing period, from verified entry prices, e.g. ?tool=elevenlabs&seats=1&billing=monthly
 
 ## Browse all tools
 - [Browse all tools directory](https://toolpick-ai.vercel.app/tools.html): filter all tools by category, free plan, verified price, billing and seat pricing, e.g. ?category=audio&free=yes&sort=price
@@ -230,11 +230,18 @@
 - [How we pick](https://toolpick-ai.vercel.app/how-we-pick.html): every pick shows how it was picked (official pricing data, not hands-on tested), price on its checked date, price history, earn disclosure (no affiliate links) and one real limitation
 
 ## Real cost of AI video
-- [Real cost of AI video](https://toolpick-ai.vercel.app/ai-video-cost.html): seconds of video per plan and $/minute for Runway, Pika, Luma from official credit rates; same model+resolution comparisons only, e.g. ?s=60&t=3
+- [Real cost of AI video](https://toolpick-ai.vercel.app/my-ai-costs.html#video): seconds of video per plan and $/minute for Runway, Pika, Luma from official credit rates; same model+resolution comparisons only, e.g. ?s=60&t=3
+
+## Real cost of AI voice
+- [Real cost of AI voice](https://toolpick-ai.vercel.app/my-ai-costs.html#voice): minutes of text-to-speech per plan and $/minute for ElevenLabs, Luma, Runway from official pricing pages; monthly billing, same-model ranking, e.g. ?m=60&t=2
 
 ## Renewal reminders
-- [Renewal reminders](https://toolpick-ai.vercel.app/renewal-reminders.html): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20
+- [Renewal reminders](https://toolpick-ai.vercel.app/my-ai-costs.html#reminders): calendar (.ics) or Google Calendar reminders before each AI subscription renews, with checked price and same-job cheaper option, e.g. ?r=claude:m:2026-11-05:20
 
 ## Embed price cards
 - [Embed live price cards](https://toolpick-ai.vercel.app/embed.html): free iframe price cards per tool (https://toolpick-ai.vercel.app/embed/claude.html) and per comparison (https://toolpick-ai.vercel.app/embed/compare/chatgpt-vs-claude.html), same like-for-like verdicts, auto-updating
 Data: https://toolpick-ai.vercel.app/tools.json
+
+
+## My AI costs
+- [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.

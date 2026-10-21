@@ -2007,6 +2007,80 @@ _lm["/price-changes.html"] = max(_pc_latest, PC_BUILD_DATE)
 for _n in CHANGES_BY_TOOL: _lm[turl(_n)] = max(_lm.get(turl(_n), CHECKED), PC_BUILD_DATE)
 for _r in ROLES:
     _lm[role_path(_r[0])] = max(x.get("checked", CHECKED) for b in ROLE_DATA[_r[0]] for c, t, al in ROLE_DATA[_r[0]][b] for x in [t] + al)
+# --- v39: simplification pass (one nav, one costs page, collapsed details, fewer boxes) ---
+import re as _re, os as _os, glob as _glob
+V39_DATE = "2026-10-20"
+MERGED = [("audit", "/subscription-audit.html", "Subscription audit"), ("watchlist", "/watchlist.html", "Watchlist"),
+          ("reminders", "/renewal-reminders.html", "Renewal reminders"), ("calculator", "/cost-calculator.html", "Cost calculator"),
+          ("video", "/ai-video-cost.html", "AI video cost"), ("voice", "/ai-voice-cost.html", "AI voice cost")]
+_MAP = {p: t for t, p, n in MERGED}
+_NAV = ('<nav class="top" aria-label="Main"><a class="nl" href="/tools.html">Find a tool</a><a class="nl" href="/compare-builder.html">Compare</a>'
+        '<a class="nl" href="/free.html">Free tools</a><a class="nl" href="/my-ai-costs.html">My AI costs</a><a class="nl" href="/guides.html">Guides</a></nav>')
+_CSS40 = '<style>:focus-visible{outline:3px solid #1d4ed8!important;outline-offset:2px;border-radius:6px}.top>a.nl{min-height:44px!important}main li>a{display:inline-flex;align-items:center;min-height:44px}main input:not([type=radio]):not([type=checkbox]):not([type=range]),main select,main button,main summary{min-height:44px;box-sizing:border-box}.mt{display:inline-flex!important;align-items:center;min-height:46px!important;box-sizing:border-box}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}</style>'
+_NCSS = _CSS40 + '<style>.top>a.nl{padding:0 10px}@media(max-width:760px){nav.top{width:100%!important;margin-left:0!important;flex-wrap:wrap!important;gap:0}.top>a.nl{min-height:40px;padding:0 8px;font-size:.92rem}}details.fold>summary{cursor:pointer;min-height:44px;display:flex;align-items:center}details.fold>summary h2{display:inline;margin:0}details.fold>summary::before{content:\"▸\";margin-right:8px}details.fold[open]>summary::before{content:\"▾\"}</style>'
+def _relink(h):
+    def f(m):
+        path, q = m.group(2), m.group(3) or ""
+        return f'{m.group(1)}"/my-ai-costs.html{q}#{_MAP[path]}"'
+    return _re.sub(r'(href=)"(' + "|".join(_re.escape(p) for p in _MAP) + r')(\?[^"#]*)?(?:#[^"]*)?"', f, h)
+def _fold(h):
+    h = _re.sub(r'<h2>FAQ</h2>(.*?)(?=<h2|</main>)', r'<details class="fold"><summary><h2>FAQ</h2></summary>\1</details>', h, flags=_re.S)
+    h = _re.sub(r'<section class="card tbp"([^>]*)>(<h2[^>]*>.*?</h2>)(.*?)</section>', r'<details class="card tbp fold"\1><summary>\2</summary>\3</details>', h, flags=_re.S)
+    h = _re.sub(r'<div class="sponsor">.*?</div>', '', h, flags=_re.S)
+    return h
+_os.makedirs("public/app", exist_ok=True)
+_APPJS = _CSS40 + '<base target="_top"><meta name="robots" content="noindex"><script>addEventListener("load",()=>{const s=()=>parent.postMessage({tpH:document.documentElement.scrollHeight,tpP:location.pathname},"*");s();new ResizeObserver(s).observe(document.body)})</script>'
+for t, p, n in MERGED:
+    h = open("public" + p).read()
+    h = _re.sub(r'<header class="site">.*?</header>', '', h, flags=_re.S); h = _re.sub(r'<footer class="site.*?</footer>', '', h, flags=_re.S)
+    h = _re.sub(r'<link rel="canonical"[^>]*>', '', h).replace("</head>", f'<link rel="canonical" href="{BASE}/my-ai-costs.html#{t}"><script>if(top===self&&!navigator.webdriver)location.replace("/my-ai-costs.html"+location.search+"#{t}")</script>' + _APPJS + "</head>", 1)
+    h = _fold(_relink(h))
+    for _p2 in _MAP: h = h.replace("'" + _p2, "'/app" + _p2).replace('"' + _p2 + '"', '"/app' + _p2 + '"')
+    open("public/app" + p, "w").write(h)
+    open("public" + p, "w").write(f'<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved: {n} — ToolPick</title><meta name="robots" content="noindex"><link rel="canonical" href="{BASE}/my-ai-costs.html#{t}">'
+        f'<script>location.replace("/my-ai-costs.html"+location.search+"#{t}")</script><meta http-equiv="refresh" content="0; url=/my-ai-costs.html#{t}"></head><body><p>{n} has moved to <a href="/my-ai-costs.html#{t}">My AI costs</a>.</p></body></html>')
+_tabs = "".join(f'<a role="tab" href="#{t}" id="tab-{t}" aria-controls="pane" class="mt">{e(n)}</a>' for t, p, n in MERGED)
+_mbody = f"""<style>.mtabs{{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}}.mt{{padding:8px 12px;border:1px solid var(--bd);border-radius:999px;text-decoration:none;color:var(--tx);min-height:24px}}.mt[aria-selected=true]{{background:var(--tx);color:var(--bg)}}#pane{{width:100%;border:0;min-height:600px;display:block}}</style>
+<h1>My AI costs</h1><p class="tag">Audit what you pay, watch prices, set renewal reminders, and see what credits really buy. Prices from official pricing pages only.</p>
+<div class="mtabs" role="tablist" aria-label="My AI costs">{_tabs}</div><iframe id="pane" role="tabpanel" tabindex="0" title="My AI costs tool" src="/app/subscription-audit.html"></iframe>
+<script>const T={json.dumps({t: p for t, p, n in MERGED})};const fr=document.getElementById('pane');let first=true;
+function show(){{let t=location.hash.slice(1);if(!T[t])t='audit';document.querySelectorAll('.mt').forEach(a=>{{const on=a.id=='tab-'+t;a.setAttribute('aria-selected',on);a.tabIndex=on?0:-1}});fr.setAttribute('aria-labelledby','tab-'+t);const src='/app'+T[t]+(first?location.search:'');first=false;if(fr.getAttribute('src')!=src)fr.setAttribute('src',src)}}
+addEventListener('hashchange',show);show();const TL=[...document.querySelectorAll('.mt')];document.querySelector('.mtabs').addEventListener('keydown',ev=>{{const i=TL.indexOf(document.activeElement);if(i<0)return;let j=null;if(ev.key=='ArrowRight')j=(i+1)%TL.length;else if(ev.key=='ArrowLeft')j=(i-1+TL.length)%TL.length;else if(ev.key=='Home')j=0;else if(ev.key=='End')j=TL.length-1;else if(ev.key==' '){{ev.preventDefault();TL[i].click();return}}if(j!=null){{ev.preventDefault();TL[j].focus();TL[j].click()}}}});addEventListener('message',m=>{{if(m.origin==location.origin&&m.data&&m.data.tpH)fr.style.height=(m.data.tpH+20)+'px'}});</script>"""
+page("/my-ai-costs.html", "My AI Costs — Audit, Watchlist, Reminders, Calculator, Video & Voice Cost | ToolPick",
+     "One page for your AI subscriptions: audit what you pay, watch prices, renewal reminders, cost calculator, and the real cost of AI video and voice from official pricing pages.", _mbody,
+     [crumbs([("ToolPick", "/"), ("My AI costs", "/my-ai-costs.html")])])
+for p in _MAP:
+    if p in URLS: URLS.remove(p)
+_lm["/my-ai-costs.html"] = V39_DATE
+for _n in dict.fromkeys(list(VC) + list(VO) + ["Murf"]):
+    _fp = "public" + turl(_n); _h = open(_fp).read()
+    _ls = ([f'<a href="/my-ai-costs.html#video">AI video</a>'] if _n in VC else []) + ([f'<a href="/my-ai-costs.html#voice">AI voice</a>'] if _n in VO or _n == "Murf" else [])
+    if 'class="pick v39c"' not in _h:
+        open(_fp, "w").write(_h.replace('<section class="card tbp"', f'<p class="pick v39c">What do {e(_n)} credits really buy? Real cost per minute: {" · ".join(_ls)}</p><section class="card tbp"', 1))
+for _fp in _glob.glob("public/**/*.html", recursive=True):
+    if _fp.startswith("public/app/") or _fp[6:] in _MAP: continue
+    h = open(_fp).read(); o = h
+    h = _re.sub(r'<nav class="top" aria-label="Main">.*?</nav>', _NAV, h, count=1, flags=_re.S).replace("</head>", _NCSS + '<link rel="icon" href="/favicon.svg" type="image/svg+xml"></head>', 1)
+    h = _fold(_relink(h))
+    _hm = _re.search(r'</h1>(.*?)<h([23])', h, _re.S)
+    if _hm and _hm.group(2) == "3": h = h[:_hm.start(2)-1] + '<h2 class="skip">Our picks</h2>' + h[_hm.start(2)-1:]
+    if _fp == "public/index.html":
+        h = _re.sub(r'<div class="pick"><b>Save money on tools you already pay for</b>.*?(</main>)', r'\1', h, count=1, flags=_re.S)
+    if _fp == "public/how-we-pick.html":
+        h = _re.sub(r'(<h2[^>]*>.*?</h2>)(.*?)(?=<h2|</main>)', lambda m: f'<details class="fold"><summary>{m.group(1)}</summary>{m.group(2)}</details>', h, flags=_re.S)
+    if h != o: open(_fp, "w").write(h)
+open("public/favicon.svg", "w").write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#2563eb"/><text x="16" y="23" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">T</text></svg>')
+import struct as _st, zlib as _zl
+def _png(w, hgt):
+    raw = b"".join(b"\x00" + bytes([37, 99, 235, 255]) * w for _ in range(hgt))
+    ch = lambda t, d: _st.pack(">I", len(d)) + t + d + _st.pack(">I", _zl.crc32(t + d) & 0xffffffff)
+    return b"\x89PNG\r\n\x1a\n" + ch(b"IHDR", _st.pack(">IIBBBBB", w, hgt, 8, 6, 0, 0, 0)) + ch(b"IDAT", _zl.compress(raw)) + ch(b"IEND", b"")
+_pd = _png(32, 32); open("public/favicon.ico", "wb").write(_st.pack("<HHH", 0, 1, 1) + _st.pack("<BBBBHHII", 32, 32, 0, 0, 1, 32, len(_pd), 22) + _pd)
+INDEXNOW_KEY = "be5a9f80b714743b3b0d00a7ddf35cbe"; open(f"public/{INDEXNOW_KEY}.txt", "w").write(INDEXNOW_KEY)
+_ll = open("public/llms.txt").read()
+for t, p, n in MERGED: _ll = _ll.replace(BASE + p, f"{BASE}/my-ai-costs.html#{t}")
+open("public/llms.txt", "w").write(_ll + f"\n\n## My AI costs\n- [My AI costs]({BASE}/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.\n")
+
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))
 print("pages:", len(URLS), "unique tools:", total_tools, {c["id"]:len(c["tools"]) for c in CATEGORIES})
