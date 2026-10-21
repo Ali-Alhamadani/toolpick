@@ -56,7 +56,7 @@
 - [Suno](https://toolpick-ai.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
 - [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
-- [Otter](https://toolpick-ai.vercel.app/tools/otter.html): Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly) | free: Basic: free forever
+- [Otter](https://toolpick-ai.vercel.app/tools/otter.html): List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). Promotional (first-time subscribers): Pro $8.49/mo monthly or $4.17/mo yearly (save 50%); Business $24/user/mo for 3 months (20% off) | free: Basic: free forever
 - [Udio](https://toolpick-ai.vercel.app/tools/udio.html): Standard $10/mo ($8 annually); Pro $30/mo ($24 annually) | free: Free: 100 credits/mo
 - [Riverside](https://toolpick-ai.vercel.app/tools/riverside.html): Paid plans billed $288/yr or $408/yr | free: Free: $0
 - [Krisp](https://toolpick-ai.vercel.app/tools/krisp.html): $16/user/mo ($8/user/mo billed yearly) | free: Free plan: $0

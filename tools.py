@@ -228,6 +228,7 @@ FREE_ALT_FOR += ["Pika","InVideo","Writesonic","Surfer","Krea","Notion AI","Clau
 
 # Browser-verified 2026-10-15 (official pricing pages)
 _BV = {
+ "Otter": dict(price="List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). Promotional (first-time subscribers): Pro $8.49/mo monthly or $4.17/mo yearly (save 50%); Business $24/user/mo for 3 months (20% off) (checked 2026-10-21)"),
  "ChatGPT": dict(price="Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing (checked 2026-10-15)", free="Free: $0 (unlimited text chats on GPT-6, limits on tools)"),
  "Perplexity": dict(price="Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15)", free="Free tier available"),
  "Gamma": dict(price="Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-15)", free="Free plan available"),
@@ -380,10 +381,13 @@ PRICE_NOTES = {
  "2026-10-19|Qodo": ("newplan", "Qodo now has a Pro Team plan at $30 (up to 30 users). Before, it only sold credit packs at $0.012 per credit."),
  "2026-10-19|Surfer": ("newplan", "Surfer now has a Discovery plan at $49/mo billed yearly. Before, its cheapest listed plan was $82/mo billed yearly."),
  "2026-10-19|n8n": ("currency", "n8n now shows US dollar prices: Starter $20/mo, Pro $50/mo, Business $800/mo, billed yearly. Before, we listed euro prices (€20, €50, €667), so this is not a like-for-like price change."),
+ "2026-10-21|Otter": ("changed", "Otter's list prices are unchanged (Pro $16.99/user/mo, Business $30/user/mo). New: a first-time-subscriber offer, Pro at $8.49/mo monthly or $4.17/mo yearly (50% off) and Business at $24/user/mo for 3 months (20% off)."),
 }
 # Snapshot diffs known to be artifacts, not real changes (never shown).
 PRICE_SKIP = {
  "2026-10-15|Kling AI": "The 2026-10-14 snapshot was rewritten with text from the 2026-10-17 check, so this diff runs backwards in time.",
+ "2026-10-21|Microsoft Copilot": "Wording-only rewrite from the 2026-10-20 tier-matching update; prices unchanged.",
+ "2026-10-21|Google Gemini": "Wording-only rewrite from the 2026-10-20 tier-matching update; prices unchanged.",
 }
 
 # --- v24-fix: merge the "Claude (Pro)" duplicate into Claude (same product, same pricing page) ---
