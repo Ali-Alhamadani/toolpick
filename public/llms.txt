@@ -247,6 +247,9 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [Cursor vs Claude Code](https://toolpick-ai.vercel.app/compare/cursor-vs-claude-code.html): plan-by-plan prices from both official pages
 - [Cheapest AI coding assistant](https://toolpick-ai.vercel.app/cheapest-ai-coding-assistant.html): free plans and cheapest paid monthly plans, yearly shown separately
 
+## Free plan limits
+- [Free plan limits, side by side](https://toolpick-ai.vercel.app/free-plan-limits.html): 22 AI tools' free plans: what's included, main limit, watermark, commercial use, cheapest monthly upgrade; official pages checked 2026-10-22; filter with ?cat=video etc.
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.

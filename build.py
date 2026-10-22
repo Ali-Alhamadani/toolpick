@@ -2047,6 +2047,50 @@ for _x in COMPARISONS:
         if 'v41"' not in _h: open(_fp, "w").write(_h.replace("</h1>", "</h1>" + _V41_LINE, 1)); V41_CHANGED.append(f"/compare/{_x[0]}.html")
 open("public/llms.txt", "a").write(f"\n## AI coding prices\n- [Cursor alternatives]({BASE}/cursor-alternatives.html): GitHub Copilot, Windsurf, Claude Code, Warp vs Cursor, monthly prices checked {CODING_CHECKED}\n- [Cursor vs Claude Code]({BASE}/compare/cursor-vs-claude-code.html): plan-by-plan prices from both official pages\n- [Cheapest AI coding assistant]({BASE}/cheapest-ai-coding-assistant.html): free plans and cheapest paid monthly plans, yearly shown separately\n")
 
+# --- v42: Free plan limits, side by side (verified 2026-10-22) ---
+FL = _tm0.FREE_LIMITS; FREE_CHECKED = _tm0.FREE_CHECKED; _NS = _tm0.NS
+_fcat = {}
+for _c in CATEGORIES:
+    for _t in _c["tools"]: _fcat.setdefault(_t["name"], _c)
+def _cell(v): return '<span class="small" style="color:var(--mu,#555)">not stated</span>' if v == _NS else e(v)
+_frows = ""
+for n, inc, lim, wm, com, up in FL:
+    _c = _fcat[n]; _s2 = _tm0.FREE_SRC2.get(n)
+    _frows += (f"<tr data-cat='{_c['id']}'><th scope='row'><a href='{turl(n)}'>{e(n)}</a><br><span class='small'>{e(_c['name'])}</span></th><td>{_cell(inc)}</td><td>{_cell(lim)}</td><td>{_cell(wm)}</td><td>{_cell(com)}</td><td>{_cell(up)}</td>"
+               f"<td><a href='{e(_tm0.FREE_SRC[n])}' rel='noopener' target='_blank'>Pricing</a>" + (f" · <a href='{e(_s2)}' rel='noopener' target='_blank'>Help/terms</a>" if _s2 else "") + "</td></tr>")
+_fcats = [c for c in CATEGORIES if any(_fcat[r[0]]["id"] == c["id"] for r in FL)]
+_fopts = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in _fcats)
+_fbest = "".join(f"<li data-cat='{cid}'><b>{e(next(c['name'] for c in CATEGORIES if c['id'] == cid))}:</b> <a href='{turl(n)}'>{e(n)}</a>, {e(why)}.</li>" for cid, (n, why) in _tm0.FREE_BEST.items())
+_fleft = "".join(f"<li><a href='{turl(n)}'>{e(n)}</a>: {e(r)}.</li>" for n, r in _tm0.FREE_LEFT_OUT)
+_fl_body = f"""<p class="small"><a href="/free.html">Free tools</a> › Free plan limits</p><h1>Free plan limits, side by side</h1>
+<p class="tag">What each free plan really includes, its main limit, watermarks, commercial use, and the cheapest monthly upgrade. Every value read on the tool's official pricing, help or terms page on {FREE_CHECKED}; “not stated” means the page doesn't say.</p>
+<h2>Best free plan for…</h2><ul id="fl-best">{_fbest}</ul>
+<style>{"".join(f'html[data-fc="{c["id"]}"] #fl-t tr[data-cat]:not([data-cat="{c["id"]}"]),html[data-fc="{c["id"]}"] #fl-best li:not([data-cat="{c["id"]}"]){{display:none}}' for c in _fcats)}</style><script>(function(){{var q=new URLSearchParams(location.search).get("cat");if(q&&/^[a-z]+$/.test(q))document.documentElement.setAttribute("data-fc",q)}})()</script><p><label for="fl-cat">Show category</label> <select id="fl-cat"><option value="">All categories</option>{_fopts}</select> <span id="fl-n" class="small" role="status"></span></p>
+<div class="tw"><table id="fl-t"><caption class="small" style="text-align:left">Free plans of {len(FL)} tools, checked {FREE_CHECKED}. Upgrade prices are monthly billing.</caption><tr><th scope="col">Tool</th><th scope="col">Free plan includes</th><th scope="col">Main limit</th><th scope="col">Watermark</th><th scope="col">Commercial use</th><th scope="col">Cheapest paid step-up (monthly)</th><th scope="col">Source</th></tr>{_frows}</table></div>
+<h2>Not in the table</h2><ul>{_fleft}</ul>
+<p class="small">Related: <a href="/free.html">Can I do it for free?</a> · <a href="/how-we-pick.html">How we pick</a></p>
+<script>const S=document.getElementById('fl-cat'),R=[...document.querySelectorAll('#fl-t tr[data-cat]')],B=[...document.querySelectorAll('#fl-best li')],N=document.getElementById('fl-n');
+function f(){{const v=S.value;if(v)document.documentElement.setAttribute('data-fc',v);else document.documentElement.removeAttribute('data-fc');let k=0;R.forEach(r=>{{const on=!v||r.dataset.cat==v;r.hidden=!on;if(on)k++}});B.forEach(li=>li.hidden=!!v&&li.dataset.cat!=v);N.textContent=k+' tool'+(k==1?'':'s')+' shown';if(v)history.replaceState(null,'','?cat='+v);else history.replaceState(null,'',location.pathname)}}
+const q=new URLSearchParams(location.search).get('cat');if(q&&[...S.options].some(o=>o.value==q))S.value=q;S.addEventListener('change',f);f();</script>"""
+page("/free-plan-limits.html", f"Free Plan Limits Side by Side ({FREE_CHECKED[:4]}): Watermarks, Commercial Use, Upgrade Prices | ToolPick",
+     f"Free plans of {len(FL)} AI tools compared: what's included, the main limit, watermark, commercial use and the cheapest monthly upgrade, from official pages checked {FREE_CHECKED}.",
+     _fl_body, [{"@context": "https://schema.org", "@type": "ItemList", "name": "AI tool free plan limits", "url": BASE + "/free-plan-limits.html", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": r[0], "url": BASE + turl(r[0])} for i, r in enumerate(FL)]},
+                {"@context": "https://schema.org", "@type": "Dataset", "name": "AI tool free plan limits", "description": f"Free plan inclusions, limits, watermark, commercial use and cheapest monthly upgrade for {len(FL)} AI tools, from official pricing pages.", "url": BASE + "/free-plan-limits.html", "dateModified": FREE_CHECKED, "creator": {"@type": "Organization", "name": "ToolPick"}, "license": BASE + "/how-we-pick.html"},
+                crumbs([("ToolPick", "/"), ("Free tools", "/free.html"), ("Free plan limits", "/free-plan-limits.html")])])
+V42_CHANGED = ["/free-plan-limits.html"]
+for n, inc, lim, wm, com, up in FL:
+    _fp = "public" + turl(n); _h = open(_fp).read()
+    if 'class="small v42"' in _h: continue
+    _bits = [x for x in [inc if inc != _NS else "", ("limit: " + lim) if lim != _NS else ""] if x]
+    _line = f'<p class="small v42"><b>Free plan:</b> {e("; ".join(_bits) or "see the official pricing page")} (checked {FREE_CHECKED}) · <a href="/free-plan-limits.html?cat={_fcat[n]["id"]}">Compare free plans</a></p>'
+    _i = _h.find('<section class="verdict')
+    if _i > 0: open(_fp, "w").write(_h[:_i] + _line + _h[_i:]); V42_CHANGED.append(turl(n))
+_FLINE = f'<p class="pick small v42">Free plans compared side by side (limits, watermarks, commercial use), checked {FREE_CHECKED}: <a href="/free-plan-limits.html">Free plan limits →</a></p>'
+for _fp in ["public/free.html"] + sorted(_glob0 for _glob0 in __import__("glob").glob("public/best-free-ai-*-tools.html")):
+    _h = open(_fp).read()
+    if 'v42"' not in _h: open(_fp, "w").write(_h.replace("</h1>", "</h1>" + _FLINE, 1)); V42_CHANGED.append(_fp[6:])
+open("public/llms.txt", "a").write(f"\n## Free plan limits\n- [Free plan limits, side by side]({BASE}/free-plan-limits.html): {len(FL)} AI tools' free plans: what's included, main limit, watermark, commercial use, cheapest monthly upgrade; official pages checked {FREE_CHECKED}; filter with ?cat=video etc.\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2128,6 +2172,8 @@ for p in _MAP:
     if p in URLS: URLS.remove(p)
 _lm["/my-ai-costs.html"] = V39_DATE
 for _u in V41_CHANGED: _lm[_u] = CODING_CHECKED
+for _u in V42_CHANGED: _lm[_u] = FREE_CHECKED
+open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
 open("/tmp/v41-changed.txt","w").write("\n".join(V41_CHANGED))
 for _n in dict.fromkeys(list(VC) + list(VO) + ["Murf"]):
     _fp = "public" + turl(_n); _h = open(_fp).read()

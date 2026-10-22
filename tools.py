@@ -597,3 +597,56 @@ CODING_V41 = [
 ]
 CODING_LEFT_OUT = [("Replit", "its pricing page showed a security check today, so we couldn't verify the price"),
                    ("Qodo", "it's a team code-review product billed in credits, a different job and billing")]
+
+# v42 (2026-10-22): Free plan limits, side by side. Every value read today on the official pricing page in FREE_SRC; "not stated" = not on the page.
+# Text tools have no watermark ("n/a (text)"). Quotes kept short in each cell; monthly step-up price read with the page's Monthly toggle.
+FREE_CHECKED = "2026-10-22"
+NS = "not stated"
+FREE_LIMITS = [
+ # name, includes, main limit, watermark, commercial use, cheapest paid step-up (monthly)
+ ("Claude", "Chat on web, desktop and mobile; web search, files and code; memory; Artifacts", NS, "n/a (text)", NS, "Pro $20/mo"),
+ ("Le Chat (Mistral)", "Web and mobile; basic image generation and editing; 100+ connectors", "“Limited messages and web searches”", "n/a (text)", NS, "Pro $14.99/mo (excl. tax)"),
+ ("Cursor", "Limited AI usage, agent and chat requests", "“Limited agent requests” (no number stated)", "n/a (text)", NS, "Plus $8/mo (only Grok models)"),
+ ("GitHub Copilot", "Entry-level models; community support", "2,000 completions per month", "n/a (text)", NS, "Pro $10/mo"),
+ ("Lovable", "Unlimited collaborators; 5 lovable.app domains; invite-only publishing", NS, "Lovable badge (removal is a Pro feature)", NS, "Pro $25/mo"),
+ ("Bolt", "Public and private projects; unlimited databases; website hosting", "1M tokens per month, with daily limits", "Bolt branding on websites", NS, NS),
+ ("Grammarly", "Spelling and grammar checks; tone detection", "100 AI prompts", "n/a (text)", NS, NS),
+ ("Notion AI", "Notion for individuals; basic forms and sites", "Notion AI is a trial only", "n/a (text)", NS, NS),
+ ("Otter", "Live transcription for Zoom, Teams and Meet; AI chat; speaker identification", "300 transcription minutes a month; 3 lifetime file imports", "n/a (text)", NS, "Pro $16.99/user/mo"),
+ ("Fathom", "Unlimited recordings; instant call summaries", NS, "n/a (text)", NS, "Premium $20/mo"),
+ ("Canva", "1,000+ design types; 1.6M+ templates; 5GB storage", "Up to 20 Standard or Premium AI uses", "On Pro content only", "Yes, Free content in your designs (e.g. marketing, merchandise)", NS),
+ ("Krea", "Selected models and features", "100 units a day", NS, "Not included (paid plans only, per pricing FAQ)", "Basic $9/mo"),
+ ("Runway", "A selection of generative models; 5GB storage", "125 credits, one time only", "Yes, videos carry a Runway watermark", "Yes, on every plan including Free", "Standard $15/mo"),
+ ("Pika", "All models; credit packs only", "0 credits a month (buy packs)", "No watermark", "No commercial license", "Starter $10/mo"),
+ ("Kling AI", "Basic plan at $0", NS, NS, NS, "Standard $10/mo ($6.99 first month)"),
+ ("HeyGen", "Avatar IV and Video Agent; 1 custom video avatar", "3 videos a month, up to 1 minute each", "Yes, watermarked", "No (personal, non-commercial use only, per terms)", "Creator $29/mo"),
+ ("Descript", "Text-based editing; AI tools to try", "60 media minutes a month; 720p export", NS, NS, "Hobbyist $24/mo"),
+ ("CapCut", "Free templates; basic editing tools", NS, NS, NS, "Pro $19.99/mo"),
+ ("ElevenLabs", "Text to speech, speech to text, sound effects, voice design, music; 3 Studio projects", "10,000 credits a month", "n/a (audio)", "No (commercial license starts at Starter)", "Starter $6/mo"),
+ ("Suno", "Free models; standard features; upload up to 8 min of audio", "50 credits a day; no monthly song downloads", NS, "No commercial rights", "Pro $10/mo"),
+ ("Udio", "Basic features; up to 4 songs at once", "10 credits a day, 100 a month; 3 full-length songs a day", NS, NS, "Standard $10/mo"),
+ ("Gamma", "Presentations, docs, websites, social and images; PDF/PPTX import and export", "400 credits at signup; up to 10 slides per prompt", "Gamma branding (removed on Plus)", NS, "Plus $12/mo"),
+]
+FREE_SRC = {"Claude": "https://claude.com/pricing", "Le Chat (Mistral)": "https://mistral.ai/pricing", "Cursor": "https://cursor.com/pricing", "GitHub Copilot": "https://github.com/features/copilot/plans",
+ "Lovable": "https://lovable.dev/pricing", "Bolt": "https://bolt.new/pricing", "Grammarly": "https://www.grammarly.com/plans", "Notion AI": "https://www.notion.com/pricing", "Otter": "https://otter.ai/pricing",
+ "Fathom": "https://www.fathom.ai/pricing", "Canva": "https://www.canva.com/pricing/", "Krea": "https://www.krea.ai/pricing", "Runway": "https://runwayml.com/pricing", "Pika": "https://pika.art/pricing",
+ "Kling AI": "https://kling.ai/app/membership/membership-plan", "HeyGen": "https://www.heygen.com/pricing", "Descript": "https://www.descript.com/pricing", "CapCut": "https://www.capcut.com/pricing",
+ "ElevenLabs": "https://elevenlabs.io/pricing", "Suno": "https://suno.com/pricing", "Udio": "https://www.udio.com/pricing", "Gamma": "https://gamma.app/pricing"}
+FREE_BEST = {"coding": ("GitHub Copilot", "its free plan states a clear allowance: 2,000 completions a month"),
+ "writing": ("Grammarly", "free spelling and grammar checks, plus 100 AI prompts"),
+ "images": ("Krea", "100 units every day, rather than a one-time grant"),
+ "video": ("Descript", "60 media minutes a month with 720p export"),
+ "audio": ("ElevenLabs", "10,000 credits every month across text to speech, sound effects and music"),
+ "productivity": ("Fathom", "unlimited recordings and instant call summaries"),
+ "presentations": ("Gamma", "400 credits at signup and PDF/PPTX export (with Gamma branding)"),
+ "assistants": ("Le Chat (Mistral)", "web and mobile access with image generation and 100+ connectors")}
+FREE_LEFT_OUT = [("ChatGPT", "its pricing page redirected to a login screen today, so we couldn't read it"),
+ ("Perplexity", "its pricing page didn't load its plan details for us today (JavaScript-heavy)"),
+ ("Google Gemini", "the Google AI plans page describes the paid plans, not the free Gemini limits"),
+ ("Microsoft Copilot", "the Microsoft 365 page we use doesn't describe free Copilot's limits"),
+ ("Ideogram", "its pricing page doesn't describe a free plan"),
+ ("Midjourney", "no free plan"), ("Luma Dream Machine", "no free plan listed on its pricing page")]
+FREE_SRC2 = {"Runway": "https://help.runwayml.com/hc/en-us/articles/50404627334547-Free-plan-details", "Canva": "https://www.canva.com/licensing-explained/", "HeyGen": "https://www.heygen.com/terms"}
+# Runway help: "All videos generated on a Free plan feature a Runway watermark"; usage rights: "the content you create using Runway is yours to use without any non-commercial restrictions" (all plans).
+# Canva licensing: "If you're a free user, you'll see a watermark on Pro content"; "You can use our content in a Canva design, for a wide range of personal and commercial uses."
+# HeyGen terms s.4 (Free Plan): output licensed "solely for personal, non-commercial, and internal evaluation purposes".
