@@ -358,13 +358,13 @@
      "name": "Bolt",
      "url": "https://bolt.new",
      "pricing": "https://bolt.new/pricing",
-     "price": "Pro $25/mo; Teams $30/member/mo",
+     "price": "Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly)",
      "free": "Free: 300K tokens/day, 1M/month",
      "about": "Build full-stack web apps from a prompt in the browser.",
      "checked": "2026-10-19",
      "affiliate": "",
      "monthly": 25,
-     "annual": null,
+     "annual": 18,
      "per_output": null
     },
     {
@@ -489,13 +489,13 @@
      "name": "Krea",
      "url": "https://www.krea.ai",
      "pricing": "https://www.krea.ai/pricing",
-     "price": "From $35/mo ($21 yearly); $105 ($63); $200 ($160)",
+     "price": "Basic $9/mo; Pro $35/mo ($21 yearly); Max $105 ($63); $200 ($160)",
      "free": "Free: 100 units/day",
      "about": "Real-time generation, many models, upscaling.",
      "checked": "2026-10-19",
      "affiliate": "",
-     "monthly": 35,
-     "annual": 21,
+     "monthly": 9,
+     "annual": null,
      "per_output": null
     },
     {

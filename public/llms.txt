@@ -38,7 +38,7 @@
 - [GitHub Copilot](https://toolpick-ai.vercel.app/tools/github-copilot.html): Pro $10/mo; Pro+ $39/mo; Max $100/mo | free: Free plan: $0
 - [Cursor](https://toolpick-ai.vercel.app/tools/cursor.html): Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user | free: Free: $0 with limited agent requests
 - [Windsurf](https://toolpick-ai.vercel.app/tools/windsurf.html): Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat | free: Free: $0
-- [Bolt](https://toolpick-ai.vercel.app/tools/bolt.html): Pro $25/mo; Teams $30/member/mo | free: Free: 300K tokens/day, 1M/month
+- [Bolt](https://toolpick-ai.vercel.app/tools/bolt.html): Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) | free: Free: 300K tokens/day, 1M/month
 - [v0](https://toolpick-ai.vercel.app/tools/v0.html): Team $30/user/mo; Business $100/user/mo | free: Free: $0 with daily credits
 - [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually) | free: Free: $0 (5 build credits/day, up to 30/mo)
 - [Warp](https://toolpick-ai.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
@@ -47,7 +47,7 @@
 - [Leonardo](https://toolpick-ai.vercel.app/tools/leonardo.html): Essential $12/mo; Premium $30; Ultimate $60 | free: Free: 150 fast tokens/day
 - [Midjourney](https://toolpick-ai.vercel.app/tools/midjourney.html): Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96) | free: No free plan (subscription only)
 - [Ideogram](https://toolpick-ai.vercel.app/tools/ideogram.html): Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20) | free: Free weekly credits for eligible accounts
-- [Krea](https://toolpick-ai.vercel.app/tools/krea.html): From $35/mo ($21 yearly); $105 ($63); $200 ($160) | free: Free: 100 units/day
+- [Krea](https://toolpick-ai.vercel.app/tools/krea.html): Basic $9/mo; Pro $35/mo ($21 yearly); Max $105 ($63); $200 ($160) | free: Free: 100 units/day
 - [Canva](https://toolpick-ai.vercel.app/tools/canva.html): Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person | free: Free plan available
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
@@ -249,6 +249,10 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## Free plan limits
 - [Free plan limits, side by side](https://toolpick-ai.vercel.app/free-plan-limits.html): 22 AI tools' free plans: what's included, main limit, watermark, commercial use, cheapest monthly upgrade; official pages checked 2026-10-22; filter with ?cat=video etc.
+
+## Pricing explainers
+- [Cursor pricing explained](https://toolpick-ai.vercel.app/cursor-pricing.html): Free, Plus (Grok only), Premium, Super, Ultra, Teams; usage vs Plus and what costs extra; checked 2026-10-22
+- [AI subscription costs per month](https://toolpick-ai.vercel.app/ai-subscription-costs.html): monthly prices of 19 popular AI subscriptions with checked dates, plus example stack totals
 
 
 ## My AI costs

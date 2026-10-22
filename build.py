@@ -2091,6 +2091,60 @@ for _fp in ["public/free.html"] + sorted(_glob0 for _glob0 in __import__("glob")
     if 'v42"' not in _h: open(_fp, "w").write(_h.replace("</h1>", "</h1>" + _FLINE, 1)); V42_CHANGED.append(_fp[6:])
 open("public/llms.txt", "a").write(f"\n## Free plan limits\n- [Free plan limits, side by side]({BASE}/free-plan-limits.html): {len(FL)} AI tools' free plans: what's included, main limit, watermark, commercial use, cheapest monthly upgrade; official pages checked {FREE_CHECKED}; filter with ?cat=video etc.\n")
 
+# --- v44: Cursor pricing explained + AI subscription costs per month ---
+CURSOR_CHECKED = _tm0.CURSOR_CHECKED
+_cp_rows = "".join(f"<tr><th scope='row'>{e(p)}</th><td>{('$' + str(pr) + '/mo') if isinstance(pr, int) else ('$' + e(pr) + '/mo')}</td><td>{e(u)}</td><td>{e(a)}</td></tr>" for p, pr, u, a in _tm0.CURSOR_PLANS)
+_qa_cp = [("Is Cursor free?", f"Yes. Cursor's Free plan is $0/month with limited AI usage, agent and chat requests (checked {CURSOR_CHECKED})."),
+          ("What's the difference between Cursor Plus and Premium?", "Plus is $8/month and only includes Grok models. Premium is $30/month with 4x the usage of Plus, cloud agents, AI code reviews and third-party models at API list price."),
+          ("Are third-party models included in the Cursor price?", "No. Cursor's pricing page says third-party model usage isn't included in the monthly prices and is billed separately by usage."),
+          ("Do Cursor prices include tax?", "No. The pricing page says prices don't include applicable taxes or fees such as VAT.")]
+_cp_body = f"""<p class="small"><a href="{turl('Cursor')}">Cursor</a> › Pricing explained</p><h1>Cursor pricing explained: free vs paid</h1>
+<p class="tag">Every Cursor plan in one table, from <a href="https://cursor.com/pricing" rel="noopener" target="_blank">cursor.com/pricing</a> (checked {CURSOR_CHECKED}). Monthly prices, before tax.</p>
+<p class="pick"><b>In short:</b> Free costs $0 with limited usage. Plus ($8/mo) is the cheapest paid plan but only has Grok models. Premium ($30/mo) is the most popular: 4x Plus usage, cloud agents, code reviews, and other models billed at API list price.</p>
+<div class="tw"><table><caption class="small" style="text-align:left">Cursor plans, checked {CURSOR_CHECKED}. Usage is shown the way Cursor shows it: relative to Plus.</caption><tr><th scope="col">Plan</th><th scope="col">Price</th><th scope="col">Usage</th><th scope="col">What the pricing page says it adds</th></tr>{_cp_rows}</table></div>
+<h2>Free vs paid: what changes</h2><ul><li><b>Free → Plus ($8/mo):</b> a shared AI usage pool instead of limited requests, but only Grok models.</li><li><b>Plus → Premium ($30/mo):</b> 4x the usage, cloud agents and automations, code hosting, AI code reviews, and third-party models at API list price.</li><li><b>Premium → Super ($100/mo) or Ultra ($200/mo):</b> 15x or 50x Plus usage; Super adds priority model access at peak times.</li><li><b>Watch out:</b> third-party model usage is billed separately on top of the plan price.</li></ul>
+{_faq(_qa_cp)}
+<p class="small">Related: <a href="/cursor-alternatives.html">Cursor alternatives</a> · <a href="/compare/cursor-vs-claude-code.html">Cursor vs Claude Code</a> · <a href="/cheapest-ai-coding-assistant.html">Cheapest AI coding assistant</a> · <a href="/free-plan-limits.html?cat=coding">Free plan limits</a></p>"""
+page("/cursor-pricing.html", f"Cursor Pricing Explained ({CURSOR_CHECKED[:4]}): Free vs Plus vs Premium vs Ultra | ToolPick",
+     f"Cursor pricing checked {CURSOR_CHECKED}: Free $0, Plus $8/mo (Grok models only), Premium $30 (4x usage), Super $100, Ultra $200, Teams $30+/user. What each plan adds and what costs extra.",
+     _cp_body, [{"@context": "https://schema.org", "@type": "Product", "name": "Cursor", "url": BASE + "/cursor-pricing.html", "brand": {"@type": "Brand", "name": "Cursor"},
+                 "offers": [{"@type": "Offer", "name": p, "price": pr, "priceCurrency": "USD", "url": "https://cursor.com/pricing"} for p, pr, u, a in _tm0.CURSOR_PLANS if isinstance(pr, int)]},
+                _ld_faq(_qa_cp), crumbs([("ToolPick", "/"), ("Cursor", turl("Cursor")), ("Cursor pricing explained", "/cursor-pricing.html")])])
+# B) AI subscription costs per month
+_sc = {}
+for n, pl, pr, q in _tm0.SUB_COSTS:
+    _t = find(n); assert q in _t["price"], (n, q, _t["price"]); _sc[n] = (pl, pr, _t.get("checked", CHECKED), _t["pricing"])
+def _m(v): return ("$%.2f" % v).replace(".00", "")
+_sc_rows = "".join(f"<tr><th scope='row'><a href='{turl(n)}'>{e(n)}</a></th><td>{e(pl)}</td><td>{_m(pr)}/mo</td><td>{dt}</td><td><a href='{e(src)}' rel='noopener' target='_blank'>official pricing</a></td></tr>" for n, (pl, pr, dt, src) in sorted(_sc.items(), key=lambda kv: kv[1][1]))
+_sc_stacks = "".join(f"<li><b>{e(r)}:</b> " + " + ".join(f"<a href='{turl(n)}'>{e(n)}</a> {e(_sc[n][0])} {_m(_sc[n][1])}" for n in ns) + f" = <b>{_m(sum(_sc[n][1] for n in ns))}/mo</b> ({_m(12 * sum(_sc[n][1] for n in ns))} a year)</li>" for r, ns in _tm0.SUB_STACKS)
+_scv = sorted(v[1] for v in _sc.values()); _scmed = _scv[len(_scv) // 2]
+_qa_sc = [("How much does an AI subscription cost per month?", f"Most popular entry plans we checked cost {_m(_scv[0])} to {_m(_scv[-1])} a month on monthly billing; the middle of the range is {_m(_scmed)}. ChatGPT Plus and Claude Pro are $20/mo."),
+          ("How much do two or three AI tools cost together?", "Our example stacks range from " + _m(min(sum(_sc[n][1] for n in ns) for r, ns in _tm0.SUB_STACKS)) + " to " + _m(max(sum(_sc[n][1] for n in ns) for r, ns in _tm0.SUB_STACKS)) + " a month on monthly billing.")]
+_sc_body = f"""<p class="small"><a href="/my-ai-costs.html">My AI costs</a> › AI subscription costs</p><h1>How much do AI subscriptions cost per month?</h1>
+<p class="tag">The monthly price of {len(_sc)} popular AI subscriptions, and what common combinations add up to. Prices are monthly billing from each official pricing page, with the date we last checked.</p>
+<p class="pick"><b>In short:</b> entry plans run {_m(_scv[0])}–{_m(_scv[-1])}/mo; the middle of the range is {_m(_scmed)}/mo. Our example stacks of two or three tools cost {_m(min(sum(_sc[n][1] for n in ns) for r, ns in _tm0.SUB_STACKS))}–{_m(max(sum(_sc[n][1] for n in ns) for r, ns in _tm0.SUB_STACKS))}/mo. <a href="/my-ai-costs.html#audit">Add up your own subscriptions →</a></p>
+<h2>Example stacks (monthly billing)</h2><ul>{_sc_stacks}</ul>
+<h2>Entry plan prices, cheapest first</h2><div class="tw"><table><caption class="small" style="text-align:left">The main individual plan of each tool, billed monthly. Prices change; always confirm on the official page.</caption><tr><th scope="col">Tool</th><th scope="col">Plan</th><th scope="col">Price</th><th scope="col">Checked</th><th scope="col">Source</th></tr>{_sc_rows}</table></div>
+<h2>Not included</h2><ul>{''.join(f"<li><a href='{turl(n)}'>{e(n)}</a>: {e(r)}.</li>" for n, r in _tm0.SUB_NOT_STATED)}</ul>
+{_faq(_qa_sc)}
+<p class="small">Related: <a href="/my-ai-costs.html">My AI costs</a> · <a href="/stacks.html">Starter stacks</a> · <a href="/free-plan-limits.html">Free plan limits</a> · <a href="/help-me-choose.html">Help me choose</a></p>"""
+page("/ai-subscription-costs.html", f"How Much Do AI Subscriptions Cost per Month? ({CHECKED[:4]}) ChatGPT, Claude, Cursor & More | ToolPick",
+     f"Monthly prices of {len(_sc)} popular AI subscriptions from official pricing pages, cheapest first, plus what common AI tool stacks cost per month and per year.",
+     _sc_body, _ld_list("AI subscription costs per month", "/ai-subscription-costs.html", [n for n, *_ in sorted(_sc.items(), key=lambda kv: kv[1][1])]) + [_ld_faq(_qa_sc), crumbs([("ToolPick", "/"), ("My AI costs", "/my-ai-costs.html"), ("AI subscription costs", "/ai-subscription-costs.html")])])
+# internal links (one line each)
+V44_CHANGED = ["/cursor-pricing.html", "/ai-subscription-costs.html"]
+def _v44ins(path, marker, html, after=False):
+    _fp = "public" + path; _h = open(_fp).read()
+    if 'v44"' in _h or marker not in _h: return
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V44_CHANGED.append(path)
+_v44ins(turl("Cursor"), '<section class="card tbp"', f'<p class="pick small v44">Free vs Plus vs Premium, plan by plan (checked {CURSOR_CHECKED}): <a href="/cursor-pricing.html">Cursor pricing explained →</a></p>')
+for _p in ["/cursor-alternatives.html", "/compare/cursor-vs-claude-code.html", "/cheapest-ai-coding-assistant.html"]:
+    _v44ins(_p, "</h1>", '<p class="small v44"><a href="/cursor-pricing.html">Cursor pricing explained, plan by plan →</a></p>', after=True)
+V44_CHANGED.append("/my-ai-costs.html")
+_v44ins("/help-me-choose.html", "</h1>", '<p class="small v44">Budgeting? <a href="/ai-subscription-costs.html">See what popular AI subscriptions cost per month →</a></p>', after=True)
+_v44ins("/stacks.html", "</h1>", '<p class="small v44"><a href="/ai-subscription-costs.html">Monthly cost of popular AI subscriptions →</a></p>', after=True)
+open("public/llms.txt", "a").write(f"\n## Pricing explainers\n- [Cursor pricing explained]({BASE}/cursor-pricing.html): Free, Plus (Grok only), Premium, Super, Ultra, Teams; usage vs Plus and what costs extra; checked {CURSOR_CHECKED}\n- [AI subscription costs per month]({BASE}/ai-subscription-costs.html): monthly prices of {len(_sc)} popular AI subscriptions with checked dates, plus example stack totals\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2160,7 +2214,7 @@ for t, p, n in MERGED:
         f'<script>location.replace("/my-ai-costs.html"+location.search+"#{t}")</script><meta http-equiv="refresh" content="0; url=/my-ai-costs.html#{t}"></head><body><p>{n} has moved to <a href="/my-ai-costs.html#{t}">My AI costs</a>.</p></body></html>')
 _tabs = "".join(f'<a role="tab" href="#{t}" id="tab-{t}" aria-controls="pane" class="mt">{e(n)}</a>' for t, p, n in MERGED)
 _mbody = f"""<style>.mtabs{{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 12px}}.mt{{padding:8px 12px;border:1px solid var(--bd);border-radius:999px;text-decoration:none;color:var(--tx);min-height:24px}}.mt[aria-selected=true]{{background:var(--tx);color:var(--bg)}}#pane{{width:100%;border:0;min-height:600px;display:block}}</style>
-<h1>My AI costs</h1><p class="tag">Audit what you pay, watch prices, set renewal reminders, and see what credits really buy. Prices from official pricing pages only.</p>
+<h1>My AI costs</h1><p class="small v44">What do popular AI subscriptions cost? <a href="/ai-subscription-costs.html">Monthly prices and example stacks →</a></p><p class="tag">Audit what you pay, watch prices, set renewal reminders, and see what credits really buy. Prices from official pricing pages only.</p>
 <div class="mtabs" role="tablist" aria-label="My AI costs">{_tabs}</div><iframe id="pane" role="tabpanel" tabindex="0" title="My AI costs tool" src="/app/subscription-audit.html"></iframe>
 <script>const T={json.dumps({t: p for t, p, n in MERGED})};const fr=document.getElementById('pane');let first=true;
 function show(){{let t=location.hash.slice(1);if(!T[t])t='audit';document.querySelectorAll('.mt').forEach(a=>{{const on=a.id=='tab-'+t;a.setAttribute('aria-selected',on);a.tabIndex=on?0:-1}});fr.setAttribute('aria-labelledby','tab-'+t);const src='/app'+T[t]+(first?location.search:'');first=false;if(fr.getAttribute('src')!=src)fr.setAttribute('src',src)}}
@@ -2173,6 +2227,8 @@ for p in _MAP:
 _lm["/my-ai-costs.html"] = V39_DATE
 for _u in V41_CHANGED: _lm[_u] = CODING_CHECKED
 for _u in V42_CHANGED: _lm[_u] = FREE_CHECKED
+for _u in V44_CHANGED: _lm[_u] = "2026-10-22"
+open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
 open("/tmp/v41-changed.txt","w").write("\n".join(V41_CHANGED))
 for _n in dict.fromkeys(list(VC) + list(VO) + ["Murf"]):

@@ -652,3 +652,31 @@ FREE_SRC2 = {"Runway": "https://help.runwayml.com/hc/en-us/articles/504046273345
 # Runway help: "All videos generated on a Free plan feature a Runway watermark"; usage rights: "the content you create using Runway is yours to use without any non-commercial restrictions" (all plans).
 # Canva licensing: "If you're a free user, you'll see a watermark on Pro content"; "You can use our content in a Canva design, for a wide range of personal and commercial uses."
 # HeyGen terms s.4 (Free Plan): output licensed "solely for personal, non-commercial, and internal evaluation purposes".
+
+# v44 (2026-10-22): Cursor pricing explained, re-read today on https://cursor.com/pricing:
+# "Free $0 /month ... Limited AI usage ... Limited agent requests"; "Plus $8 /month ... Shared AI usage pool ... *Only Grok models are available on this plan";
+# "Premium Most popular $30 /month ... 4x more usage compared to Plus ... Cloud agents & automations, Code hosting & AI code reviews, Third-party models at API list price";
+# "Super $100 /month ... 15x more usage compared to Plus ... Priority model access at peak times"; compare table: "Ultra $200/month", "Teams $30+/user/month",
+# "Usage Limited Basic 4x Plus 15x Plus 50x Plus 4-50x Plus Pooled"; "Third Party model usage in Cursor is not included in the monthly prices shown and must be purchased separately";
+# "Prices shown do not include applicable taxes or fees (e.g. VAT)."
+CURSOR_CHECKED = "2026-10-22"
+CURSOR_PLANS = [  # plan, $/mo, usage vs Plus, what the page says it adds
+ ("Free", 0, "Limited", "Limited AI usage, agent and chat requests"),
+ ("Plus", 8, "Basic (shared usage pool)", "Only Grok models are available on this plan"),
+ ("Premium", 30, "4x Plus", "Cloud agents and automations, code hosting, AI code reviews (Bugbot), third-party models at API list price"),
+ ("Super", 100, "15x Plus", "Priority model access at peak times"),
+ ("Ultra", 200, "50x Plus", "not stated beyond usage"),
+ ("Teams", "30+ per user", "4-50x Plus, pooled", "Team plan; price shown as $30+/user/month"),
+]
+# v44: AI subscription costs per month. Each price is copied from the tool's verified tools.py entry (date shown per row); build.py asserts the text exists there.
+SUB_COSTS = [  # tool, plan, $/mo (monthly billing), quote that must appear in the tool's tools.py price text, checked date source
+ ("ChatGPT", "Plus", 20, "Plus $20/mo"), ("Claude", "Pro", 20, "Pro $20/mo"), ("Google Gemini", "Google AI Pro", 19.99, "Google AI Pro $19.99/mo"),
+ ("Microsoft Copilot", "Microsoft 365 Personal", 9.99, "Microsoft 365 Personal $9.99/mo"), ("Le Chat (Mistral)", "Pro", 14.99, "Pro $14.99/mo"),
+ ("Cursor", "Premium", 30, "Premium $30/mo"), ("GitHub Copilot", "Pro", 10, "Pro $10/mo"), ("Windsurf", "Pro", 20, "Pro $20/mo"),
+ ("Midjourney", "Basic", 10, "Basic $10/mo"), ("Canva", "Pro", 18, "Pro $18/mo"), ("Ideogram", "Plus", 20, "Plus $20/mo"),
+ ("ElevenLabs", "Starter", 6, "Starter $6/mo"), ("Runway", "Standard", 15, "Standard $15/mo"), ("Descript", "Hobbyist", 24, "Hobbyist $24/mo"),
+ ("HeyGen", "Creator", 29, "Creator $29/mo"), ("Grammarly", "Pro", 12, "Pro $12/mo"), ("Notion AI", "Plus", 10, "Plus $10/member/mo"),
+ ("Otter", "Pro", 16.99, "Pro $16.99/user/mo"), ("Gamma", "Plus", 12, "Plus $12/mo"),
+]
+SUB_NOT_STATED = [("Perplexity", "its pricing page shows Pro only billed annually ($17/mo); a monthly price isn't stated")]
+SUB_STACKS = [("Writer", ["ChatGPT", "Grammarly"]), ("Developer", ["Cursor", "Claude"]), ("Video creator", ["Descript", "ElevenLabs", "Canva"]), ("Designer", ["Midjourney", "Canva"]), ("Meetings and notes", ["Otter", "Notion AI"])]
