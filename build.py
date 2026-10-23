@@ -2278,6 +2278,68 @@ _v44ins("/help-me-choose.html", "</h1>", '<p class="small v44">Budgeting? <a hre
 _v44ins("/stacks.html", "</h1>", '<p class="small v44"><a href="/ai-subscription-costs.html">Monthly cost of popular AI subscriptions →</a></p>', after=True)
 open("public/llms.txt", "a").write(f"\n## Pricing explainers\n- [Cursor pricing explained]({BASE}/cursor-pricing.html): Free, Plus (Grok only), Premium, Super, Ultra, Teams; usage vs Plus and what costs extra; checked {CURSOR_CHECKED}\n- [AI subscription costs per month]({BASE}/ai-subscription-costs.html): monthly prices of {len(_sc)} popular AI subscriptions with checked dates, plus example stack totals\n")
 
+# --- v47: ChatGPT pricing + Is Claude Pro worth it ---
+CGC = _tm0.CHATGPT_CHECKED
+_cg_rows = "".join(f"<tr><th scope='row'>{e(p)}</th><td>{e(pr) if pr != 'not stated' else '<span class=small>not stated</span>'}</td><td>{dt}</td><td>{e(bf)}</td><td>{e(k)}</td></tr>" for p, pr, dt, bf, k in _tm0.CHATGPT_PLANS)
+_cg_feat = "".join(f"<tr><th scope='row'>{e(r)}</th>" + "".join(f"<td>{e(v)}</td>" for v in vals) + "</tr>" for r, *vals in _tm0.CHATGPT_FEATURES)
+_qa_cg = [("How much is ChatGPT Plus?", "$20/month on monthly billing (from our 2026-10-15 check of the official pricing page; today's fetch didn't show the dollar amount)."),
+          ("Is ChatGPT Go available in the US?", f"Go is listed on the official pricing page we fetched today ({CGC}). Its price ($8/mo) is from our 2026-10-15 check; prices on the page are shown by country."),
+          ("How much is ChatGPT Pro?", f"From $100/month, with a choice of 3 usage tiers (official pricing page, {CGC})."),
+          ("Is ChatGPT free?", "Yes. The Free plan includes unlimited text chats with GPT-6, with limits on uploads, image creation, voice, deep research and memory.")]
+_cg_body = f"""<p class="small"><a href="{turl('ChatGPT')}">ChatGPT</a> › Pricing</p><h1>ChatGPT pricing: Free vs Go vs Plus vs Pro</h1>
+<p class="tag">Every ChatGPT plan from the official pricing page (fetched {CGC}). Each price shows the date we confirmed it; where the page didn't show a price, we say so.</p>
+<p class="pick"><b>In short:</b> Free is $0 with unlimited text chats. Go ($8/mo) adds more messages, uploads and images and may include ads. Plus ($20/mo) adds advanced reasoning, more deep research and Codex. Pro starts at $100/mo.</p>
+<h2>Plans and prices</h2><div class="tw"><table><caption class="small" style="text-align:left">Monthly prices, per user. “Price confirmed” is the date we last read that price on the official page.</caption><tr><th scope="col">Plan</th><th scope="col">Price</th><th scope="col">Price confirmed</th><th scope="col">Best for</th><th scope="col">What it includes</th></tr>{_cg_rows}</table></div>
+<p class="small">Why two dates: today's fetch of <a href="https://openai.com/chatgpt/pricing/" rel="noopener" target="_blank">openai.com/chatgpt/pricing</a> lists every plan and feature, but fills in the dollar prices by country in your browser. It showed “From $100” for Pro; Go and Plus prices are from our {find('ChatGPT').get('checked')} check. The Business price wasn't shown.</p>
+<h2>Key differences</h2><div class="tw"><table><caption class="small" style="text-align:left">From the plan comparison on the official page, {CGC}. *Usage must be reasonable and follow OpenAI's policies.</caption><tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Go</th><th scope="col">Plus</th><th scope="col">Pro</th></tr>{_cg_feat}</table></div>
+{_faq(_qa_cg)}
+<p class="small">Related: <a href="/compare/chatgpt-vs-claude.html">ChatGPT vs Claude</a> · <a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it?</a> · <a href="/ai-subscription-costs.html">AI subscription costs</a> · <a href="/free-plan-limits.html?cat=writing">Free plan limits</a></p>"""
+page("/chatgpt-pricing.html", f"ChatGPT Pricing ({CGC[:4]}): Free vs Go vs Plus vs Pro Explained | ToolPick",
+     f"ChatGPT plans compared from the official pricing page ({CGC}): Free $0, Go $8/mo, Plus $20/mo, Pro from $100/mo, with each price's confirmation date and the key feature differences.",
+     _cg_body, [{"@context": "https://schema.org", "@type": "Product", "name": "ChatGPT", "url": BASE + "/chatgpt-pricing.html", "brand": {"@type": "Brand", "name": "OpenAI"},
+                 "offers": [{"@type": "Offer", "name": "Free", "price": 0, "priceCurrency": "USD"}, {"@type": "Offer", "name": "Go", "price": 8, "priceCurrency": "USD"}, {"@type": "Offer", "name": "Plus", "price": 20, "priceCurrency": "USD"}, {"@type": "AggregateOffer", "name": "Pro", "lowPrice": 100, "priceCurrency": "USD"}]},
+                _ld_faq(_qa_cg), crumbs([("ToolPick", "/"), ("ChatGPT", turl("ChatGPT")), ("ChatGPT pricing", "/chatgpt-pricing.html")])])
+# Is Claude Pro worth it
+CLC = _tm0.CLAUDE_CHECKED
+_alt = [(n, pl, pr, find(n).get("checked", CHECKED)) for n, pl, pr in [("ChatGPT", "Plus", "$20/mo"), ("Google Gemini", "Google AI Pro", "$19.99/mo"), ("Le Chat (Mistral)", "Pro", "$14.99/mo")]]
+for n, pl, pr, dt in _alt: assert pr.split("/")[0] in find(n)["price"], n
+_alt_li = "".join(f"<li><a href='{turl(n)}'>{e(n)}</a> {e(pl)}: {e(pr)} (checked {dt})</li>" for n, pl, pr, dt in _alt)
+_qa_cl = [("How much is Claude Pro?", f"$20/month billed monthly, or $17/month billed yearly ($200 up front), before tax (claude.com/pricing, {CLC})."),
+          ("Does Claude Pro include Claude Code?", "Yes. Claude Code is included in all paid plans and shares the same usage limits as your chats."),
+          ("How much more usage does Pro give than Free?", "Claude says Pro gives at least 5x more usage per 5-hour session than Free. There's no fixed message count."),
+          ("When is Claude Max better?", "Max starts at $100/month and gives 5x or 20x the usage of Pro, plus priority access at busy times.")]
+_cl_body = f"""<p class="small"><a href="{turl('Claude')}">Claude</a> › Is Claude Pro worth it?</p><h1>Is Claude Pro worth it?</h1>
+<p class="tag">What $20 a month gets you over the free plan, from <a href="https://claude.com/pricing" rel="noopener" target="_blank">claude.com/pricing</a> (checked {CLC}), and when to choose something else.</p>
+<p class="pick"><b>Short answer:</b> worth it if you hit Free's limits often, want Claude Code, Research or Opus, or need more than 5 projects. Skip it if Free covers your everyday questions. Pay yearly and it's $17/mo instead of $20.</p>
+<h2>What Pro adds over Free</h2><div class="tw"><table><caption class="small" style="text-align:left">From the plan comparison on claude.com/pricing, {CLC}.</caption><tr><th scope="col">Feature</th><th scope="col">Free ($0)</th><th scope="col">Pro ($20/mo, or $17/mo yearly)</th></tr>
+<tr><th scope="row">Usage</th><td>Everyday questions</td><td>At least 5x Free per 5-hour session</td></tr><tr><th scope="row">Claude Code</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Research</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Opus model</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Projects</th><td>Up to 5</td><td>Yes</td></tr><tr><th scope="row">Claude in Chrome, Microsoft 365, Outlook</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Claude Dashboards (beta)</th><td>No</td><td>Yes</td></tr></table></div>
+<h2>Worth it if…</h2><ul><li>You run into Free's usage limits most weeks.</li><li>You code: Claude Code is included and shares your plan's usage.</li><li>You want Research, the Opus model, or more than 5 projects.</li></ul>
+<h2>Skip it if…</h2><ul><li>Free covers what you do: chat, web search, files and code, memory, Artifacts and connectors are all in Free.</li><li>You'd use it all day: Max (from $100/mo) gives 5x or 20x Pro's usage.</li></ul>
+<h2>Similar plans elsewhere (monthly billing)</h2><ul>{_alt_li}</ul>
+{_faq(_qa_cl)}
+<p class="small">Related: <a href="/chatgpt-pricing.html">ChatGPT pricing</a> · <a href="/compare/chatgpt-vs-claude.html">ChatGPT vs Claude</a> · <a href="/compare/cursor-vs-claude-code.html">Cursor vs Claude Code</a> · <a href="/ai-subscription-costs.html">AI subscription costs</a></p>"""
+page("/is-claude-pro-worth-it.html", f"Is Claude Pro Worth It? ({CLC[:4]}) What $20/mo Adds Over Free | ToolPick",
+     f"Claude Pro is $20/mo ($17 yearly). What it adds over Free (Claude Code, Research, Opus, 5x usage), when to skip it, and similar plans, from claude.com/pricing checked {CLC}.",
+     _cl_body, [{"@context": "https://schema.org", "@type": "Product", "name": "Claude Pro", "url": BASE + "/is-claude-pro-worth-it.html", "brand": {"@type": "Brand", "name": "Anthropic"}, "offers": [{"@type": "Offer", "name": "Pro (monthly)", "price": 20, "priceCurrency": "USD"}, {"@type": "Offer", "name": "Pro (yearly, per month)", "price": 17, "priceCurrency": "USD"}]},
+                _ld_faq(_qa_cl), crumbs([("ToolPick", "/"), ("Claude", turl("Claude")), ("Is Claude Pro worth it?", "/is-claude-pro-worth-it.html")])])
+V47_CHANGED = ["/chatgpt-pricing.html", "/is-claude-pro-worth-it.html"]
+def _v47ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not __import__("os").path.exists(_fp): return
+    _h = open(_fp).read()
+    if 'v47"' in _h or marker not in _h: return
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V47_CHANGED.append(path)
+_v47ins(turl("ChatGPT"), '<section class="card tbp"', f'<p class="pick small v47">Free vs Go vs Plus vs Pro, side by side ({CGC}): <a href="/chatgpt-pricing.html">ChatGPT pricing →</a></p>')
+_v47ins(turl("Claude"), '<section class="card tbp"', f'<p class="pick small v47">What $20/mo adds over Free ({CLC}): <a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it? →</a></p>')
+_v47ins(turl("Claude Pro") if "Claude Pro" in tool_pages else "/tools/claude-pro.html", '<section class="card tbp"', f'<p class="pick small v47"><a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it? →</a></p>')
+for _x in COMPARISONS:
+    _ns = cnames(_x); _l = []
+    if "ChatGPT" in _ns: _l.append('<a href="/chatgpt-pricing.html">ChatGPT pricing</a>')
+    if "Claude" in _ns: _l.append('<a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it?</a>')
+    if _l: _v47ins(f"/compare/{_x[0]}.html", "</h1>", '<p class="small v47">' + " · ".join(_l) + "</p>", after=True)
+_v47ins("/ai-subscription-costs.html", "</h1>", '<p class="small v47"><a href="/chatgpt-pricing.html">ChatGPT pricing</a> · <a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it?</a></p>', after=True)
+open("public/llms.txt", "a").write(f"\n## ChatGPT and Claude plans\n- [ChatGPT pricing]({BASE}/chatgpt-pricing.html): Free vs Go vs Plus vs Pro (and Business), each price with its confirmation date; feature differences from the official page ({CGC})\n- [Is Claude Pro worth it?]({BASE}/is-claude-pro-worth-it.html): what Pro adds over Free, when to skip it, similar plans; claude.com/pricing checked {CLC}\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2362,6 +2424,8 @@ _lm["/"] = "2026-10-23"  # v45 smart search
 for _u in V41_CHANGED: _lm[_u] = CODING_CHECKED
 for _u in V42_CHANGED: _lm[_u] = FREE_CHECKED
 for _u in V44_CHANGED: _lm[_u] = "2026-10-22"
+for _u in V47_CHANGED: _lm[_u] = "2026-10-23"
+open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
 open("/tmp/v41-changed.txt","w").write("\n".join(V41_CHANGED))

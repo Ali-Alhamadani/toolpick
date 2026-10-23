@@ -18,8 +18,8 @@ CATEGORIES = [
   {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong long-form writing, editing and analysis assistant.","why":"Pro is $17-20/mo with a usable free tier, and is excellent at long, natural-sounding drafts."},
   {"name":"ChatGPT","url":"https://chatgpt.com","pricing":"https://chatgpt.com/pricing","price":"check site","free":"Free plan with unlimited text chats on GPT-6 (limits on tools)","about":"General-purpose AI assistant: writing, research, images, voice."},
   {"name":"Google Gemini","url":"https://gemini.google.com","pricing":"https://one.google.com/about/ai-premium","price":"Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo","free":"Gemini app is free to use","about":"Google's assistant, integrated with Gmail, Docs and Drive."},
-  {"name":"Grammarly","url":"https://www.grammarly.com","pricing":"https://www.grammarly.com/plans","price":"Pro $12/mo","free":"Free: $0 spelling & grammar checks","about":"Grammar, clarity and tone fixes everywhere you type."},
-  {"name":"Notion AI","url":"https://www.notion.com","pricing":"https://www.notion.com/pricing","price":"Plus $10/member/mo; Business $20/member/mo","free":"Free plan: $0 (AI trial only)","about":"AI writing inside your notes, docs and wikis."},
+  {"name":"Grammarly","url":"https://www.grammarly.com","pricing":"https://www.grammarly.com/plans","price":"Pro $30/mo ($12/mo billed yearly, $144/yr; $60 quarterly) (checked 2026-10-23)","free":"Free: $0 spelling & grammar checks","about":"Grammar, clarity and tone fixes everywhere you type."},
+  {"name":"Notion AI","url":"https://www.notion.com","pricing":"https://www.notion.com/pricing","price":"Plus $12/member/mo ($10 billed yearly); Business $24/member/mo ($20 billed yearly) (checked 2026-10-23)","free":"Free plan: $0 (AI trial only)","about":"AI writing inside your notes, docs and wikis."},
   {"name":"Copy.ai","url":"https://www.copy.ai","pricing":"https://www.copy.ai/prices","price":"Chat $29/mo ($24 yearly); team plans from $1,000/mo","free":"Free trial available","about":"Marketing copy and GTM workflow automation."},
   {"name":"Jasper","url":"https://www.jasper.ai","pricing":"https://www.jasper.ai/pricing","price":"check site","free":"7-day free trial of Pro","about":"On-brand marketing content for teams."},
  ]},
@@ -132,7 +132,7 @@ CATEGORIES += [
   T("Taskade","https://www.taskade.com","https://www.taskade.com/pricing","Pro $10/mo (yearly, 10 users incl.); $25; $100; $250","Free: $0","Projects, notes and AI agents in one workspace."),
   T("Superhuman","https://superhuman.com","https://superhuman.com/plans","$12/member/mo yearly ($15 monthly); $33 ($40)","Free: $0","AI assistance across your apps (includes Grammarly)."),
   T("Zapier","https://zapier.com","https://zapier.com/pricing","Professional from $19.99/mo; Team from $69/mo","Free forever: 100 tasks/mo","Automate workflows between 7,000+ apps with AI."),
-  T("Notion AI","https://www.notion.com","https://www.notion.com/pricing","Plus $10/member/mo; Business $20/member/mo","Free plan: $0 (AI trial only)","AI writing inside your notes, docs and wikis."),
+  T("Notion AI","https://www.notion.com","https://www.notion.com/pricing","Plus $12/member/mo ($10 billed yearly); Business $24/member/mo ($20 billed yearly) (checked 2026-10-23)","Free plan: $0 (AI trial only)","AI writing inside your notes, docs and wikis."),
  ]},
  {"id":"agents","name":"Chatbots & Agents","need":"Build a chatbot or AI agent","best":"Botpress","free":["Botpress","Lindy","Zapier Agents"],"tools":[
   T("Botpress","https://botpress.com","https://botpress.com/pricing","Plus $150/mo billed annually (250 conversations); extra $0.65/conversation","Free: $0, 100 conversations","Build and deploy AI chatbots and agents.","Free tier with 100 conversations and transparent per-conversation pricing."),
@@ -151,7 +151,7 @@ for _c in CATEGORIES:
 PRICE_TABLE = {
  "Runway":(15,12,"Gen-4.5: 60 credits per 5s; Standard's 625 credits ≈ 52s of Gen-4.5"),"Pika":(10,8,"Seedance 2.5 720p 5s = 122 credits; Starter 900 credits ≈ 7 clips"),
  "Luma Dream Machine":(30,25,None),"HeyGen":(29,24,None),"Synthesia":(29,18,"~100 credits per finished video minute"),"Descript":(24,16,None),"CapCut":(19.99,None,None),
- "InVideo":(20,10,None),"Claude":(20,17,None),"Claude (Pro)":(20,17,None),"Grammarly":(12,None,None),"Notion AI":(10,None,None),"Copy.ai":(29,24,None),"GitHub Copilot":(10,None,None),
+ "InVideo":(20,10,None),"Claude":(20,17,None),"Claude (Pro)":(20,17,None),"Grammarly":(30,12,None),"Notion AI":(12,10,None),"Copy.ai":(29,24,None),"GitHub Copilot":(10,None,None),
  "Cursor":(8,None,None),"Windsurf":(20,None,None),"Bolt":(25,18,None),"v0":(30,None,None),"Leonardo":(12,None,None),"Midjourney":(10,8,"Extra Fast GPU time $4/hr"),
  "Ideogram":(20,15,"Pay-as-you-go 1¢ per credit"),"Krea":(9,None,None),"ElevenLabs":(6,None,None),"Suno":(None,8,None),"Murf":(None,None,"$0.01-$0.03 per 1,000 characters (API)"),
  "Speechify":(29,None,None),"Otter":(16.99,8.33,None),"Pitch":("€10",None,None),"Beautiful.ai":(None,14.50,None),"Plus AI":(15,10,None),"SlidesAI":(None,10,None),"Le Chat (Mistral)":(14.99,None,None),
@@ -243,7 +243,7 @@ PRICE_TABLE.update({"ChatGPT":(8,None,None),"Perplexity":(None,17,None),"Gamma":
 # Browser-verified 2026-10-15, batch 2 (official pages)
 _BV2 = {
  "Captions": dict(price="Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote)", free="Free plan available"),
- "Jasper": dict(price="Pro $59/seat/mo", free="No free plan; 7-day free trial"),
+ "Jasper": dict(price="Pro $69/seat/mo ($59/seat/mo billed yearly) (checked 2026-10-23)", free="No free plan; 7-day free trial"),
  "Lovable": dict(price="Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually)", free="Free: $0 (5 build credits/day, up to 30/mo)"),
  "Qodo": dict(price="Credit-based: $0.012 per credit (packs of 2,500, 5,000, 20,000)", free="No free plan; 14-day trial"),
  "Recraft": dict(price="Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually", free="Free plan (images not licensed for commercial use)"),
@@ -265,7 +265,7 @@ _BV2 = {
 for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in _BV2: _t.update(_BV2[_t["name"]])
-PRICE_TABLE.update({"Captions":(24.99,None,None),"Jasper":(59,None,None),"Lovable":(25,21,None),"Qodo":(None,None,"$0.012 per credit"),"Recraft":(None,10,None),
+PRICE_TABLE.update({"Captions":(24.99,None,None),"Jasper":(69,59,None),"Lovable":(25,21,None),"Qodo":(None,None,"$0.012 per credit"),"Recraft":(None,10,None),
  "Magnific":(20,14.50,None),"Photoroom":(12.99,7.50,None),"Murf":(None,19,"API $0.01-$0.03 per 1,000 characters"),"Udio":(10,8,None),"Microsoft Copilot":(9.99,None,None),
  "Elicit":(None,49,None),"Consensus":(20,12,None),"SciSpace":(None,12,None),"Humata":(9.99,None,"Extra pages $0.01-$0.02/page"),"Scholarcy":(9.99,None,None),
  "Reclaim":(12,10,None),"Chatbase":(None,32,None),"Relevance AI":(None,None,None)})
@@ -363,6 +363,10 @@ for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in _W1019: _t.update(_W1019[_t["name"]])
         _t["checked"] = "2026-10-19" if _t["name"] in _V1019 else _t.get("checked", "2026-10-14")
+# Daily ops 2026-10-23: monthly-billing prices re-read on official pricing pages.
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in ("Grammarly","Notion AI","Jasper"): _t["checked"] = "2026-10-23"
 COMPARISONS += [
  ("replit-vs-lovable","Replit vs Lovable","Replit","Lovable","coding"),
  ("replit-vs-bolt","Replit vs Bolt","Replit","Bolt","coding"),
@@ -383,6 +387,9 @@ PRICE_NOTES = {
  "2026-10-19|n8n": ("currency", "n8n now shows US dollar prices: Starter $20/mo, Pro $50/mo, Business $800/mo, billed yearly. Before, we listed euro prices (€20, €50, €667), so this is not a like-for-like price change."),
  "2026-10-22|Bolt": ("changed", "Bolt's monthly prices are unchanged (Pro $25/mo, Teams $30/member/mo). We now also show the yearly prices: Pro $18/mo ($216/yr) and Teams $27/member/mo."),
  "2026-10-22|Krea": ("newplan", "Krea now has a Basic plan at $9/mo (5,000 units a month). Before, its cheapest paid plan was Pro at $35/mo."),
+ "2026-10-23|Grammarly": ("correction", "Grammarly Pro is $30/mo billed monthly. The $12/mo we showed before is the yearly price ($144/yr); a quarterly plan is $60."),
+ "2026-10-23|Notion AI": ("correction", "Notion billed monthly is Plus $12/member/mo and Business $24/member/mo. The $10 and $20 we showed before are the yearly-billing prices."),
+ "2026-10-23|Jasper": ("correction", "Jasper Pro is $69/seat/mo billed monthly, or $59/seat/mo billed yearly. Before, we only showed the $59 yearly price."),
  "2026-10-21|Otter": ("changed", "Otter's list prices are unchanged (Pro $16.99/user/mo, Business $30/user/mo). New: a first-time-subscriber offer, Pro at $8.49/mo monthly or $4.17/mo yearly (50% off) and Business at $24/user/mo for 3 months (20% off)."),
 }
 # Snapshot diffs known to be artifacts, not real changes (never shown).
@@ -675,8 +682,40 @@ SUB_COSTS = [  # tool, plan, $/mo (monthly billing), quote that must appear in t
  ("Cursor", "Premium", 30, "Premium $30/mo"), ("GitHub Copilot", "Pro", 10, "Pro $10/mo"), ("Windsurf", "Pro", 20, "Pro $20/mo"),
  ("Midjourney", "Basic", 10, "Basic $10/mo"), ("Canva", "Pro", 18, "Pro $18/mo"), ("Ideogram", "Plus", 20, "Plus $20/mo"),
  ("ElevenLabs", "Starter", 6, "Starter $6/mo"), ("Runway", "Standard", 15, "Standard $15/mo"), ("Descript", "Hobbyist", 24, "Hobbyist $24/mo"),
- ("HeyGen", "Creator", 29, "Creator $29/mo"), ("Grammarly", "Pro", 12, "Pro $12/mo"), ("Notion AI", "Plus", 10, "Plus $10/member/mo"),
+ ("HeyGen", "Creator", 29, "Creator $29/mo"), ("Grammarly", "Pro", 30, "Pro $30/mo"), ("Notion AI", "Plus", 12, "Plus $12/member/mo"),
  ("Otter", "Pro", 16.99, "Pro $16.99/user/mo"), ("Gamma", "Plus", 12, "Plus $12/mo"),
 ]
 SUB_NOT_STATED = [("Perplexity", "its pricing page shows Pro only billed annually ($17/mo); a monthly price isn't stated")]
 SUB_STACKS = [("Writer", ["ChatGPT", "Grammarly"]), ("Developer", ["Cursor", "Claude"]), ("Video creator", ["Descript", "ElevenLabs", "Canva"]), ("Designer", ["Midjourney", "Canva"]), ("Meetings and notes", ["Otter", "Notion AI"])]
+
+# v47 (2026-10-23): ChatGPT pricing, browser-free fetch of https://openai.com/chatgpt/pricing/ (WebFetch) + curl of https://chatgpt.com/pricing today.
+# Today's fetch lists plans Free, Go, Plus, Pro (+ Business/Enterprise in FAQ) and features, but the dollar prices are filled in client-side by country:
+# the static HTML only shows "Pro ... priceHeader From" with label "Pro $100"; Business shows placeholders "{prices.chatgpt.team.monthly.2026}".
+# So: Pro "from $100/mo" confirmed today; Go $8 and Plus $20 are from our 2026-10-15 check (tools.py ChatGPT entry); Business price not stated today.
+# FAQ today: "Paid plans (Go, Plus, Business, and Enterprise) are priced per user per month. We offer monthly plans for Go, Plus and Business and annual plans for Business and Enterprise."
+# "Business plans are available starting at 2 users." Go: "This plan may include ads."
+CHATGPT_CHECKED = "2026-10-23"
+CHATGPT_PLANS = [  # plan, price text, price source date, best for (page), key points (page)
+ ("Free", "$0", "2026-10-23", "Best for trying out ChatGPT", "Unlimited text chats with GPT-6; limited uploads, image creation, voice, deep research, memory and Codex"),
+ ("Go", "$8/mo", "2026-10-15", "Best for longer conversations", "More messages with tools, uploads, image creation and voice; longer memory; may include ads"),
+ ("Plus", "$20/mo", "2026-10-15", "Best for advanced work and productivity", "Advanced reasoning with GPT-6; expanded deep research, memory, Codex; projects, scheduled tasks and custom GPTs"),
+ ("Pro", "from $100/mo", "2026-10-23", "Best for research and coding", "Choice of 3 usage tiers; Pro reasoning (GPT-6 Astra); maximum deep research and memory; unlimited, faster image creation"),
+ ("Business", "not stated", "2026-10-23", "For businesses, from 2 users", "Priced per user per month; monthly or annual billing"),
+]
+CHATGPT_FEATURES = [  # row, Free, Go, Plus, Pro (from today's comparison table; "" = not stated for that plan)
+ ("GPT Instant context window", "27K", "54K", "54K", "128K"),
+ ("GPT Reasoning context window", "Varies", "256K", "256K", "400K"),
+ ("Deep research", "Limited", "Limited", "Yes", "Yes"),
+ ("Codex", "Limited", "Limited", "Yes", "Expanded"),
+ ("Image generation", "Limited", "Yes", "Yes", "Yes"),
+ ("Image generation with Thinking", "No", "No", "Yes", "Yes"),
+ ("Voice", "Yes", "Expanded", "Expanded", "Unlimited*"),
+ ("Memory", "Limited", "Yes", "Expanded", "not stated"),
+ ("Scheduled tasks", "No", "Yes", "Yes", "not stated"),
+ ("Developer mode (beta)", "No", "No", "Yes", "Yes"),
+]
+# Claude Pro, https://claude.com/pricing (WebFetch today): Pro "$17 Per month with annual subscription discount ($200 billed up front). $20 if billed monthly.";
+# Max "From $100 Per month", "Choose 5x or 20x more usage than Pro"; FAQ "Pro gives you at least 5x more usage per 5-hour session than Free";
+# "Claude Code is included in all paid plans"; Free: Projects "Up to 5", Research "No", Opus "No"; Pro: Opus Yes, Research Yes, Claude in Chrome / Microsoft 365 Yes;
+# "Usage limits apply. Prices shown don't include applicable tax."
+CLAUDE_CHECKED = "2026-10-23"
