@@ -257,3 +257,6 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.
+
+## Smart search (v45)
+- [Finder](https://toolpick-ai.vercel.app/?q=voiceover%20under%20%2410): type a whole sentence. It reads the job, a budget ("under $10", "$120/year"), team size ("team of 5": per-seat totals only where the verified entry price is per seat), billing ("no annual plan"), "free", "cheap", and tool names: "cheaper than ChatGPT" (same main job, same billing, like-for-like tiers), "like ElevenLabs but free", "ChatGPT vs Claude" (links the full comparison). Shareable: https://toolpick-ai.vercel.app/?q=cheaper%20than%20ChatGPT
