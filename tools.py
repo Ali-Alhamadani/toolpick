@@ -229,10 +229,10 @@ FREE_ALT_FOR += ["Pika","InVideo","Writesonic","Surfer","Krea","Notion AI","Clau
 # Browser-verified 2026-10-15 (official pricing pages)
 _BV = {
  "Otter": dict(price="List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). Promotional (first-time subscribers): Pro $8.49/mo monthly or $4.17/mo yearly (save 50%); Business $24/user/mo for 3 months (20% off) (checked 2026-10-21)"),
- "ChatGPT": dict(price="Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing (checked 2026-10-15)", free="Free: $0 (unlimited text chats on GPT-6, limits on tools)"),
- "Perplexity": dict(price="Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-15)", free="Free tier available"),
- "Gamma": dict(price="Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-15)", free="Free plan available"),
- "Canva": dict(price="Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person (checked 2026-10-15)", free="Free plan available"),
+ "ChatGPT": dict(price="Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); Business $25/seat/mo ($20 billed annually); monthly billing (checked 2026-10-24)", free="Free: $0 (unlimited text chats on GPT-6, limits on tools)"),
+ "Perplexity": dict(price="Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-24)", free="Free tier available"),
+ "Gamma": dict(price="Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-24)", free="Free plan available"),
+ "Canva": dict(price="Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person (checked 2026-10-24)", free="Free plan available"),
  "Kling AI": dict(pricing="https://kling.ai/app/membership/membership-plan", price="List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $207/mo ($1,490/yr); Ultra+ $619/mo ($4,457/yr). Promotional: Standard $6.99 first month then $8.8/mo; Pro $25.99 first month then $32.56/mo; Premier $135 first month then $181.99/mo; Ultra+ $402 first month then $544.99/mo (checked 2026-10-17)", free="Basic: free", about="Text/image-to-video generator."),
 }
 for _c in CATEGORIES:
@@ -694,13 +694,13 @@ SUB_STACKS = [("Writer", ["ChatGPT", "Grammarly"]), ("Developer", ["Cursor", "Cl
 # So: Pro "from $100/mo" confirmed today; Go $8 and Plus $20 are from our 2026-10-15 check (tools.py ChatGPT entry); Business price not stated today.
 # FAQ today: "Paid plans (Go, Plus, Business, and Enterprise) are priced per user per month. We offer monthly plans for Go, Plus and Business and annual plans for Business and Enterprise."
 # "Business plans are available starting at 2 users." Go: "This plan may include ads."
-CHATGPT_CHECKED = "2026-10-23"
+CHATGPT_CHECKED = "2026-10-24"
 CHATGPT_PLANS = [  # plan, price text, price source date, best for (page), key points (page)
- ("Free", "$0", "2026-10-23", "Best for trying out ChatGPT", "Unlimited text chats with GPT-6; limited uploads, image creation, voice, deep research, memory and Codex"),
- ("Go", "$8/mo", "2026-10-15", "Best for longer conversations", "More messages with tools, uploads, image creation and voice; longer memory; may include ads"),
- ("Plus", "$20/mo", "2026-10-15", "Best for advanced work and productivity", "Advanced reasoning with GPT-6; expanded deep research, memory, Codex; projects, scheduled tasks and custom GPTs"),
- ("Pro", "from $100/mo", "2026-10-23", "Best for research and coding", "Choice of 3 usage tiers; Pro reasoning (GPT-6 Astra); maximum deep research and memory; unlimited, faster image creation"),
- ("Business", "not stated", "2026-10-23", "For businesses, from 2 users", "Priced per user per month; monthly or annual billing"),
+ ("Free", "$0", "2026-10-24", "Best for trying out ChatGPT", "Unlimited text chats with GPT-6; limited uploads, image creation, voice, deep research, memory and Codex"),
+ ("Go", "$8/mo", "2026-10-24", "Best for longer conversations", "More messages with tools, uploads, image creation and voice; longer memory; may include ads"),
+ ("Plus", "$20/mo", "2026-10-24", "Best for advanced work and productivity", "Advanced reasoning with GPT-6; expanded deep research, memory, Codex; projects, scheduled tasks and custom GPTs"),
+ ("Pro", "from $100/mo", "2026-10-24", "Best for research and coding", "Choice of 3 usage tiers; Pro reasoning (GPT-6 Astra); maximum deep research and memory; unlimited, faster image creation"),
+ ("Business", "$25/seat/mo ($20 billed annually); Premium seat $125/mo ($100 annually)", "2026-10-24", "For businesses, from 2 users", "Priced per user per month; monthly or annual billing"),
 ]
 CHATGPT_FEATURES = [  # row, Free, Go, Plus, Pro (from today's comparison table; "" = not stated for that plan)
  ("GPT Instant context window", "27K", "54K", "54K", "128K"),
@@ -840,3 +840,11 @@ STUDENT_NONE = [  # tool, what the official page says today, src
  ("Cursor", "No standing discount: “Anyone can get started with Cursor for free. To upgrade your access, look out for promotions at our on-campus and online events.”", "https://cursor.com/students"),
  ("Warp", "“At this time, Warp does not offer discounts for students, non-profits, or open-source teams.” It points to the Free plan instead.", "https://www.warp.dev/pricing"),
 ]
+
+# Daily ops 2026-10-24: browser re-check of chatgpt.com/pricing, perplexity.ai/pro, gamma.app/pricing, canva.com/pricing; prices unchanged, ChatGPT Business now shown.
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in ("ChatGPT","Perplexity","Gamma","Canva"): _t["checked"] = "2026-10-24"
+PRICE_NOTES["2026-10-24|ChatGPT"] = ("changed", "ChatGPT's prices are unchanged (Go $8/mo, Plus $20/mo, Pro from $100/mo). New: we now also show Business at $25/seat/mo billed monthly, or $20 billed annually.")
+for _n in ("Perplexity", "Gamma", "Canva"):
+    PRICE_SKIP[f"2026-10-24|{_n}"] = "Re-checked 2026-10-24; only the checked date changed, prices unchanged."

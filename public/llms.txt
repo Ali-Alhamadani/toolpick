@@ -27,7 +27,7 @@
 - [Opus Clip](https://toolpick-ai.vercel.app/tools/opus-clip.html): Paid from $15/mo billed monthly | free: Free forever plan ($0)
 - [Captions](https://toolpick-ai.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
 - [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
-- [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
+- [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); Business $25/seat/mo ($20 billed annually); monthly billing | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
 - [Google Gemini](https://toolpick-ai.vercel.app/tools/google-gemini.html): Google AI Plus $4.99/mo (Flash model, lighter tier); Google AI Pro $19.99/mo; Ultra from $99.99/mo (US prices) | free: Gemini app is free to use
 - [Grammarly](https://toolpick-ai.vercel.app/tools/grammarly.html): Pro $30/mo ($12/mo billed yearly, $144/yr; $60 quarterly) | free: Free: $0 spelling & grammar checks
 - [Notion AI](https://toolpick-ai.vercel.app/tools/notion-ai.html): Plus $12/member/mo ($10 billed yearly); Business $24/member/mo ($20 billed yearly) | free: Free plan: $0 (AI trial only)
@@ -255,7 +255,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [AI subscription costs per month](https://toolpick-ai.vercel.app/ai-subscription-costs.html): monthly prices of 19 popular AI subscriptions with checked dates, plus example stack totals
 
 ## ChatGPT and Claude plans
-- [ChatGPT pricing](https://toolpick-ai.vercel.app/chatgpt-pricing.html): Free vs Go vs Plus vs Pro (and Business), each price with its confirmation date; feature differences from the official page (2026-10-23)
+- [ChatGPT pricing](https://toolpick-ai.vercel.app/chatgpt-pricing.html): Free vs Go vs Plus vs Pro (and Business), each price with its confirmation date; feature differences from the official page (2026-10-24)
 - [Is Claude Pro worth it?](https://toolpick-ai.vercel.app/is-claude-pro-worth-it.html): what Pro adds over Free, when to skip it, similar plans; claude.com/pricing checked 2026-10-23
 
 ## AI student discounts (v48)
