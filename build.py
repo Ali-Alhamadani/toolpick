@@ -2340,6 +2340,115 @@ for _x in COMPARISONS:
 _v47ins("/ai-subscription-costs.html", "</h1>", '<p class="small v47"><a href="/chatgpt-pricing.html">ChatGPT pricing</a> · <a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it?</a></p>', after=True)
 open("public/llms.txt", "a").write(f"\n## ChatGPT and Claude plans\n- [ChatGPT pricing]({BASE}/chatgpt-pricing.html): Free vs Go vs Plus vs Pro (and Business), each price with its confirmation date; feature differences from the official page ({CGC})\n- [Is Claude Pro worth it?]({BASE}/is-claude-pro-worth-it.html): what Pro adds over Free, when to skip it, similar plans; claude.com/pricing checked {CLC}\n")
 
+# --- v48: Student & teacher discounts (verified 2026-10-24 on official pages) ---
+SOC = _tm0.STUDENT_CHECKED; SO = _tm0.STUDENT_OFFERS
+_socat = {}
+for _c in CATEGORIES:
+    for _t in _c["tools"]: _socat.setdefault(_t["name"], _c)
+for _o in SO:
+    assert _o["reg"] in find(_o["tool"])["price"], ("student reg price not in tools.py", _o["tool"], _o["reg"])
+    assert _o["kind"] in ("free", "off", "ask") and set(_o["who"]) <= {"s", "t"}
+_SO_ORDER = {"free": 0, "off": 1, "ask": 2}
+SO_SORTED = sorted(SO, key=lambda o: (_SO_ORDER[o["kind"]], -(o["save"][1] if o.get("save") else 0), o["tool"]))
+def _sousd(v): return "$" + (f"{v:,.2f}" if round(v, 2) != int(v) else f"{int(v):,}")
+_WHO_L = {"s": "Students", "t": "Teachers", "st": "Students & teachers"}
+_KIND_L = {"free": "b-sofree", "off": "b-sooff", "ask": "b-soask"}
+def _so_card(o):
+    c = _socat[o["tool"]]; d = dom(o["src"]); tt = find(o["tool"]); ck = tt.get("checked", CHECKED)
+    sv = o.get("save")
+    save_html = f'<dt>Year-one saving</dt><dd><b>{_sousd(sv[1])}</b> <span class="small">= {e(sv[0])}</span></dd>' if sv else ""
+    note = f'<p class="small sonote">{e(o["note"])}</p>' if o.get("note") else ""
+    src2 = f' · <a href="{e(o["src2"])}" rel="noopener" target="_blank">{e(dom(o["src2"]))}</a>' if o.get("src2") else ""
+    remind = f'<a class="bbtn" href="/my-ai-costs.html?add={slug(o["tool"])}#reminders">Remind me before it ends</a>' if o.get("end") else ""
+    return (f'<article class="card so" id="o-{o["k"]}" data-k="{o["k"]}" data-who="{o["who"]}" data-cat="{c["id"]}" data-kind="{o["kind"]}" data-save="{sv[1] if sv else 0}" data-end="{1 if o.get("end") else 0}">'
+            f'<div class="badges"><span class="badge {_KIND_L[o["kind"]]}">{e(o["badge"])}</span><span class="badge b-rank">{_WHO_L[o["who"]]}</span></div>'
+            f'<h3><a href="{turl(o["tool"])}">{e(o["tool"])}</a> <span class="small">· {e(c["name"])}</span></h3><p class="sooffer">{e(o["offer"])}</p>'
+            f'<dl class="sodl"><dt>What you get</dt><dd>{e(o["gets"])}</dd><dt>Who qualifies</dt><dd>{e(o["elig"])}</dd><dt>How to claim</dt><dd class="soclaim">{e(o["claim"])}</dd>'
+            f'<dt>Regular price</dt><dd>{e(o["reg"])} <span class="small">(checked {ck})</span></dd>{save_html}</dl>{note}'
+            f'<details class="soq"><summary>What the official page says</summary><blockquote>“{e(o["quote"])}”</blockquote><p class="small">Read on <a href="{e(o["src"])}" rel="noopener" target="_blank">{e(d)}</a>{src2} on {SOC}</p></details>'
+            f'<div class="factions"><a class="bbtn primary" href="{e(o["src"])}" rel="noopener" target="_blank">Get it on {e(d)}<span class="skip"> (opens in a new tab)</span></a>'
+            f'<button type="button" class="bbtn sopick" aria-pressed="false" data-k="{o["k"]}">＋ I\'d use this</button>{remind}</div></article>')
+_so_cats = [c for c in CATEGORIES if any(_socat[o["tool"]]["id"] == c["id"] for o in SO)]
+_so_chips = '<button type="button" class="on" aria-pressed="true" data-cat="">All</button>' + "".join(f'<button type="button" aria-pressed="false" data-cat="{c["id"]}">{e(c["name"])}</button>' for c in _so_cats)
+_so_n_s = sum(1 for o in SO if "s" in o["who"]); _so_n_t = sum(1 for o in SO if "t" in o["who"]); _so_free_s = sum(1 for o in SO if "s" in o["who"] and o["kind"] == "free")
+_so_save_s = round(sum(o["save"][1] for o in SO if "s" in o["who"] and o.get("save")), 2)
+_so_school = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: {e(w)} <span class="small">(<a href="{e(s)}" rel="noopener" target="_blank">{e(dom(s))}</a>, {SOC})</span></li>' for n, w, s, q in _tm0.STUDENT_SCHOOL_ONLY)
+_so_none = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: {e(w)} <span class="small">(<a href="{e(s)}" rel="noopener" target="_blank">{e(dom(s))}</a>, {SOC})</span></li>' for n, w, s in _tm0.STUDENT_NONE)
+_qa_so = [("Which AI tools are free for students?", "Free offers we verified on " + SOC + ": " + "; ".join(f'{o["tool"]} ({o["offer"]})' for o in SO_SORTED if o["kind"] == "free" and "s" in o["who"]) + ". Each has eligibility rules, listed on the page."),
+          ("Is ChatGPT free for students?", "Not with a special plan: on " + SOC + " ChatGPT's pricing page listed no student plan or discount. Its regular Free plan is open to everyone."),
+          ("Do teachers get AI tool discounts?", "Yes. Verified on " + SOC + ": " + "; ".join(f'{o["tool"]} ({o["offer"]})' for o in SO_SORTED if "t" in o["who"] and o["kind"] != "ask") + "."),
+          ("What happens when a free student year ends?", "Most time-limited offers (for example Google AI Pro, Beautiful.ai Pro, v0, Lovable) end after the stated period. Use “Remind me before it ends” on any card to get a reminder before you'd start paying.")]
+_so_cards = "".join(_so_card(o) for o in SO_SORTED)
+_so_css = (".sohead{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);align-items:center}.sohead>span{font-weight:600}.b-sofree{background:var(--ok);color:var(--okt)}.b-sooff{background:var(--ac);color:var(--sf)}.b-soask{background:var(--sf2);color:var(--tx);border:1px solid var(--bd)}"
+           ".so .sooffer{font-size:1.08rem;font-weight:700;margin:2px 0 6px}.sodl{display:grid;grid-template-columns:1fr;gap:2px;margin:0 0 6px}.sodl dt{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu);margin-top:6px}.sodl dd{margin:0}"
+           ".soq summary{cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--ac);font-weight:600;font-size:.92rem}.soq blockquote{margin:0 0 6px;padding:8px 12px;border-left:3px solid var(--bd);background:var(--sf2);border-radius:8px;font-size:.92rem}"
+           ".so .factions{margin-top:auto;padding-top:8px}.sopick[aria-pressed=true]{background:var(--ok);border-color:var(--ok);color:var(--okt)}.so.picked{border:2px solid var(--ok)}.so.hl{outline:3px solid var(--ac);outline-offset:3px}.sonote{border-left:3px solid var(--warn);padding-left:8px}"
+           "#so-sum{font-size:1.05rem;margin:var(--s3) 0 0}#so-tray b{font-size:1.05rem}#so-tray .grow{flex:1 1 220px}#so-list li{margin:var(--s3) 0}.sofree{display:inline-flex;align-items:center;gap:8px;min-height:44px;font-weight:500;cursor:pointer}.sofree input{width:20px;height:20px}"
+           "#so-tray[hidden],#so-plan[hidden],#so-hint[hidden]{display:none!important}@media(max-width:640px){#so-tray{bottom:8px;gap:8px;padding:10px 12px}#so-tray #so-tot2{display:none}#so-tray .grow{flex:1 1 100%}#so-tray .bbtn{flex:1 1 0;justify-content:center;padding-left:8px;padding-right:8px;min-width:0}}")
+_so_body = f"""<style>{_so_css}</style><p class="small"><a href="/guides.html">Guides</a> › Student &amp; teacher discounts</p><h1>AI student discounts &amp; free plans</h1>
+<p class="tag">{_so_n_s} offers for students and {_so_n_t} for teachers, each read on the tool's own official page on {SOC}. Pick who you are, tap <b>I'd use this</b> on the ones you want, and get your year-one saving plus a claim checklist.</p>
+<div class="builder"><div class="sohead"><span id="so-wl">I am a</span><fieldset class="seg" aria-labelledby="so-wl"><legend>I am a</legend><input type="radio" name="sowho" id="so-ws" value="s" checked><label for="so-ws">Student</label><input type="radio" name="sowho" id="so-wt" value="t"><label for="so-wt">Teacher / educator</label></fieldset>
+<label class="sofree"><input type="checkbox" id="so-free"> Free offers only</label></div>
+<div class="needs" role="group" aria-label="Filter by what you need" id="so-cats">{_so_chips}</div>
+<p id="so-sum" role="status" aria-live="polite">{_so_n_s} offers for students · {_so_free_s} free · up to {_sousd(_so_save_s)} saved in year one where both prices are stated</p></div>
+<h2 class="skip">Offers</h2><div class="grid" id="so-grid">{_so_cards}</div>
+<p id="so-empty" class="fempty" hidden>No offers match. <button type="button" class="bbtn" id="so-reset">Show all offers</button></p>
+<div class="tray" id="so-tray" hidden><span class="grow"><b id="so-tot"></b><br><span class="small" id="so-tot2"></span></span><a class="bbtn primary" href="#so-plan">Checklist ↓</a><button type="button" class="bbtn" id="so-share">Copy link</button><button type="button" class="bbtn" id="so-clear">Clear</button></div>
+<section id="so-plan" hidden aria-labelledby="so-ph"><h2 id="so-ph">Your claim checklist</h2><p class="small">Do these in order: most offers need your school email first. Time-limited offers renew at the regular price, so set a reminder.</p><ol id="so-list"></ol><p><button type="button" class="bbtn" id="so-copy">Copy checklist</button> <span class="small" id="so-msg" role="status"></span></p></section>
+<h2>Only through your school</h2><p class="small">These tools offer education pricing to institutions, not to individuals. Ask your school's IT or library.</p><ul>{_so_school}</ul>
+<h2>No student discount (checked {SOC})</h2><ul>{_so_none}</ul>
+<p class="small">How we check: every offer is copied from the tool's own pricing, education or help page on {SOC}; the exact sentence is under “What the official page says” on each card. Year-one savings are only shown when the page names the plan and both prices are known (regular prices from our tool pages, with their checked date). Offers change often — always confirm on the official page. We earn nothing from these links.</p>
+<p class="small">Related: <a href="/best-ai-tools-for-students.html">AI starter stack for students</a> · <a href="/free-plan-limits.html">Free plan limits</a> · <a href="/free.html">Free AI tools</a> · <a href="/my-ai-costs.html#reminders">Renewal reminders</a></p>
+<h2>FAQ</h2>{"".join(f"<h3>{e(q)}</h3><p>{e(a)}</p>" for q, a in _qa_so)}
+<script>(function(){{const G=[...document.querySelectorAll('#so-grid .so')],CH=[...document.querySelectorAll('#so-cats button')],FR=document.getElementById('so-free'),SUM=document.getElementById('so-sum'),EM=document.getElementById('so-empty'),TR=document.getElementById('so-tray'),PL=document.getElementById('so-plan'),LI=document.getElementById('so-list'),MSG=document.getElementById('so-msg');
+let who='s',cat='',picks=new Set();const usd=v=>'$'+(Math.round(v*100)%100?v.toFixed(2):String(Math.round(v))).replace(/\\B(?=(\\d{{3}})+(?!\\d))/g,',');
+const p=new URLSearchParams(location.search);if(p.get('who')=='t')who='t';if(p.get('cat')&&CH.some(b=>b.dataset.cat==p.get('cat')))cat=p.get('cat');if(p.get('free')=='1')FR.checked=true;(p.get('pick')||'').split(',').forEach(k=>{{if(G.some(c=>c.dataset.k==k))picks.add(k)}});
+document.getElementById(who=='t'?'so-wt':'so-ws').checked=true;
+function url(){{const q=new URLSearchParams();if(who=='t')q.set('who','t');if(cat)q.set('cat',cat);if(FR.checked)q.set('free','1');if(picks.size)q.set('pick',[...picks].join(','));const s=q.toString();return location.pathname+(s?'?'+s:'')}}
+function render(){{let n=0,f=0,sv=0;G.forEach(c=>{{const ok=c.dataset.who.includes(who)&&(!cat||c.dataset.cat==cat)&&(!FR.checked||c.dataset.kind=='free');c.hidden=!ok;if(ok){{n++;if(c.dataset.kind=='free')f++;sv+=+c.dataset.save}}const on=picks.has(c.dataset.k);c.classList.toggle('picked',on);const b=c.querySelector('.sopick');b.setAttribute('aria-pressed',on);b.textContent=on?'✓ Added':'＋ I\\'d use this'}});
+CH.forEach(b=>{{const on=b.dataset.cat==cat;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}});
+SUM.textContent=n+' offer'+(n==1?'':'s')+' for '+(who=='t'?'teachers':'students')+' · '+f+' free'+(sv>0?' · up to '+usd(sv)+' saved in year one where both prices are stated':'');EM.hidden=n>0;
+const P=G.filter(c=>picks.has(c.dataset.k));TR.hidden=PL.hidden=!P.length;
+if(P.length){{const t=P.reduce((a,c)=>a+ +c.dataset.save,0),ns=P.filter(c=>!+c.dataset.save).length;document.getElementById('so-tot').textContent=P.length+' offer'+(P.length==1?'':'s')+' picked · '+(t>0?usd(t)+' saved in year one':'saving not stated');document.getElementById('so-tot2').textContent=ns?(ns+' pick'+(ns==1?' has':'s have')+' no stated $ saving (percent off or plan not named).'):'Savings use the regular prices on our tool pages.';
+LI.innerHTML=P.map(c=>{{const a=c.querySelector('.factions a.primary'),r=c.querySelector('.factions a[href*="reminders"]');return '<li><b>'+c.querySelector('h3 a').textContent+'</b>: '+c.querySelector('.sooffer').textContent+'<br>'+c.querySelector('.soclaim').textContent+' <a href="'+a.href+'" rel="noopener" target="_blank">Official page</a>'+(r?' · <a href="'+r.getAttribute('href')+'">Remind me before it ends</a>':'')+'</li>'}}).join('')}}
+history.replaceState(null,'',url())}}
+document.querySelectorAll('input[name=sowho]').forEach(r=>r.addEventListener('change',()=>{{who=r.value;render()}}));FR.addEventListener('change',render);
+CH.forEach(b=>b.addEventListener('click',()=>{{cat=b.dataset.cat;render()}}));document.getElementById('so-reset').addEventListener('click',()=>{{cat='';FR.checked=false;render()}});
+G.forEach(c=>c.querySelector('.sopick').addEventListener('click',()=>{{const k=c.dataset.k;picks.has(k)?picks.delete(k):picks.add(k);render()}}));
+document.getElementById('so-clear').addEventListener('click',()=>{{picks.clear();render()}});
+function cp(t,okmsg){{const done=()=>{{MSG.textContent=okmsg;document.getElementById('so-tot2').textContent=okmsg}};if(navigator.clipboard)navigator.clipboard.writeText(t).then(done,()=>prompt('Copy this:',t));else prompt('Copy this:',t)}}
+document.getElementById('so-share').addEventListener('click',()=>cp(location.origin+url(),'Link copied: it opens with your picks.'));
+document.getElementById('so-copy').addEventListener('click',()=>cp([...LI.querySelectorAll('li')].map((l,i)=>(i+1)+'. '+l.innerText.replace(/\\s*Official page.*$/s,'')+' — '+l.querySelector('a').href).join('\\n'),'Checklist copied.'));
+render();const tk=p.get('tool');if(tk){{const c=G.find(x=>x.dataset.k==tk)||G.find(x=>x.dataset.k.startsWith(tk));if(c){{if(!c.dataset.who.includes(who)){{who=c.dataset.who.includes('s')?'s':'t';document.getElementById(who=='t'?'so-wt':'so-ws').checked=true;cat='';render()}}c.classList.add('hl');c.scrollIntoView({{block:'center'}})}}}}}})();</script>"""
+page("/ai-student-discounts.html", f"AI Student Discounts ({SOC[:4]}): Free & Discounted AI Tools for Students and Teachers | ToolPick",
+     f"{_so_n_s} verified AI student offers ({_so_free_s} free) and {_so_n_t} for teachers: Gemini, GitHub Copilot, Notion, Perplexity, Microsoft 365 and more. Eligibility, how to claim and year-one savings, checked {SOC} on official pages.",
+     _so_body, [{"@context": "https://schema.org", "@type": "ItemList", "name": "AI student discounts", "url": BASE + "/ai-student-discounts.html", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": f'{o["tool"]}: {o["offer"]}', "url": BASE + "/ai-student-discounts.html#o-" + o["k"]} for i, o in enumerate(SO_SORTED)]},
+                _ld_faq(_qa_so), crumbs([("ToolPick", "/"), ("Guides", "/guides.html"), ("AI student discounts", "/ai-student-discounts.html")])])
+V48_CHANGED = ["/ai-student-discounts.html"]
+def _v48ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not __import__("os").path.exists(_fp): return False
+    _h = open(_fp).read()
+    if 'v48"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V48_CHANGED.append(path); return True
+_so_by = {}
+for _o in SO_SORTED: _so_by.setdefault(_o["tool"], []).append(_o)
+for _n, _os_ in _so_by.items():
+    _txt = " · ".join(f'{e(o["offer"])} ({_WHO_L[o["who"]].lower()})' for o in _os_)
+    _line = f'<p class="pick small v48"><b>Student &amp; teacher offer:</b> {_txt} — checked {SOC} · <a href="/ai-student-discounts.html?tool={_os_[0]["k"]}">All AI student discounts →</a></p>'
+    if not _v48ins(turl(_n), '<section class="card tbp"', _line): _v48ins(turl(_n), '<section class="verdict', _line)
+_SO_LINE = f'<p class="pick v48"><b>Student or teacher?</b> {_so_n_s} AI tools have verified student offers ({_so_free_s} free), checked {SOC}: <a href="/ai-student-discounts.html">AI student discounts →</a></p>'
+_v48ins("/best-ai-tools-for-students.html", "</h1>", _SO_LINE, after=True)
+_v48ins("/free.html", "</h1>", _SO_LINE, after=True)
+_v48ins("/tools.html", "</h1>", f'<p class="small v48">Student or teacher? <a href="/ai-student-discounts.html">See verified AI student discounts →</a></p>', after=True)
+_v48ins("/guides.html", "<h2>New guides</h2><ul>", "<li class=\"v48\"><a href='/ai-student-discounts.html'>AI student &amp; teacher discounts</a></li>", after=True)
+_v48ins("/stacks.html", "</h1>", f'<p class="small v48">Student or teacher? <a href="/ai-student-discounts.html">Verified AI student discounts →</a></p>', after=True)
+# Finder: when the search mentions students/teachers, show a one-tap link (doesn't change results)
+_SOH = f'<p class="pick v48 sohint" hidden><b>Student or teacher?</b> {_so_n_s} AI tools have verified student offers ({_so_free_s} free): <a href="/ai-student-discounts.html">AI student discounts →</a></p>'
+_v48ins("/index.html", '<div class="chips" aria-label="Example searches">', _SOH + '<style>.sohint[hidden]{display:none!important}.sohint{margin:var(--s3) auto;max-width:720px;text-align:left}</style>')
+_h = open("public/index.html").read(); open("public/index.html", "w").write(_h.replace('<div id="out" aria-live="polite">', _SOH + '<div id="out" aria-live="polite">' + '<script>(function(){const q=document.getElementById("q"),H=[...document.querySelectorAll(".sohint")];if(!q||!H.length)return;const re=/\\b(student|students|college|university|teacher|teachers|educator|school|edu|study|studying|homework|class)\\b/i;const f=()=>{const m=re.test(q.value);H.forEach(h=>h.hidden=!m)};q.addEventListener("input",f);addEventListener("load",f);document.addEventListener("click",()=>setTimeout(f,50));f()})()</script>', 1))
+open("public/llms.txt", "a").write(f"\n## AI student discounts (v48)\n- [AI student & teacher discounts]({BASE}/ai-student-discounts.html): {_so_n_s} student offers ({_so_free_s} free) and {_so_n_t} teacher offers, each with eligibility, how to claim, regular price and year-one saving where both prices are stated; read on official pages {SOC}. Also lists school-only plans (Claude, Grammarly, Canva Campus, Scite) and tools with no student discount (ChatGPT, Cursor, Warp). Filters: ?who=t, ?cat=coding, ?free=1, ?tool=lovable.\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2425,6 +2534,7 @@ for _u in V41_CHANGED: _lm[_u] = CODING_CHECKED
 for _u in V42_CHANGED: _lm[_u] = FREE_CHECKED
 for _u in V44_CHANGED: _lm[_u] = "2026-10-22"
 for _u in V47_CHANGED: _lm[_u] = "2026-10-23"
+for _u in V48_CHANGED: _lm[_u] = "2026-10-24"
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))

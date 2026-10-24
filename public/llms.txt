@@ -29,10 +29,10 @@
 - [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
 - [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); monthly billing | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
 - [Google Gemini](https://toolpick-ai.vercel.app/tools/google-gemini.html): Google AI Plus $4.99/mo (Flash model, lighter tier); Google AI Pro $19.99/mo; Ultra from $99.99/mo (US prices) | free: Gemini app is free to use
-- [Grammarly](https://toolpick-ai.vercel.app/tools/grammarly.html): Pro $12/mo | free: Free: $0 spelling & grammar checks
-- [Notion AI](https://toolpick-ai.vercel.app/tools/notion-ai.html): Plus $10/member/mo; Business $20/member/mo | free: Free plan: $0 (AI trial only)
+- [Grammarly](https://toolpick-ai.vercel.app/tools/grammarly.html): Pro $30/mo ($12/mo billed yearly, $144/yr; $60 quarterly) | free: Free: $0 spelling & grammar checks
+- [Notion AI](https://toolpick-ai.vercel.app/tools/notion-ai.html): Plus $12/member/mo ($10 billed yearly); Business $24/member/mo ($20 billed yearly) | free: Free plan: $0 (AI trial only)
 - [Copy.ai](https://toolpick-ai.vercel.app/tools/copy-ai.html): Chat $29/mo ($24 yearly); team plans from $1,000/mo | free: Free trial available
-- [Jasper](https://toolpick-ai.vercel.app/tools/jasper.html): Pro $59/seat/mo | free: No free plan; 7-day free trial
+- [Jasper](https://toolpick-ai.vercel.app/tools/jasper.html): Pro $69/seat/mo ($59/seat/mo billed yearly) | free: No free plan; 7-day free trial
 - [Wordtune](https://toolpick-ai.vercel.app/tools/wordtune.html): From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99) | free: Basic $0 (limited)
 - [Rytr](https://toolpick-ai.vercel.app/tools/rytr.html): Lite $9/mo; Personal $19/mo; Pro $49/mo (monthly prices; yearly billing saves 20%) | free: Free forever: 10,000 characters/mo
 - [GitHub Copilot](https://toolpick-ai.vercel.app/tools/github-copilot.html): Pro $10/mo; Pro+ $39/mo; Max $100/mo | free: Free plan: $0
@@ -253,6 +253,13 @@ Data: https://toolpick-ai.vercel.app/tools.json
 ## Pricing explainers
 - [Cursor pricing explained](https://toolpick-ai.vercel.app/cursor-pricing.html): Free, Plus (Grok only), Premium, Super, Ultra, Teams; usage vs Plus and what costs extra; checked 2026-10-22
 - [AI subscription costs per month](https://toolpick-ai.vercel.app/ai-subscription-costs.html): monthly prices of 19 popular AI subscriptions with checked dates, plus example stack totals
+
+## ChatGPT and Claude plans
+- [ChatGPT pricing](https://toolpick-ai.vercel.app/chatgpt-pricing.html): Free vs Go vs Plus vs Pro (and Business), each price with its confirmation date; feature differences from the official page (2026-10-23)
+- [Is Claude Pro worth it?](https://toolpick-ai.vercel.app/is-claude-pro-worth-it.html): what Pro adds over Free, when to skip it, similar plans; claude.com/pricing checked 2026-10-23
+
+## AI student discounts (v48)
+- [AI student & teacher discounts](https://toolpick-ai.vercel.app/ai-student-discounts.html): 17 student offers (7 free) and 8 teacher offers, each with eligibility, how to claim, regular price and year-one saving where both prices are stated; read on official pages 2026-10-24. Also lists school-only plans (Claude, Grammarly, Canva Campus, Scite) and tools with no student discount (ChatGPT, Cursor, Warp). Filters: ?who=t, ?cat=coding, ?free=1, ?tool=lovable.
 
 
 ## My AI costs
