@@ -2449,6 +2449,178 @@ _v48ins("/index.html", '<div class="chips" aria-label="Example searches">', _SOH
 _h = open("public/index.html").read(); open("public/index.html", "w").write(_h.replace('<div id="out" aria-live="polite">', _SOH + '<div id="out" aria-live="polite">' + '<script>(function(){const q=document.getElementById("q"),H=[...document.querySelectorAll(".sohint")];if(!q||!H.length)return;const re=/\\b(student|students|college|university|teacher|teachers|educator|school|edu|study|studying|homework|class)\\b/i;const f=()=>{const m=re.test(q.value);H.forEach(h=>h.hidden=!m)};q.addEventListener("input",f);addEventListener("load",f);document.addEventListener("click",()=>setTimeout(f,50));f()})()</script>', 1))
 open("public/llms.txt", "a").write(f"\n## AI student discounts (v48)\n- [AI student & teacher discounts]({BASE}/ai-student-discounts.html): {_so_n_s} student offers ({_so_free_s} free) and {_so_n_t} teacher offers, each with eligibility, how to claim, regular price and year-one saving where both prices are stated; read on official pages {SOC}. Also lists school-only plans (Claude, Grammarly, Canva Campus, Scite) and tools with no student discount (ChatGPT, Cursor, Warp). Filters: ?who=t, ?cat=coding, ?free=1, ?tool=lovable.\n")
 
+# --- v49: "Alternatives to X" pages (/alternatives/<tool>.html + hub /alternatives.html) ---
+# Built ONLY from verified tools.py data and the site's one same-job rule (samejob / cmp_price / cheaper_alt / free_alt,
+# TIER_MATCH for lighter entry tiers). No new prices. Unverified values show "check site". Cursor keeps its own
+# hand-checked page (/cursor-alternatives.html) and free-only pages (/free-alternative-to-*.html) are linked, not duplicated.
+ALT49_DATE = "2026-10-25"
+ALT49 = ["ChatGPT", "Claude", "Google Gemini", "Microsoft Copilot", "Midjourney", "ElevenLabs", "Runway", "Grammarly",
+         "Otter", "GitHub Copilot", "Lovable", "Bolt", "Gamma", "Surfer", "Lindy"]
+for _n in ALT49: assert _n in TOOL and len(samejob(_n)) >= 2, _n
+def alt49_path(n): return "/cursor-alternatives.html" if n == "Cursor" else f"/alternatives/{slug(n)}.html"
+ALT49_PATHS = {n: alt49_path(n) for n in ALT49 + ["Cursor"]}
+_FA_PATH = dict(FREE_ALT_URLS)
+_CAT49 = {}
+for _c in CATEGORIES:
+    for _t in _c["tools"]: _CAT49.setdefault(_t["name"], _c)
+def _p49(v, unit="/mo"):
+    if isinstance(v, (int, float)): return _usd(v) + unit
+    if isinstance(v, str) and v.strip() and v != "check site": return e(v) + unit
+    return '<span class="check">check site</span>'
+def _cmpkey49(x, n):
+    m, a = cmp_price(x, n, "monthly"), cmp_price(x, n, "annual")
+    return (0 if m is not None else 1, m if m is not None else (a if a is not None else 1e9), x["name"].lower())
+def _cheaper49(n):
+    """Same rule as tool pages (tool_verdict): monthly with monthly first, then billed-yearly with billed-yearly."""
+    t = TOOL[n]; m, a = _num(t["monthly"]), _num(t["annual"])
+    cm, ca = cheaper_alt(n, "monthly"), cheaper_alt(n, "annual")
+    if m is not None and cm is not None and cm["monthly"] < m: return cm, "monthly", cm["monthly"], m
+    if a is not None and ca is not None and ca["annual"] < a: return ca, "annual", ca["annual"], a
+    return None
+def _bv49(n):
+    return [x for x in [TOOL[n]] + samejob(n) if x["name"] in BEST_OF]
+def _alt49_lines(n):
+    t = TOOL[n]; job = cap_label(n); L = []
+    ch = _cheaper49(n)
+    if ch:
+        x, key, v, own = ch; bl = "monthly billing" if key == "monthly" else "billed yearly"
+        tn = tier_note(n, x["name"])
+        L.append(("Cheaper", f'<a href="{turl(x["name"])}">{e(tname(x))}</a> at {_usd(v)}/mo vs {e(n)} at {_usd(own)}/mo ({bl}, same job).' + (f' <span class="small">{e(tn)}</span>' if tn else "")))
+    else:
+        m, a = _num(t["monthly"]), _num(t["annual"])
+        if m is None and a is None: L.append(("Cheaper", f"We have no checked price for {e(n)}, so we can't say what is cheaper."))
+        else: L.append(("Cheaper", f"None checked: {e(n)} already has the lowest checked entry price for {e(job)} among comparable plans."))
+    fa = free_alt(n)
+    if fa: L.append(("Free", f'<a href="{turl(fa["name"])}">{e(fa["name"])}</a> has a real free plan: {e(fa["free"])}.' + (f' {e(n)} has one too: {e(t["free"])}.' if realfree(t) else "")))
+    elif realfree(t): L.append(("Free", f"No other same-job tool has a real free plan, but {e(n)} itself does: {e(t['free'])}."))
+    else: L.append(("Free", f"No same-job tool in our list has a real free plan (trials and one-time credits don't count)."))
+    bv = sorted([x for x in _bv49(n) if x["name"] != n], key=lambda x: 0 if _CAT49[n]["id"] in BEST_OF[x["name"]] else 1)
+    if bv:
+        x = bv[0]; c = next(cc for cc in CATEGORIES if cc["id"] == BEST_OF[x["name"]][0])
+        L.append(("Best value", f'<a href="{turl(x["name"])}">{e(x["name"])}</a> is our Best Value pick for {e(c["name"])}' + (f": {e(x['why'].rstrip('.'))}." if x.get("why") else " (chosen for overall value, not only price).")))
+    elif n in BEST_OF:
+        c = next(cc for cc in CATEGORIES if cc["id"] == BEST_OF[n][0])
+        L.append(("Best value", f"{e(n)} itself is our Best Value pick for {e(c['name'])}, so switch only for price or a specific feature."))
+    return L
+def _row49(x, n, is_target):
+    m, a = _num(x["monthly"]), _num(x["annual"]); ck = x.get("checked", CHECKED)
+    mon = _p49(x["monthly"]) if x["monthly"] is not None else '<span class="check">check site</span>'
+    tier = ""
+    _cmv = cmp_price(x, n, "monthly")
+    if not is_target and _cmv is not None and _cmv != m: tier = f'<br><span class="small">Compared at {e(TIER_MATCH[x["name"]][0])}: {_usd(_cmv)}/mo</span>'
+    yr = _p49(x["annual"]) if x["annual"] is not None else '<span class="check">check site</span>'
+    fr = f'<b>Yes</b><br><span class="small">{e(x["free"])}</span>' if realfree(x) else f'No<br><span class="small">{e(x["free"])}</span>'
+    bd = ('<span class="badge b-rank">THIS TOOL</span>' if is_target else "") + ('<span class="badge b-best">BEST VALUE</span>' if x["name"] in BEST_OF else "") + ('<span class="badge b-free">FREE PLAN</span>' if realfree(x) else "")
+    return (f'<tr{" class=a49t" if is_target else ""}><th scope="row" data-l="Tool"><a href="{turl(x["name"])}">{e(x["name"])}</a><span class="a49b">{bd}</span><span class="small a49d">{e(x["about"])}</span></th>'
+            f'<td data-l="Monthly">{mon}{tier}</td><td data-l="Billed yearly">{yr}</td><td data-l="Real free plan">{fr}</td><td data-l="Main limit">{e(limitation(x))}</td>'
+            f'<td data-l="Checked">{ck}<br><a href="{e(x["pricing"])}" rel="noopener" target="_blank">Official pricing<span class="skip"> for {e(x["name"])} (opens in a new tab)</span></a></td></tr>')
+ALT49_CSS = ("<style>.a49v{display:grid;gap:8px;margin:var(--s4) 0}.a49v div{background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--ok);border-radius:12px;padding:10px 14px}.a49v b{display:inline-block;min-width:92px}"
+             ".a49 table{min-width:860px}.a49 th[scope=row]{font-weight:600;min-width:180px;white-space:normal}.a49 th[scope=row]>a{min-height:32px}.a49b{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0}.a49b:empty{display:none}.a49d{display:block;font-weight:400}.a49 td{font-size:.92rem}.a49 tr.a49t{background:var(--sf2)}.a49 tr.a49t th[scope=row]{box-shadow:inset 4px 0 0 var(--ac)}.a49 td[data-l=Checked]{white-space:nowrap}.a49c{display:flex;flex-wrap:wrap;gap:0 16px;list-style:none;padding:0}.a49c li{margin:0}"
+             ".a49h{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:var(--s4);margin:var(--s4) 0}.a49h .card h3 a{min-height:32px}.a49h .card p{font-size:.92rem}"
+             "@media(max-width:640px){.a49 table{min-width:0}.a49 tr:first-child{display:none}.a49 table,.a49 tbody,.a49 tr,.a49 td,.a49 th[scope=row]{display:block;width:100%}.a49 tr{border-bottom:1px solid var(--bd);padding:10px 4px}.a49 td,.a49 th[scope=row]{border:0;padding:4px 12px}"
+             ".a49 caption{display:block;width:100%}.a49 tr{margin:0 0 4px}.a49 td::before{content:attr(data-l);display:block;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu)}.a49v b{display:block}}</style>")
+ALT49_CHANGED = []
+_alt49_summ = {}
+for _n in ALT49:
+    _t = TOOL[_n]; _p = ALT49_PATHS[_n]; _job = cap_label(_n); _cat = _CAT49[_n]
+    _alts = sorted(samejob(_n), key=lambda x: _cmpkey49(x, _n))
+    _rows = _row49(_t, _n, True) + "".join(_row49(x, _n, False) for x in _alts)
+    _lines = _alt49_lines(_n)
+    _ver = "".join(f"<div><b>{k}:</b> {v}</div>" for k, v in _lines)
+    _cmps = [x for x in COMPARISONS if _n in cnames(x)]
+    _cl = "".join(f'<li><a href="/compare/{x[0]}.html">{e(x[1])}</a></li>' for x in _cmps)
+    _cb = "/compare-builder.html?tools=" + ",".join(slug(x) for x in [_n] + [a["name"] for a in _alts[:2]])
+    _ch = _cheaper49(_n); _fa = free_alt(_n)
+    _rel = [f'<a href="{turl(_n)}">{e(_n)} prices &amp; review</a>']
+    if _n in _FA_PATH: _rel.append(f'<a href="{_FA_PATH[_n]}">Free alternatives to {e(_n)} only</a>')
+    if _n == "ChatGPT": _rel.append('<a href="/chatgpt-pricing.html">ChatGPT pricing</a>')
+    if _n == "Claude": _rel.append('<a href="/is-claude-pro-worth-it.html">Is Claude Pro worth it?</a>')
+    if cap1(_n) == "code-assistant": _rel.append('<a href="/cursor-alternatives.html">Cursor alternatives</a>')
+    _rel.append(f'<a href="/best-ai-{_cat["id"]}-tools.html">Best AI {e(_cat["name"].lower())} tools</a>')
+    _rel.append('<a href="/alternatives.html">All alternatives pages</a>')
+    _qa = [(f"What is the cheapest alternative to {_n}?",
+            (f"{tname(_ch[0])} at {_usd(_ch[2])}/mo vs {_n} at {_usd(_ch[3])}/mo ({'monthly billing' if _ch[1]=='monthly' else 'billed yearly'}), among tools that do the same main job ({_job}). Prices checked on official pricing pages.") if _ch
+            else f"None of the tools we track that do the same main job ({_job}) has a lower checked entry price than {_n}."),
+           (f"Is there a free alternative to {_n}?",
+            (f"Yes: {_fa['name']} has a real free plan ({_fa['free']}), checked {_fa.get('checked', CHECKED)}.") if _fa else f"No tool in our list that does the same main job as {_n} has a real free plan."),
+           (f"How much does {_n} cost?", f"{_t['price']} (official pricing page, checked {_t.get('checked', CHECKED)})."),
+           (f"Which tools do the same job as {_n}?", f"{', '.join(a['name'] for a in _alts)} all have the same main job ({_job}) in ToolPick's list.")]
+    _body = f"""{ALT49_CSS}<p class="small"><a href="/alternatives.html">Alternatives</a> › {e(_n)}</p><h1>{e(_n)} alternatives</h1>
+<p class="tag">{len(_alts)} tools that do the same main job as {e(_n)} ({e(_job)}), with prices copied from each official pricing page and the date we checked.</p>
+<h2 class="h3" style="margin:var(--s5) 0 var(--s2)">Which one fits you</h2><div class="a49v">{_ver}</div>
+<h2>Side by side</h2><div class="tw a49"><table><caption class="small" style="text-align:left;padding:12px 16px">Entry plan per month. “Billed yearly” is the monthly rate when you pay for a year. Real free plan = a free plan you can keep using (trials and one-time credits don't count). “check site” = not verified, so we don't guess.</caption>
+<tr><th scope="col">Tool</th><th scope="col">Monthly</th><th scope="col">Billed yearly</th><th scope="col">Real free plan</th><th scope="col">Main limit</th><th scope="col">Checked</th></tr>{_rows}</table></div>
+<p><a class="btn" href="{_cb}">Compare {e(_n)} with the top 2 side by side →</a></p>
+{f'<h2>Head-to-head comparisons</h2><ul class="a49c">{_cl}</ul>' if _cl else ''}
+<p class="small">How we pick alternatives: only tools whose main job is the same as {e(_n)}{'’' if _n.endswith('s') else '’s'} ({e(_job)}), sorted by checked monthly price. Cheaper is compared like for like: monthly with monthly, yearly with yearly, and lighter entry tiers at their comparable tier. Not hands-on tested. <a href="/how-we-pick.html">How we pick</a></p>
+{_faq(_qa)}
+<p class="small">Related: {' · '.join(_rel)}</p>"""
+    _yr = ALT49_DATE[:4]
+    _names = ", ".join(a["name"] for a in _alts[:4])
+    _desc = (f"{len(_alts)} {_n} alternatives that do the same job ({_job}): {_names}. "
+             + (f"Cheaper: {tname(_ch[0])} {_usd(_ch[2])}/mo. " if _ch else "") + (f"Free: {_fa['name']}. " if _fa else "")
+             + "Monthly and yearly prices, free plans and limits from official pages.")[:300]
+    page(_p, f"{_n} Alternatives ({_yr}): {len(_alts)} Same-Job Tools Compared on Price | ToolPick", _desc, _body,
+         _ld_list(f"{_n} alternatives", _p, [a["name"] for a in _alts]) + [_ld_faq(_qa), crumbs([("ToolPick", "/"), ("Alternatives", "/alternatives.html"), (f"{_n} alternatives", _p)])])
+    ALT49_CHANGED.append(_p)
+    _lm_v = max(x.get("checked", CHECKED) for x in [_t] + _alts)
+    _alt49_summ[_n] = dict(p=_p, n=len(_alts), ch=_ch, fa=_fa, job=_job, cat=_cat, lm=_lm_v, alts=[a["name"] for a in _alts])
+# Hub
+_hub_groups = {}
+for _n in ALT49 + ["Cursor"]: _hub_groups.setdefault(_CAT49[_n]["id"], []).append(_n)
+def _hub_card(n):
+    if n == "Cursor":
+        _al = samejob("Cursor")
+        return (f'<article class="card"><h3><a href="/cursor-alternatives.html">Cursor alternatives</a></h3><p class="small">{len(_al)} same-job tools · {e(cap_label("Cursor"))}</p>'
+                f'<p>Plan-by-plan coding prices, checked {CODING_CHECKED}.</p></article>')
+    s = _alt49_summ[n]; ch, fa = s["ch"], s["fa"]
+    return (f'<article class="card"><h3><a href="{s["p"]}">{e(n)} alternatives</a></h3><p class="small">{s["n"]} same-job tools · {e(s["job"])}</p>'
+            f'<p><b>Cheaper:</b> {(e(tname(ch[0])) + " " + _usd(ch[2]) + "/mo" + (" yearly" if ch[1] == "annual" else "")) if ch else "none checked"}</p>'
+            f'<p><b>Free:</b> {e(fa["name"]) if fa else ("only " + e(n) + " itself" if realfree(TOOL[n]) else "none")}</p></article>')
+_hub_order = ALT49[:ALT49.index("GitHub Copilot") + 1] + ["Cursor"] + ALT49[ALT49.index("GitHub Copilot") + 1:]
+_hub_html = f'<h2 class="skip">Alternatives pages</h2><div class="a49h">{"".join(_hub_card(n) for n in _hub_order)}</div>'
+_qa_hub = [("How does ToolPick choose alternatives?", "Only tools with the same main job count as alternatives, so a chatbot is never compared with an image tool. Prices are copied from each tool's official pricing page with the date we checked."),
+           ("What does 'cheaper' mean here?", "A lower checked entry price on the same billing: monthly with monthly, yearly with yearly. Lighter entry tiers (like ChatGPT Go or Google AI Plus) are compared at their comparable tier against full plans."),
+           ("Only want free tools?", "Each page shows which alternatives have a real free plan. For free-only lists, see the free alternatives pages in Guides.")]
+_hub_body = f"""{ALT49_CSS}<p class="small"><a href="/guides.html">Guides</a> › Alternatives</p><h1>Alternatives to popular AI tools</h1>
+<p class="tag">Pick the tool you use now. Each page lists tools that do the same job, with checked monthly and yearly prices, free plans and the main limit, and tells you which is cheaper, which is free and which is our best-value pick.</p>
+{_hub_html}
+<p class="small">Free only? <a href="/free.html">Can I do it for free?</a> · Free-only lists: {" · ".join(f'<a href="{p}">{e(n)}</a>' for n, p in FREE_ALT_URLS if n in ALT49)} · <a href="/guides.html">all guides</a></p>
+{_faq(_qa_hub)}"""
+page("/alternatives.html", f"Alternatives to ChatGPT, Midjourney, ElevenLabs & More ({ALT49_DATE[:4]}) | ToolPick",
+     f"Same-job alternatives to {len(ALT49) + 1} popular AI tools (ChatGPT, Claude, Midjourney, ElevenLabs, Runway, Grammarly, Cursor...) with checked prices, free plans and the cheaper and free option for each.",
+     _hub_body, [{"@context": "https://schema.org", "@type": "ItemList", "name": "Alternatives to popular AI tools", "url": BASE + "/alternatives.html",
+                  "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": f"{n} alternatives", "url": BASE + ALT49_PATHS[n]} for i, n in enumerate(_hub_order)]},
+                 _ld_faq(_qa_hub), crumbs([("ToolPick", "/"), ("Guides", "/guides.html"), ("Alternatives", "/alternatives.html")])])
+ALT49_CHANGED.append("/alternatives.html")
+V49_CHANGED = []
+def _v49ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if 'v49"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V49_CHANGED.append(path); return True
+for _n in ALT49 + ["Cursor"]:
+    _k = len(samejob(_n))
+    _line = f'<p class="pick small v49">Looking for something else? <a href="{ALT49_PATHS[_n]}">See {_k} {e(_n)} alternatives that do the same job →</a></p>'
+    if not _v49ins(turl(_n), '<section class="card tbp"', _line): _v49ins(turl(_n), '<section class="verdict', _line)
+for _x in COMPARISONS:
+    _ls = [f'<a href="{ALT49_PATHS[_nn]}">{e(_nn)} alternatives</a>' for _nn in cnames(_x) if _nn in ALT49_PATHS]
+    if _ls: _v49ins(f"/compare/{_x[0]}.html", "</h1>", '<p class="small v49">See alternatives: ' + " · ".join(_ls) + "</p>", after=True)
+for _n, _fp2 in FREE_ALT_URLS:
+    if _n in ALT49_PATHS: _v49ins(_fp2, "</h1>", f'<p class="small v49">Paid options too? <a href="{ALT49_PATHS[_n]}">All {e(_n)} alternatives with prices →</a></p>', after=True)
+_v49ins("/cursor-alternatives.html", "</h1>", '<p class="small v49">Other tools: <a href="/alternatives.html">alternatives to ChatGPT, Claude, Midjourney and more →</a></p>', after=True)
+_v49ins("/guides.html", "<h2>New guides</h2><ul>", "<li class=\"v49\"><a href='/alternatives.html'>Alternatives to popular AI tools</a></li>", after=True)
+_v49ins("/tools.html", "</h1>", '<p class="small v49">Replacing a tool you use? <a href="/alternatives.html">See same-job alternatives →</a></p>', after=True)
+# Finder: the "itself" line under any tool result links that tool's alternatives page (when we have one).
+_ih = open("public/index.html").read()
+_sl_old = 'const selfLine=`<p class="small" style="margin-top:12px"><b><a href="${x.u}">${X(x.n)}</a> itself:</b> ${ptxt(x)}${x.fr?\' · real free plan\':\'\'} · checked ${x.k} · <a href="${X(x.pr)}" rel="noopener" target="_blank">official pricing</a></p>`;'
+assert _ih.count(_sl_old) == 2, ("selfLine pattern", _ih.count(_sl_old))
+_sl_new = _sl_old.replace('official pricing</a></p>`;', 'official pricing</a>${AP49[x.sl]?` · <a href="${AP49[x.sl]}">All ${X(x.n)} alternatives →</a>`:\'\'}</p>`;')
+_ih = _ih.replace(_sl_old, _sl_new).replace("<script>", "<script>const AP49=" + json.dumps({slug(n): p for n, p in ALT49_PATHS.items()}) + ";", 1)
+open("public/index.html", "w").write(_ih); V49_CHANGED.append("/")
+open("public/llms.txt", "a").write(f"\n## Alternatives pages (v49)\n- [Alternatives to popular AI tools]({BASE}/alternatives.html): hub\n" + "".join(f"- [{n} alternatives]({BASE}{ALT49_PATHS[n]}): {_alt49_summ[n]['n']} same-job tools ({_alt49_summ[n]['job']}): {', '.join(_alt49_summ[n]['alts'])}; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates\n" for n in ALT49))
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2535,6 +2707,9 @@ for _u in V42_CHANGED: _lm[_u] = FREE_CHECKED
 for _u in V44_CHANGED: _lm[_u] = "2026-10-22"
 for _u in V47_CHANGED: _lm[_u] = "2026-10-23"
 for _u in V48_CHANGED: _lm[_u] = "2026-10-24"
+for _u in V49_CHANGED: _lm[_u] = ALT49_DATE
+for _n, _s in _alt49_summ.items(): _lm[_s["p"]] = _s["lm"]
+_lm["/alternatives.html"] = ALT49_DATE
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
@@ -2550,7 +2725,7 @@ for _fp in _glob.glob("public/**/*.html", recursive=True):
     h = _re.sub(r'<nav class="top" aria-label="Main">.*?</nav>', _NAV, h, count=1, flags=_re.S).replace("</head>", _NCSS + '<link rel="icon" href="/favicon.svg" type="image/svg+xml"></head>', 1)
     h = _fold(_relink(h))
     _hm = _re.search(r'</h1>(.*?)<h([23])', h, _re.S)
-    if _hm and _hm.group(2) == "3": h = h[:_hm.start(2)-1] + '<h2 class="skip">Our picks</h2>' + h[_hm.start(2)-1:]
+    if _hm and _hm.group(2) == "3": h = h[:_hm.start(2)-2] + '<h2 class="skip">Our picks</h2>' + h[_hm.start(2)-2:]  # v49 fix: insert before '<h3', not between '<' and 'h3'
     if _fp == "public/index.html":
         h = _re.sub(r'<div class="pick"><b>Save money on tools you already pay for</b>.*?(</main>)', r'\1', h, count=1, flags=_re.S)
     if _fp == "public/how-we-pick.html":
