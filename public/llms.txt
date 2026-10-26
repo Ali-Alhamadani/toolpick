@@ -52,7 +52,7 @@
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
-- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Creator $11 first month (50% off) | free: Free: $0
+- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (until Nov 1), Creator $11 first month (50% off) | free: Free: $0
 - [Suno](https://toolpick-ai.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
 - [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
@@ -281,6 +281,10 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## AI team plan costs (v50)
 - [What AI tools cost for your team](https://toolpick-ai.vercel.app/ai-team-plans.html): 22 team/business plans (ChatGPT Business, Claude Team, Le Chat Team, Perplexity Enterprise Pro, Microsoft 365 Copilot Business, GitHub Copilot Business, Cursor Teams, Windsurf Teams, Bolt Teams, Lovable Business, Otter, Fireflies, Fathom, Notion Business, Gamma, Beautiful.ai, Plus AI, Canva Business, Ideogram, Recraft, Descript, CapCut) with per-seat price, seat minimum/maximum, flat workspace prices and plan fees; monthly and yearly totals for any team size; lowest price per job; official pages read 2026-10-26. Params: ?seats=10&bill=y&cat=coding
+
+## ElevenLabs plans
+- [ElevenLabs pricing](https://toolpick-ai.vercel.app/elevenlabs-pricing.html): every plan with monthly and yearly price, credits, minutes, first-month offers and credit costs per product (elevenlabs.io/pricing, 2026-10-26)
+- [Is ElevenLabs worth it?](https://toolpick-ai.vercel.app/is-elevenlabs-worth-it.html): Free vs Starter vs Creator, when to pay and when to skip (2026-10-26)
 
 
 ## My AI costs

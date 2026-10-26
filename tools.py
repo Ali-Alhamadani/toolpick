@@ -348,7 +348,7 @@ COMPARISONS += [
 # Weekly price pass 2026-10-19 (official pricing pages; static HTML or rendered page text)
 CATEGORIES[2]["tools"].append(T("Replit","https://replit.com","https://replit.com/pricing","Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom",CK,"Build and deploy apps by describing them to Replit's AI agent, all in the browser."))
 _W1019 = {
- "ElevenLabs": dict(price="Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Creator $11 first month (50% off)"),
+ "ElevenLabs": dict(price="Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (until Nov 1), Creator $11 first month (50% off) (checked 2026-10-26)"),
  "Rytr": dict(price="Lite $9/mo; Personal $19/mo; Pro $49/mo (monthly prices; yearly billing saves 20%)", free="Free forever: 10,000 characters/mo", about="AI writing in your own voice, plus relationship and follow-up tools."),
  "Qodo": dict(price="Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits)", free="14-day free trial, no card; free for open source projects"),
  "Surfer": dict(price="Discovery $49/mo; AI Search Analytics $82/mo; Standard $99/mo; Pro $182/mo; Peace of Mind $299/mo (all billed yearly)"),
@@ -926,3 +926,23 @@ TEAM_LEFT_OUT = [  # tool, why (all read on TEAM_CHECKED)
  ("ClickUp", "its AI is a separate per-user add-on on top of the workspace plan"),
  ("Replit", "its pricing page showed a security check today"),
 ]
+
+# v51 (2026-10-26): ElevenLabs, https://elevenlabs.io/pricing (WebFetch, "Monthly billing"). FAQ: "Free $0 (10,000 credits); Starter $6 (30,000 credits);
+# Creator $22 (121,000 credits, $11 for the first month); Pro $99 (600,000 credits); Scale $299 (1,800,000 credits, 3 seats); Business $990 (6,000,000 credits, 10 seats); Enterprise is custom."
+# Starter card: "Until Nov 1 $6 First month 83% off $1per month" (a stale banner on the same page says "Ends September 30"; we use the plan card).
+# Annual: "annual price = monthly price x 10 ... $5 Starter, $18.33 Creator, $82.50 Pro, $249.17 Scale, $825 Business".
+# Compare table: TTS minutes included ~10/~30/~121/~600/~1,800/~6,000 (Free..Business). The "Extra minute" row is ambiguous in the fetched text (values shifted), so not used.
+# Credits: TTS 1 credit/character (V2 Multilingual); STT 330/min; Music 900/min; SFX 200/generation; Voice Changer & Isolator 1,000/min; Dubbing 2,000-10,000/min.
+# Rollover: unused credits roll over up to 2 months (max 3x quota) on active paid plans; not on Free. "Prices exclude all taxes, levies and duties."
+EL_CHECKED = "2026-10-26"
+EL_PLANS = [  # plan, monthly $, yearly $/mo, credits, ~TTS minutes (UI), first-month promo, key adds
+ ("Free", 0, None, "10,000", "~10", "", "Text to speech, speech to text, sound effects, music; 3 Studio projects; no commercial license"),
+ ("Starter", 6, 5, "30,000", "~30", "$1 first month (until Nov 1)", "Commercial license, Instant Voice Cloning, Dubbing Studio, 20 Studio projects"),
+ ("Creator", 22, 18.33, "121,000", "~121", "$11 first month (50% off)", "Professional Voice Cloning, additional credits"),
+ ("Pro", 99, 82.50, "600,000", "~600", "", "44.1kHz PCM output via API, 192kbps audio"),
+ ("Scale", 299, 249.17, "1,800,000", "~1,800", "", "3 workspace seats, team collaboration, 3 Professional Voice Clones"),
+ ("Business", 990, 825, "6,000,000", "~6,000", "", "10 seats, 10 Professional Voice Clones, low-latency TTS from 5c/minute"),
+ ("Enterprise", None, None, "Custom", "Custom", "", "Custom terms, SSO, more seats; contact sales"),
+]
+EL_CREDITS = [("Text to speech", "1 credit per character (V2 Multilingual)"), ("Speech to text", "330 credits per minute"), ("Music", "900 credits per minute"),
+ ("Sound effects", "200 credits per generation"), ("Voice changer / isolator", "1,000 credits per minute"), ("Dubbing", "2,000-10,000 credits per minute (watermark and Studio options)")]

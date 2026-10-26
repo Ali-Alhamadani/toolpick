@@ -2780,6 +2780,65 @@ assert '<div id="out" aria-live="polite">' in _h
 open("public/index.html", "w").write(_h.replace('<div id="out" aria-live="polite">', _TH + '<style>.tmhint[hidden]{display:none!important}.tmhint{margin:var(--s3) auto;max-width:720px;text-align:left}</style><div id="out" aria-live="polite">' + '<script>(function(){const q=document.getElementById("q"),H=document.querySelector(".tmhint"),A=document.getElementById("tmlink");if(!q||!H)return;const re=/\\b(?:team|group|company|agency|staff) of (\\d{1,3})\\b|\\b(\\d{1,3}) (?:people|users|seats|members|employees|devs|developers|teammates)\\b|\\bfor (?:my|our|a) (?:team|company|business|startup|agency)\\b/i;const rn=/\\b(?:team|group|company|agency|staff) of (\\d{1,3})\\b|\\b(\\d{1,3}) (?:people|users|seats|members|employees|devs|developers|teammates)\\b/i;const f=()=>{const m=q.value.match(re);H.hidden=!m;if(m){const k=q.value.match(rn),n=k?(k[1]||k[2]):null;A.href="' + TEAM_PATH + '"+(n?"?seats="+n:"");A.textContent=n?"See team plan costs for "+n+" seats →":"See team plan costs for your team size →"}};q.addEventListener("input",f);addEventListener("load",f);document.addEventListener("click",()=>setTimeout(f,50));f()})()</script>', 1)); V50_CHANGED.append("/")
 open("public/llms.txt", "a").write(f"\n## AI team plan costs (v50)\n- [What AI tools cost for your team]({BASE}{TEAM_PATH}): {_t_n} team/business plans (ChatGPT Business, Claude Team, Le Chat Team, Perplexity Enterprise Pro, Microsoft 365 Copilot Business, GitHub Copilot Business, Cursor Teams, Windsurf Teams, Bolt Teams, Lovable Business, Otter, Fireflies, Fathom, Notion Business, Gamma, Beautiful.ai, Plus AI, Canva Business, Ideogram, Recraft, Descript, CapCut) with per-seat price, seat minimum/maximum, flat workspace prices and plan fees; monthly and yearly totals for any team size; lowest price per job; official pages read {TEAM_CHECKED}. Params: ?seats=10&bill=y&cat=coding\n")
 
+# --- v51: ElevenLabs pricing + Is ElevenLabs worth it ---
+ELC = _tm0.EL_CHECKED
+def _m(v): return "Custom" if v is None else ("$0" if v == 0 else f"${v:,.2f}".replace(".00", ""))
+def _ppm(p, mins):
+    try: return f"~${p / int(mins.strip('~').replace(',', '')):.2f}" if p else "—"
+    except Exception: return "—"
+_el_rows = "".join(f"<tr><th scope='row'>{e(n)}</th><td>{_m(mo)}</td><td>{_m(yr) if yr is not None else ('—' if mo == 0 else 'Custom')}</td><td>{cr}</td><td>{mi}</td><td>{_ppm(mo, mi)}</td><td>{e(pr) or '—'}</td><td>{e(k)}</td></tr>" for n, mo, yr, cr, mi, pr, k in _tm0.EL_PLANS)
+_el_cr = "".join(f"<tr><th scope='row'>{e(a)}</th><td>{e(b)}</td></tr>" for a, b in _tm0.EL_CREDITS)
+_qa_el = [("How much is ElevenLabs per month?", f"Free $0, Starter $6, Creator $22, Pro $99, Scale $299, Business $990 on monthly billing; Enterprise is custom (elevenlabs.io/pricing, {ELC}). Prices exclude taxes."),
+          ("Is there an ElevenLabs discount right now?", f"On {ELC} the pricing page showed Starter at $1 for the first month (until Nov 1) and Creator at $11 for the first month (50% off). A separate banner on the same page said \"Ends September 30\", so check the page before you subscribe."),
+          ("How many characters do ElevenLabs credits buy?", "For text to speech, 1 credit is 1 character on V2 Multilingual models (Flash/Turbo models cost 0.5–1 credit per character via the API). ElevenLabs estimates 10,000 credits at about 10 minutes of speech."),
+          ("Is yearly billing cheaper?", "Yes. Yearly costs 10× the monthly price (two months free): Starter $5/mo, Creator $18.33/mo, Pro $82.50/mo."),
+          ("Do unused credits roll over?", "On active paid plans, unused credits roll over for up to two months (a balance of up to 3× your monthly quota). They don't roll over on Free, and are forfeited if you downgrade or cancel.")]
+_el_body = f"""<p class="small"><a href="{turl('ElevenLabs')}">ElevenLabs</a> › Pricing</p><h1>ElevenLabs pricing: plans, credits and minutes</h1>
+<p class="tag">Every ElevenLabs plan from <a href="https://elevenlabs.io/pricing" rel="noopener" target="_blank">elevenlabs.io/pricing</a>, checked {ELC}. Monthly billing unless marked yearly.</p>
+<p class="pick"><b>In short:</b> Free gives 10,000 credits (~10 min of speech) with no commercial license. Starter is $6/mo for 30,000 credits and a commercial license, and is $1 for the first month until Nov 1. Creator is $22/mo for 121,000 credits and Professional Voice Cloning.</p>
+<h2>Plans and prices</h2><div class="tw"><table><caption class="small" style="text-align:left">Checked {ELC}. Minutes are ElevenLabs' own text-to-speech estimate. “Per minute” is our calculation: monthly price ÷ included minutes.</caption><tr><th scope="col">Plan</th><th scope="col">Monthly</th><th scope="col">Yearly (per month)</th><th scope="col">Credits / month</th><th scope="col">~Minutes of speech</th><th scope="col">Per minute</th><th scope="col">First-month offer</th><th scope="col">Adds</th></tr>{_el_rows}</table></div>
+<h2>What credits buy</h2><p>All products share one monthly credit pool.</p><div class="tw"><table><caption class="small" style="text-align:left">Approximate credit costs, from the official FAQ ({ELC}).</caption><tr><th scope="col">Product</th><th scope="col">Credits</th></tr>{_el_cr}</table></div>
+{_faq(_qa_el)}
+<p class="small">Related: <a href="/is-elevenlabs-worth-it.html">Is ElevenLabs worth it?</a> · <a href="/free-alternative-to-elevenlabs.html">Free alternatives to ElevenLabs</a> · <a href="/my-ai-costs.html#voice">AI voice cost</a> · <a href="/compare/elevenlabs-vs-murf.html">ElevenLabs vs Murf</a></p>"""
+page("/elevenlabs-pricing.html", f"ElevenLabs Pricing ({ELC[:4]}): Plans, Credits & Minutes Explained | ToolPick",
+     f"ElevenLabs plans checked {ELC}: Free $0 (10k credits), Starter $6 (30k, $1 first month), Creator $22 (121k), Pro $99, Scale $299, Business $990. Yearly prices, minutes and credit costs.",
+     _el_body, [{"@context": "https://schema.org", "@type": "Product", "name": "ElevenLabs", "url": BASE + "/elevenlabs-pricing.html", "brand": {"@type": "Brand", "name": "ElevenLabs"},
+                 "offers": [{"@type": "Offer", "name": n, "price": mo, "priceCurrency": "USD"} for n, mo, *_ in _tm0.EL_PLANS if mo is not None]},
+                _ld_faq(_qa_el), crumbs([("ToolPick", "/"), ("ElevenLabs", turl("ElevenLabs")), ("ElevenLabs pricing", "/elevenlabs-pricing.html")])])
+_qa_ew = [("Is ElevenLabs Starter worth $6?", f"If you need a commercial license or voice cloning, yes: those start at Starter. You get 30,000 credits (~30 min of speech). On {ELC} the first month was $1 (until Nov 1)."),
+          ("Can I use the free plan for YouTube or client work?", "Free has no commercial license, which starts at Starter. Free does include 10,000 credits a month for text to speech, speech to text, sound effects and music."),
+          ("Starter or Creator?", "Creator ($22) adds Professional Voice Cloning and about 4× Starter's credits (121,000 vs 30,000). Pick it if you need a close clone of your own voice, or more than ~30 minutes a month."),
+          ("Is there a cheaper way to pay?", "Yearly billing costs 10 months' price for 12, so Starter is $5/mo and Creator $18.33/mo. Unused credits also roll over for up to two months on active paid plans.")]
+_ew_body = f"""<p class="small"><a href="{turl('ElevenLabs')}">ElevenLabs</a> › Is it worth it?</p><h1>Is ElevenLabs worth it?</h1>
+<p class="tag">Free vs Starter vs Creator: what each step up gets you, from <a href="https://elevenlabs.io/pricing" rel="noopener" target="_blank">elevenlabs.io/pricing</a> (checked {ELC}).</p>
+<p class="pick"><b>Short answer:</b> stay on Free for personal tests under ~10 minutes a month. Pay for Starter ($6) when you publish or sell the audio, because the commercial license starts there. Pay for Creator ($22) when you need Professional Voice Cloning or more than ~30 minutes a month.</p>
+<div class="tw"><table><caption class="small" style="text-align:left">Monthly billing, checked {ELC}.</caption><tr><th scope="col"></th><th scope="col">Free</th><th scope="col">Starter</th><th scope="col">Creator</th></tr>
+<tr><th scope="row">Price</th><td>$0</td><td>$6/mo ($1 first month, until Nov 1)</td><td>$22/mo ($11 first month)</td></tr>
+<tr><th scope="row">Credits</th><td>10,000 (~10 min)</td><td>30,000 (~30 min)</td><td>121,000 (~121 min)</td></tr>
+<tr><th scope="row">Commercial license</th><td>No</td><td>Yes</td><td>Yes</td></tr>
+<tr><th scope="row">Voice cloning</th><td>No</td><td>Instant</td><td>Instant + Professional</td></tr>
+<tr><th scope="row">Dubbing Studio</th><td>No</td><td>Yes</td><td>Yes</td></tr>
+<tr><th scope="row">Credit rollover</th><td>No</td><td>Up to 2 months</td><td>Up to 2 months</td></tr></table></div>
+<h2>Worth it if…</h2><ul><li>You publish voiceovers, podcasts or videos and need the commercial license.</li><li>You want to clone a voice: Instant on Starter, Professional on Creator.</li><li>You also use speech to text, sound effects or music, which all draw on the same credits.</li></ul>
+<h2>Skip it if…</h2><ul><li>You only need a few minutes for personal use: Free covers ~10 minutes a month.</li><li>You just need text read aloud: see <a href="/free-alternative-to-elevenlabs.html">free alternatives to ElevenLabs</a>.</li></ul>
+{_faq(_qa_ew)}
+<p class="small">Related: <a href="/elevenlabs-pricing.html">ElevenLabs pricing (all plans)</a> · <a href="/my-ai-costs.html#voice">AI voice cost</a> · <a href="/compare/elevenlabs-vs-speechify.html">ElevenLabs vs Speechify</a> · <a href="/pay-less.html">Pay less for the same job</a></p>"""
+page("/is-elevenlabs-worth-it.html", f"Is ElevenLabs Worth It? ({ELC[:4]}) Free vs Starter vs Creator | ToolPick",
+     f"Is ElevenLabs worth paying for? Free (10k credits, no commercial use) vs Starter $6 (commercial license, cloning) vs Creator $22, from elevenlabs.io/pricing checked {ELC}.",
+     _ew_body, [_ld_faq(_qa_ew), crumbs([("ToolPick", "/"), ("ElevenLabs", turl("ElevenLabs")), ("Is ElevenLabs worth it?", "/is-elevenlabs-worth-it.html")])])
+V51_CHANGED = ["/elevenlabs-pricing.html", "/is-elevenlabs-worth-it.html"]
+def _v51ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not __import__("os").path.exists(_fp): return
+    _h = open(_fp).read()
+    if ' v51"' in _h or marker not in _h: return
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V51_CHANGED.append(path)
+_EL2 = '<a href="/elevenlabs-pricing.html">ElevenLabs pricing</a> · <a href="/is-elevenlabs-worth-it.html">Is ElevenLabs worth it?</a>'
+_v51ins(turl("ElevenLabs"), '<section class="card tbp"', f'<p class="pick small v51">All plans, credits and minutes ({ELC}): {_EL2}</p>')
+for _p in ["/free-alternative-to-elevenlabs.html", "/pay-less.html"] + [f"/compare/{_x[0]}.html" for _x in COMPARISONS if "ElevenLabs" in cnames(_x)]:
+    _v51ins(_p, "</h1>", f'<p class="small v51">{_EL2}</p>', after=True)
+open("public/llms.txt", "a").write(f"\n## ElevenLabs plans\n- [ElevenLabs pricing]({BASE}/elevenlabs-pricing.html): every plan with monthly and yearly price, credits, minutes, first-month offers and credit costs per product (elevenlabs.io/pricing, {ELC})\n- [Is ElevenLabs worth it?]({BASE}/is-elevenlabs-worth-it.html): Free vs Starter vs Creator, when to pay and when to skip ({ELC})\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2861,6 +2920,8 @@ page("/my-ai-costs.html", "My AI Costs — Audit, Watchlist, Reminders, Calculat
 for p in _MAP:
     if p in URLS: URLS.remove(p)
 _lm["/my-ai-costs.html"] = V39_DATE
+_fpm = "public/my-ai-costs.html"; _hm = open(_fpm).read()
+if ' v51"' not in _hm and "</h1>" in _hm: open(_fpm, "w").write(_hm.replace("</h1>", '</h1><p class="small v51">Paying for voice? <a href="/elevenlabs-pricing.html">ElevenLabs pricing</a> · <a href="/is-elevenlabs-worth-it.html">Is ElevenLabs worth it?</a></p>', 1)); _lm["/my-ai-costs.html"] = ELC
 _lm["/"] = "2026-10-23"  # v45 smart search
 for _u in V41_CHANGED: _lm[_u] = CODING_CHECKED
 for _u in V42_CHANGED: _lm[_u] = FREE_CHECKED
@@ -2870,6 +2931,7 @@ for _u in V48_CHANGED: _lm[_u] = "2026-10-24"
 for _u in V49_CHANGED: _lm[_u] = ALT49_DATE
 for _n, _s in _alt49_summ.items(): _lm[_s["p"]] = _s["lm"]
 _lm["/alternatives.html"] = ALT49_DATE
+for _u in V51_CHANGED + ["/my-ai-costs.html"]: _lm[_u] = ELC
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
