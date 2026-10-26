@@ -2621,6 +2621,165 @@ _ih = _ih.replace(_sl_old, _sl_new).replace("<script>", "<script>const AP49=" + 
 open("public/index.html", "w").write(_ih); V49_CHANGED.append("/")
 open("public/llms.txt", "a").write(f"\n## Alternatives pages (v49)\n- [Alternatives to popular AI tools]({BASE}/alternatives.html): hub\n" + "".join(f"- [{n} alternatives]({BASE}{ALT49_PATHS[n]}): {_alt49_summ[n]['n']} same-job tools ({_alt49_summ[n]['job']}): {', '.join(_alt49_summ[n]['alts'])}; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates\n" for n in ALT49))
 
+# --- v50: AI team plan costs (/ai-team-plans.html) ---
+# Team/business tiers read on official pricing pages on TEAM_CHECKED (tools.py TEAM_PLANS, exact page text in q).
+# One input (team size) + billing switch: per-seat price x seats, seat minimums/maximums, flat workspace prices and
+# platform fees applied exactly as the page states. Lowest team price is only marked inside one job group, on the same
+# billing, among plans that allow that team size; add-ons that need another paid plan are never ranked.
+TEAM_CHECKED = _tm0.TEAM_CHECKED; TEAM_GROUPS = _tm0.TEAM_GROUPS; TEAM_PLANS = _tm0.TEAM_PLANS; TEAM_LEFT_OUT = _tm0.TEAM_LEFT_OUT
+TEAM_PATH = "/ai-team-plans.html"
+_TG = dict(TEAM_GROUPS)
+def _tnum(v): return ("%g" % v) if float(v).is_integer() else ("%.2f" % v)
+for _p in TEAM_PLANS:
+    assert _p["t"] in TOOL and _p["g"] in _TG, _p["t"]
+    assert _p.get("m") is not None or _p.get("y") is not None, _p["t"]
+    _qq = " ".join(_p["q"])
+    for _k in ("m", "base", "mn", "mx"):
+        if _p.get(_k) is not None: assert _tnum(_p[_k]).replace(".", " .") in _qq or _tnum(_p[_k]) in _qq, (_p["t"], _k, _p[_k])
+    if _p.get("y") is not None and not _p.get("yr"): assert _tnum(_p["y"]) in _qq.replace(" .", "."), (_p["t"], "y")
+    if _p.get("yr"): assert _tnum(_p["yr"]) in _qq, (_p["t"], "yr")
+def _tcost(p, seats, bill):
+    """Monthly team cost for `seats` on `bill` ('m' or 'y'); returns (monthly, billed_seats, why_not)."""
+    per = p.get("y") if bill == "y" else p.get("m")
+    if per is None: return None, None, ("Yearly price not stated. Switch to Monthly to see it." if bill == "y" else "Monthly price not stated. Switch to Billed yearly to see it.")
+    if p.get("mx") and seats > p["mx"]: return None, None, f"This plan allows up to {p['mx']} seats."
+    billed = max(seats, p.get("mn") or 1)
+    tot = per if p.get("flat") else (p.get("base") or 0) + per * billed
+    return tot, billed, None
+def _tlowest(rows, seats, bill):
+    c = [(r, _tcost(r, seats, bill)[0]) for r in rows if not r.get("addon")]
+    c = [(r, v) for r, v in c if v is not None]
+    if len(c) < 2: return set()
+    lo = min(v for r, v in c); return {r["t"] for r, v in c if abs(v - lo) < 0.005}
+def _tm(v): return _usd(v)
+def _tper(p):
+    a = []
+    if p.get("flat"): a.append(f'{"from " if p.get("frm") else ""}{_tm(p["m"])}/mo for the whole workspace')
+    else:
+        if p.get("m") is not None: a.append(f'{"from " if p.get("frm") else ""}{_tm(p["m"])}/seat monthly')
+        if p.get("yr"): a.append(f'{_tm(p["yr"])}/seat per year')
+        elif p.get("y") is not None: a.append(f'{_tm(p["y"])}/seat billed yearly')
+    s = " · ".join(a)
+    return (f'{_tm(p["base"])}/mo plan fee + ' + s) if p.get("base") else s
+def _trules(p):
+    r = []
+    if p.get("mn"): r.append(f'Min {p["mn"]} seats')
+    if p.get("mx"): r.append(f'Max {p["mx"]} seats')
+    if p.get("flat"): r.append("Unlimited users")
+    if p.get("addon"): r.append("Add-on")
+    return r
+def _trow(p, seats, bill, low):
+    s = slug(p["t"]); v, billed, why = _tcost(p, seats, bill)
+    if v is None: tot, yr = f'<span class="check">{e(why)}</span>', "–"
+    else:
+        tot = f'<b>{_tm(v)}</b>/mo' + (f'<br><span class="small">billed for {billed} seats (minimum)</span>' if billed != seats and not p.get("flat") else "")
+        yr = _tm(v * 12) + ("/yr" if bill == "y" else "/yr if you stay 12 months")
+    bd = ('<span class="badge b-best">LOWEST FOR YOUR TEAM</span>' if p["t"] in low else "") + "".join(f'<span class="badge b-rank">{e(x)}</span>' for x in _trules(p))
+    nt = e(p.get("note") or "")
+    return (f'<tr id="t-{s}" data-k="{s}"{' class="lo"' if p["t"] in low else ""}><th scope="row" data-l="Plan"><a href="{turl(p["t"])}">{e(p["t"])}</a> <span class="t50p">{e(p["plan"])}</span><span class="t50b">{bd}</span></th>'
+            f'<td data-l="Price">{_tper(p)}</td><td data-l="Your team" class="t50tot">{tot}</td><td data-l="Per year" class="t50yr">{yr}</td>'
+            f'<td data-l="Good to know" class="small">{nt}</td><td data-l="Checked" class="small">{TEAM_CHECKED}<br><a href="{e(p["src"])}" rel="noopener" target="_blank">Official pricing<span class="skip"> for {e(p["t"])} (opens in a new tab)</span></a></td></tr>')
+_T_DEF_SEATS, _T_DEF_BILL = 5, "m"
+def _tgroup(g, seats, bill):
+    rows = [p for p in TEAM_PLANS if p["g"] == g]
+    low = _tlowest(rows, seats, bill)
+    rows = sorted(rows, key=lambda p: (1 if p.get("addon") else 0, _tcost(p, seats, bill)[0] is None, _tcost(p, seats, bill)[0] or 0, p["t"].lower()))
+    return (f'<section class="t50g" data-g="{g}" aria-labelledby="h-{g}"><h2 id="h-{g}">{e(_TG[g])}</h2><div class="tw a49 t50"><table>'
+            f'<tr><th scope="col">Plan</th><th scope="col">Price on the official page</th><th scope="col">Your team</th><th scope="col">Per year</th><th scope="col">Good to know</th><th scope="col">Checked</th></tr>'
+            + "".join(_trow(p, seats, bill, low) for p in rows) + "</table></div></section>")
+def _tquick(seats, bill):
+    li = []
+    for g, gn in TEAM_GROUPS:
+        rows = [p for p in TEAM_PLANS if p["g"] == g]; low = _tlowest(rows, seats, bill)
+        if low:
+            w = [p for p in rows if p["t"] in low]
+            li.append(f'<li><b>{e(gn)}:</b> ' + " = ".join(f'<a href="#t-{slug(p["t"])}">{e(p["t"])} {e(p["plan"].split(" (")[0])}</a>' for p in w) + f' at {_tm(_tcost(w[0], seats, bill)[0])}/mo</li>')
+    return "".join(li)
+_tjs = [{"k": slug(p["t"]), "t": p["t"], "pl": p["plan"].split(" (")[0], "g": p["g"], "m": p.get("m"), "y": p.get("y"), "b": p.get("base") or 0,
+         "f": 1 if p.get("flat") else 0, "mn": p.get("mn") or 1, "mx": p.get("mx") or 0, "ad": 1 if p.get("addon") else 0} for p in TEAM_PLANS]
+_t_chips = '<button type="button" class="on" aria-pressed="true" data-g="">All</button>' + "".join(f'<button type="button" aria-pressed="false" data-g="{g}">{e(n)}</button>' for g, n in TEAM_GROUPS)
+_t_left = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: {e(w)}.</li>' if n in TOOL else f'<li>{e(n)}: {e(w)}.</li>' for n, w in TEAM_LEFT_OUT)
+_t_n = len(TEAM_PLANS)
+def _t_q5(g):
+    rows = [p for p in TEAM_PLANS if p["g"] == g]; low = _tlowest(rows, 5, "m")
+    return ", ".join(f'{p["t"]} {p["plan"].split(" (")[0]}' for p in rows if p["t"] in low), _tcost(next(p for p in rows if p["t"] in low), 5, "m")[0] if low else None
+_qa_t = [("How much does ChatGPT Business cost for a team?", f"$25 per seat per month billed monthly, or $20 billed yearly (standard seat), for teams of 2 to 200; a team of 5 pays $125/mo monthly or $1,200 a year billed yearly. Read on chatgpt.com/pricing on {TEAM_CHECKED}."),
+         ("Is Claude Team cheaper than ChatGPT Business?", f"On {TEAM_CHECKED} both standard seats cost the same: $25 per seat per month billed monthly or $20 billed yearly. Claude Team is for 2 to 150 seats, ChatGPT Business for 2 to 200."),
+         ("Which AI coding assistant is cheapest for a team?", f"GitHub Copilot Business at $19 per user per month. For 5 developers that is $95/mo, vs Cursor Teams from $150/mo and Windsurf Teams $280/mo ($80 plan fee + $40 per seat), monthly prices read on {TEAM_CHECKED}."),
+         ("Do AI team plans have seat minimums?", "Some do: ChatGPT Business, Claude Team, Fathom Team and Beautiful.ai Team start at 2 seats, so a solo buyer pays for 2. Others cap the team size, like Beautiful.ai (20), Otter Business (25 billed users) and Claude Team (150). The calculator applies these automatically."),
+         ("Which team plans charge one price for everyone?", "Lovable Business is one price for the whole workspace with unlimited users (from $50/mo, credits shared), so it gets cheaper per person as the team grows. Windsurf charges a fixed $80/mo plan fee on top of $40 per seat.")]
+_t_body = f"""<style>{ALT49_CSS[7:-8]}.t50 table{{min-width:0;width:100%}}.t50p{{display:block;font-weight:400;font-size:.92rem}}.t50b{{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 0}}.t50b:empty{{display:none}}.t50 tr.lo{{background:var(--sf2)}}.t50 tr.lo th[scope=row]{{box-shadow:inset 4px 0 0 var(--ok)}}.t50 td.t50tot{{min-width:8em;max-width:15em}}.t50tot b{{white-space:nowrap}}@media(min-width:641px){{.t50 td:nth-child(5){{min-width:13em}}}}
+.t50c{{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);align-items:flex-end}}.t50s label{{display:block;font-weight:600;margin-bottom:6px}}.t50s .row{{display:flex;gap:6px;align-items:center}}.t50s input{{width:5.5em;text-align:center;font-size:1.1rem;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)}}.t50s button{{min-width:44px;font-size:1.2rem}}
+#t50q{{margin:var(--s4) 0}}#t50q ul{{margin:6px 0 0;padding-left:20px}}#t50q li{{margin:4px 0}}.t50g[hidden],#t50msg:empty{{display:none!important}}.t50g h2{{margin-top:var(--s6)}}</style>
+<p class="small"><a href="/my-ai-costs.html">My AI costs</a> › Team plans</p><h1>What will AI tools cost for your team?</h1>
+<p class="tag">Enter your team size. We show what {_t_n} team and business plans really cost per month and per year, with seat minimums, seat limits and flat workspace prices applied. Every price was read on the official pricing page on {TEAM_CHECKED}.</p>
+<div class="builder"><div class="t50c"><div class="t50s"><label for="t50n">Team size</label><div class="row"><button type="button" class="bbtn" id="t50dec" aria-label="One seat fewer">−</button><input type="number" id="t50n" min="1" max="500" step="1" value="{_T_DEF_SEATS}" inputmode="numeric"><button type="button" class="bbtn" id="t50inc" aria-label="One seat more">+</button></div></div>
+<fieldset class="seg"><legend>Billing</legend><input type="radio" name="t50b" id="t50bm" value="m" checked><label for="t50bm">Monthly</label><input type="radio" name="t50b" id="t50by" value="y"><label for="t50by">Billed yearly</label></fieldset></div>
+<div class="needs" role="group" aria-label="Show plans for" id="t50cats">{_t_chips}</div>
+<p class="small" id="t50msg" role="status"></p></div>
+<div class="pick" id="t50q" aria-live="polite"><b id="t50qh">Lowest price for a team of {_T_DEF_SEATS}, billed monthly</b><ul id="t50ql">{_tquick(_T_DEF_SEATS, _T_DEF_BILL)}</ul><p class="small" style="margin:6px 0 0">Compared only within the same job and the same billing. Plans differ in features and usage limits, so open the official page before you buy. <button type="button" class="bbtn" id="t50share">Copy link to these results</button></p></div>
+<div id="t50groups">{"".join(_tgroup(g, _T_DEF_SEATS, _T_DEF_BILL) for g, n in TEAM_GROUPS)}</div>
+<h2>How we work it out</h2><p class="small">Your team / month = price per seat × seats, using the seat minimum when your team is smaller (you pay for the minimum). Flat plans (one price for the whole workspace) don't multiply. A plan fee, like Windsurf's, is added once. “Billed yearly” uses the monthly rate the page shows when you pay for a year; per year = that × 12. If a page doesn't state a price for the billing you picked, or your team is above the plan's seat limit, we say so instead of guessing. Taxes are extra. Individual plans (Plus, Pro) aren't listed here: see <a href="/ai-subscription-costs.html">AI subscription costs</a>.</p>
+<h2>Not included yet</h2><p class="small">We leave a tool out when its official page doesn't let us state the team price clearly (read {TEAM_CHECKED}):</p><ul class="small">{_t_left}</ul>
+<p class="small">Related: <a href="/compare-builder.html">Compare tools side by side</a> · <a href="/alternatives.html">Alternatives to popular AI tools</a> · <a href="/best-ai-tools-for-small-business.html">AI tools for small business</a> · <a href="/my-ai-costs.html#calculator">Cost calculator</a></p>
+{_faq(_qa_t)}
+<script>(function(){{const P={json.dumps(_tjs, separators=(',', ':'))},GN={json.dumps(dict(TEAM_GROUPS), separators=(',', ':'))},N=document.getElementById('t50n'),MSG=document.getElementById('t50msg'),CH=[...document.querySelectorAll('#t50cats button')],SEC=[...document.querySelectorAll('.t50g')];
+let seats={_T_DEF_SEATS},bill='m',cat='';const usd=v=>'$'+(Math.abs(v-Math.round(v))<.005?String(Math.round(v)):v.toFixed(2)).replace(/\\B(?=(\\d{{3}})+(?!\\d))/g,',');
+function cost(p){{const per=bill=='y'?p.y:p.m;if(per==null)return {{v:null,why:bill=='y'?'Yearly price not stated. Switch to Monthly to see it.':'Monthly price not stated. Switch to Billed yearly to see it.'}};if(p.mx&&seats>p.mx)return {{v:null,why:'This plan allows up to '+p.mx+' seats.'}};const b=Math.max(seats,p.mn);return {{v:p.f?per:p.b+per*b,b}}}}
+function low(g){{const c=P.filter(p=>p.g==g&&!p.ad).map(p=>[p,cost(p).v]).filter(x=>x[1]!=null);if(c.length<2)return [];const lo=Math.min(...c.map(x=>x[1]));return c.filter(x=>Math.abs(x[1]-lo)<.005).map(x=>x[0])}}
+function render(push){{const q=document.getElementById('t50ql');let qh='';
+SEC.forEach(s=>{{const g=s.dataset.g,L=low(g),LK=L.map(p=>p.k),tb=s.querySelector('tbody')||s.querySelector('table');s.hidden=!!cat&&cat!=g;
+const rows=P.filter(p=>p.g==g).sort((a,b)=>{{const A=cost(a).v,B=cost(b).v;return (a.ad-b.ad)||((A==null)-(B==null))||((A||0)-(B||0))||a.t.toLowerCase().localeCompare(b.t.toLowerCase())}});
+rows.forEach(p=>{{const tr=document.getElementById('t-'+p.k),c=cost(p),tot=tr.querySelector('.t50tot'),yr=tr.querySelector('.t50yr'),bd=tr.querySelector('.t50b');
+if(c.v==null){{tot.innerHTML='<span class="check">'+c.why+'</span>';yr.textContent='–'}}else{{tot.innerHTML='<b>'+usd(c.v)+'</b>/mo'+(c.b!=seats&&!p.f?'<br><span class="small">billed for '+c.b+' seats (minimum)</span>':'');yr.textContent=usd(c.v*12)+(bill=='y'?'/yr':'/yr if you stay 12 months')}}
+const isl=LK.includes(p.k);tr.classList.toggle('lo',isl);let lb=bd.querySelector('.b-best');if(isl&&!lb){{lb=document.createElement('span');lb.className='badge b-best';lb.textContent='LOWEST FOR YOUR TEAM';bd.prepend(lb)}}else if(!isl&&lb)lb.remove();tr.parentNode.appendChild(tr)}});
+if(L.length&&(!cat||cat==g))qh+='<li><b>'+GN[g]+':</b> '+L.map(p=>'<a href="#t-'+p.k+'">'+p.t+' '+p.pl+'</a>').join(' = ')+' at '+usd(cost(L[0]).v)+'/mo</li>'}});
+q.innerHTML=qh||'<li>'+(bill=='y'?'Not enough yearly prices to compare here. Try Monthly.':'Not enough plans fit this team size to compare. See the table below.')+'</li>';document.getElementById('t50qh').textContent='Lowest price for '+(seats==1?'1 person':'a team of '+seats)+', '+(bill=='y'?'billed yearly':'billed monthly');
+CH.forEach(b=>{{const on=b.dataset.g==cat;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)}});
+const u=new URLSearchParams();if(seats!={_T_DEF_SEATS})u.set('seats',seats);if(bill=='y')u.set('bill','y');if(cat)u.set('cat',cat);const s=u.toString();history.replaceState(null,'',location.pathname+(s?'?'+s:'')+location.hash)}}
+function setSeats(v,typed){{let n=parseInt(v,10);MSG.textContent='';if(isNaN(n)){{if(!typed||String(v).trim()!==''){{MSG.textContent='Team size must be a number, so we used 1.'}}n=1}}if(n<1){{n=1;MSG.textContent='Team size starts at 1.'}}if(n>500){{n=500;MSG.textContent='This calculator goes up to 500 seats. Bigger teams usually get custom pricing.'}}seats=n;if(!typed||String(N.value)!==String(n))N.value=n;render()}}
+const p=new URLSearchParams(location.search);if(p.get('bill')=='y')bill='y';if(p.get('cat')&&GN[p.get('cat')])cat=p.get('cat');document.getElementById(bill=='y'?'t50by':'t50bm').checked=true;
+N.addEventListener('input',()=>{{if(N.value.trim()!=='')setSeats(N.value,true)}});N.addEventListener('change',()=>setSeats(N.value,false));
+document.getElementById('t50dec').addEventListener('click',()=>setSeats(seats-1));document.getElementById('t50inc').addEventListener('click',()=>setSeats(seats+1));
+document.querySelectorAll('input[name=t50b]').forEach(r=>r.addEventListener('change',()=>{{bill=r.value;render()}}));CH.forEach(b=>b.addEventListener('click',()=>{{cat=b.dataset.g;render()}}));
+document.getElementById('t50share').addEventListener('click',e=>{{const t=location.href,b=e.currentTarget,ok=()=>{{MSG.textContent='Link copied. It opens with this team size and billing.'}};if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>prompt('Copy this link:',t));else prompt('Copy this link:',t)}});
+if(p.get('seats'))setSeats(p.get('seats'));else render();if(location.hash){{const el=document.getElementById(location.hash.slice(1));if(el){{el.classList.add('lo');el.scrollIntoView({{block:'center'}})}}}}}})();</script>"""
+page(TEAM_PATH, f"AI Team Plan Costs ({TEAM_CHECKED[:4]}): ChatGPT Business, Claude Team, Copilot & More by Seat | ToolPick",
+     f"Enter your team size and see what {_t_n} AI team plans cost per month and per year: ChatGPT Business, Claude Team, GitHub Copilot, Cursor, Notion, Otter, Gamma and more, with seat minimums applied. Official prices read {TEAM_CHECKED}.",
+     _t_body, [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI team plan cost calculator", "url": BASE + TEAM_PATH, "applicationCategory": "BusinessApplication", "operatingSystem": "Any",
+                "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": f"Monthly and yearly cost of {_t_n} AI team plans for any team size, from official pricing pages read {TEAM_CHECKED}."},
+               {"@context": "https://schema.org", "@type": "ItemList", "name": "AI team and business plans", "url": BASE + TEAM_PATH,
+                "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": f'{p["t"]} {p["plan"]}', "url": BASE + TEAM_PATH + "#t-" + slug(p["t"])} for i, p in enumerate(TEAM_PLANS)]},
+               _ld_faq(_qa_t), crumbs([("ToolPick", "/"), ("My AI costs", "/my-ai-costs.html"), ("Team plans", TEAM_PATH)])])
+V50_CHANGED = [TEAM_PATH]
+def _v50ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if 'v50"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V50_CHANGED.append(path); return True
+for _p in TEAM_PLANS:
+    _v, _b, _w = _tcost(_p, 5, "m") if _p.get("m") is not None else _tcost(_p, 5, "y")
+    _bl = "monthly" if _p.get("m") is not None else "billed yearly"
+    _line = (f'<p class="pick small v50"><b>Buying for a team?</b> {e(_p["t"])} {e(_p["plan"])}: {_tper(_p)} (checked {TEAM_CHECKED})'
+             + ((f', so a team of 5 pays {_tm(_v)}/mo monthly' if _bl == "monthly" else f', so a team of 5 pays {_tm(_v * 12)} a year billed yearly') if _v is not None else "") + f'. <a href="{TEAM_PATH}?cat={_p["g"]}#t-{slug(_p["t"])}">Team costs for your team size →</a></p>')
+    if not _v50ins(turl(_p["t"]), '<section class="card tbp"', _line): _v50ins(turl(_p["t"]), '<section class="verdict', _line)
+_T_LINE = f'<p class="small v50">Buying for a team? <a href="{TEAM_PATH}">See what {_t_n} AI team plans cost for your team size →</a></p>'
+for _pp in ["/best-ai-tools-for-small-business.html", "/compare-builder.html", "/chatgpt-pricing.html", "/is-claude-pro-worth-it.html", "/ai-subscription-costs.html", "/cheapest-ai-coding-assistant.html", "/tools.html"]:
+    _v50ins(_pp, "</h1>", _T_LINE, after=True)
+_v50ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v50\"><a href='{TEAM_PATH}'>What AI tools cost for your team (team plans by seat)</a></li>", after=True)
+for _x in COMPARISONS:
+    _gs = [_p["g"] for _p in TEAM_PLANS if _p["t"] in cnames(_x)]
+    _ls = sorted({g for g in _gs if _gs.count(g) >= 2})  # only when at least 2 of the compared tools have a team plan for the same job
+    if _ls:
+        _v50ins(f"/compare/{_x[0]}.html", "</h1>", f'<p class="small v50">Buying seats for a team? <a href="{TEAM_PATH}?cat={_ls[0]}">Compare their team plans by team size →</a></p>', after=True)
+# Finder: when the search mentions a team size, show a one-tap link to team plan costs with that size (doesn't change results)
+_TH = f'<p class="pick v50 tmhint" hidden><b>Buying for a team?</b> <a id="tmlink" href="{TEAM_PATH}">See team plan costs for your team size →</a></p>'
+_h = open("public/index.html").read()
+assert '<div id="out" aria-live="polite">' in _h
+open("public/index.html", "w").write(_h.replace('<div id="out" aria-live="polite">', _TH + '<style>.tmhint[hidden]{display:none!important}.tmhint{margin:var(--s3) auto;max-width:720px;text-align:left}</style><div id="out" aria-live="polite">' + '<script>(function(){const q=document.getElementById("q"),H=document.querySelector(".tmhint"),A=document.getElementById("tmlink");if(!q||!H)return;const re=/\\b(?:team|group|company|agency|staff) of (\\d{1,3})\\b|\\b(\\d{1,3}) (?:people|users|seats|members|employees|devs|developers|teammates)\\b|\\bfor (?:my|our|a) (?:team|company|business|startup|agency)\\b/i;const rn=/\\b(?:team|group|company|agency|staff) of (\\d{1,3})\\b|\\b(\\d{1,3}) (?:people|users|seats|members|employees|devs|developers|teammates)\\b/i;const f=()=>{const m=q.value.match(re);H.hidden=!m;if(m){const k=q.value.match(rn),n=k?(k[1]||k[2]):null;A.href="' + TEAM_PATH + '"+(n?"?seats="+n:"");A.textContent=n?"See team plan costs for "+n+" seats →":"See team plan costs for your team size →"}};q.addEventListener("input",f);addEventListener("load",f);document.addEventListener("click",()=>setTimeout(f,50));f()})()</script>', 1)); V50_CHANGED.append("/")
+open("public/llms.txt", "a").write(f"\n## AI team plan costs (v50)\n- [What AI tools cost for your team]({BASE}{TEAM_PATH}): {_t_n} team/business plans (ChatGPT Business, Claude Team, Le Chat Team, Perplexity Enterprise Pro, Microsoft 365 Copilot Business, GitHub Copilot Business, Cursor Teams, Windsurf Teams, Bolt Teams, Lovable Business, Otter, Fireflies, Fathom, Notion Business, Gamma, Beautiful.ai, Plus AI, Canva Business, Ideogram, Recraft, Descript, CapCut) with per-seat price, seat minimum/maximum, flat workspace prices and plan fees; monthly and yearly totals for any team size; lowest price per job; official pages read {TEAM_CHECKED}. Params: ?seats=10&bill=y&cat=coding\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2651,6 +2810,7 @@ _lm["/ai-voice-cost.html"] = VOICE_CHECKED
 _lm["/how-we-pick.html"] = HWP_DATE
 _lm["/renewal-reminders.html"] = RR_DATE
 _lm["/embed.html"] = EMBED_DATE
+_lm[TEAM_PATH] = TEAM_CHECKED
 PC_BUILD_DATE = "2026-10-20"  # tracker page + its tool-page boxes redesigned (v18)
 _lm["/price-changes.html"] = max(_pc_latest, PC_BUILD_DATE)
 for _n in CHANGES_BY_TOOL: _lm[turl(_n)] = max(_lm.get(turl(_n), CHECKED), PC_BUILD_DATE)

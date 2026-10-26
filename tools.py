@@ -848,3 +848,81 @@ for _c in CATEGORIES:
 PRICE_NOTES["2026-10-24|ChatGPT"] = ("changed", "ChatGPT's prices are unchanged (Go $8/mo, Plus $20/mo, Pro from $100/mo). New: we now also show Business at $25/seat/mo billed monthly, or $20 billed annually.")
 for _n in ("Perplexity", "Gamma", "Canva"):
     PRICE_SKIP[f"2026-10-24|{_n}"] = "Re-checked 2026-10-24; only the checked date changed, prices unchanged."
+
+# --- v50: AI team plan costs (/ai-team-plans.html) ---
+# Every row read on the official pricing page on TEAM_CHECKED (curl + headless-Chrome render, text saved in /workspace/v50/raw).
+# m = $ per seat per month billed monthly; y = $ per seat per month billed yearly (None = not stated on the page today).
+# base = fixed $/mo for the workspace on top of seats; flat = one price for the whole workspace (seats don't multiply);
+# mn/mx = seat minimum/maximum stated on the page; frm = page says "from"/"+"; addon = needs another paid plan (never ranked).
+# q = exact text from the page (whitespace-normalised) that the numbers come from; build.py asserts the numbers appear in it.
+TEAM_CHECKED = "2026-10-26"
+TEAM_GROUPS = [("assistants", "AI assistants"), ("coding", "AI coding"), ("apps", "App builders"), ("meetings", "Meeting notes"),
+               ("docs", "Docs & notes"), ("slides", "Presentations"), ("design", "Design & images"), ("video", "Video editing")]
+TEAM_PLANS = [
+ dict(t="ChatGPT", plan="Business (standard seat)", g="assistants", m=25, y=20, mn=2, mx=200, src="https://chatgpt.com/pricing",
+      q=["$20/month if billed annually. $25/month if billed monthly.", "For teams of 2–200 employees."],
+      note="Premium seat (5x usage) $125/mo, or $100 billed yearly. Mix seat types."),
+ dict(t="Claude", plan="Team (standard seat)", g="assistants", m=25, y=20, mn=2, mx=150, src="https://claude.com/pricing",
+      q=["For teams of 2 to 150", "$20 Per seat / month if billed annually. $25 if billed monthly."],
+      note="Premium seat (5x usage) $125/mo, or $100 billed yearly. Mix seat types."),
+ dict(t="Le Chat (Mistral)", plan="Team", g="assistants", m=24.99, y=None, src="https://mistral.ai/pricing",
+      q=["Team Secure, collaborative workspace for teams building with AI. $24.99 /user/mo Excluding taxes"],
+      note="Price excludes tax. A yearly price isn't stated."),
+ dict(t="Perplexity", plan="Enterprise Pro", g="assistants", m=None, y=34, src="https://www.perplexity.ai/enterprise/pricing",
+      q=["$34 / month per seat when billed annually"], note="Only a billed-yearly price is shown."),
+ dict(t="Microsoft Copilot", plan="Microsoft 365 Copilot Business (add-on)", g="assistants", m=25.20, y=21, addon=True,
+      src="https://www.microsoft.com/en-us/microsoft-365-copilot/pricing",
+      q=["Microsoft 365 Copilot Business (add-on) AI built for work to help drive productivity, clarity and impact across your existing Microsoft 365 experience $25.20 user/month Monthly subscription",
+         "Originally starting from $21.00 now starting from $18.00 $21.00 $18.00 user/month, paid yearly"],
+      note="Add-on: you also need a Microsoft 365 business plan (not included), so it isn't ranked. Yearly list price $21; the page shows a limited offer of $18."),
+ dict(t="GitHub Copilot", plan="Business", g="coding", m=19, y=None, src="https://github.com/features/copilot/plans",
+      q=["Business $19 per user / month"], note="Pooled credits for the team. A yearly price isn't stated."),
+ dict(t="Cursor", plan="Teams", g="coding", m=30, y=None, frm=True, src="https://cursor.com/pricing",
+      q=["Teams $30 +/user/month"], note="Shown as $30+ per user; usage is pooled. A yearly price isn't stated."),
+ dict(t="Windsurf", plan="Teams", g="coding", m=40, y=None, base=80, mx=200, src="https://windsurf.com/pricing",
+      q=["Teams $80 /month for team plan + $40/mo per full dev seat", "Up to 200 users"],
+      note="$80/mo team plan fee plus $40/mo per full dev seat."),
+ dict(t="Bolt", plan="Teams", g="apps", m=30, y=27, src="https://bolt.new/pricing",
+      q=["Teams $30 * /month Per member, billed monthly", "Teams $27 * /month Total of $324"], note="$324 per member per year billed yearly."),
+ dict(t="Lovable", plan="Business", g="apps", m=50, y=None, flat=True, frm=True, src="https://lovable.dev/pricing",
+      q=["Business Advanced controls and power features for growing departments $50 / month 100 monthly credits Get started Unlimited users"],
+      note="One price for the whole workspace with unlimited users; the 100 monthly credits are shared. Pro ($25/mo) also allows unlimited users."),
+ dict(t="Otter", plan="Business", g="meetings", m=30, y=19.99, mx=25, src="https://otter.ai/pricing",
+      q=["Business Best Value For medium-sized teams $30 $24 /user/month 20% off for 3 months", "Business Best Value For medium-sized teams $19 .99 /user/month", "Max workspace members 5 5 billed users 25 billed users"],
+      note="Up to 25 billed users. New subscribers: $24/user/mo for the first 3 months on monthly billing."),
+ dict(t="Fireflies", plan="Business", g="meetings", m=29, y=19, src="https://fireflies.ai/pricing",
+      q=["Business For fast growing businesses $29 $19 per seat / month, billed annually"], note=""),
+ dict(t="Fathom", plan="Team", g="meetings", m=19, y=15, mn=2, src="https://www.fathom.ai/pricing",
+      q=["FOR TEAMS Team $ 19 $15 $19 /month / per user (2 user min"], note="Business plan (CRM sync, coaching): $34/user/mo, or $25 billed yearly."),
+ dict(t="Notion AI", plan="Business", g="docs", m=24, y=20, src="https://www.notion.com/pricing",
+      q=["Business $24 per seat/month", "Business $20 per seat/month"],
+      note="Full Notion AI starts on Business. Plus ($12, or $10 billed yearly) only includes an AI trial."),
+ dict(t="Gamma", plan="Business", g="slides", m=None, y=40, src="https://gamma.app/pricing",
+      q=["Business For organizations ready to make it official with Gamma $40 / seat / month $480 per seat, billed annually"],
+      note="$480 per seat per year. Plus ($9) and Pro ($18) are also per seat, billed yearly."),
+ dict(t="Beautiful.ai", plan="Team", g="slides", m=50, y=40, mn=2, mx=20, src="https://www.beautiful.ai/pricing",
+      q=["Teams of 2 to 20 pay $40 per user per month billed annually, or $50 billed monthly."], note="For 2 to 20 seats."),
+ dict(t="Plus AI", plan="Team", g="slides", m=40, y=30, src="https://plusai.com/pricing",
+      q=["Team $30 per user/month, billed annually. $40/user billed monthly."], note="Works inside Google Slides and PowerPoint."),
+ dict(t="Canva", plan="Business", g="design", m=None, y=250/12, yr=250, src="https://www.canva.com/pricing/",
+      q=["Business Create content faster, market smarter, and grow your business with advanced tools. US$ 250 /year per person"],
+      note="$250 per person per year. We couldn't read a monthly price today."),
+ dict(t="Ideogram", plan="Team", g="design", m=30, y=20, src="https://ideogram.ai/pricing",
+      q=["Team Best for teams creating together $30 per user/month, $240 billed annually", "Team $20/user/mo"], note="$240 per user per year billed yearly."),
+ dict(t="Recraft", plan="Teams", g="design", m=None, y=18, src="https://www.recraft.ai/pricing",
+      q=["Teams For teams collaborating on shared creative workflows. $18 per month per seat billed annually"], note="Only a billed-yearly price is shown."),
+ dict(t="Descript", plan="Business", g="video", m=65, y=50, src="https://www.descript.com/pricing",
+      q=["Business $ 50 $ 65 per person / month Scale to a team of 5 (billed separately)"], note="The page says “Scale to a team of 5 (billed separately)”."),
+ dict(t="CapCut", plan="Teams", g="video", m=12.49, y=None, src="https://www.capcut.com/pricing",
+      q=["Teams USD 12.49 /month per seat"], note="The yearly price changes with seat count on the page, so we show monthly only."),
+]
+TEAM_LEFT_OUT = [  # tool, why (all read on TEAM_CHECKED)
+ ("Google Gemini", "Gemini for teams comes inside Google Workspace plans; today's page showed introductory offers and footnoted prices, so we couldn't state a clean per-seat price"),
+ ("HeyGen", "Business is $149/mo plus $20 per seat, but the page doesn't say whether the $149 includes the first seat"),
+ ("Jasper", "Pro includes 1 seat; adding teammates needs the Business plan, which has custom pricing"),
+ ("v0", "the Team plan card showed two different per-user prices, so we couldn't tell which applies"),
+ ("Zapier", "Team is “from $69/month” for 25 users, but the page doesn't say which billing period that is"),
+ ("Grammarly", "the page shows Pro at $12 per member but didn't state the billing period in the text we could read"),
+ ("ClickUp", "its AI is a separate per-user add-on on top of the workspace plan"),
+ ("Replit", "its pricing page showed a security check today"),
+]

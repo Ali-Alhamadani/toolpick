@@ -279,6 +279,9 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [Surfer alternatives](https://toolpick-ai.vercel.app/alternatives/surfer.html): 2 same-job tools (SEO content): Frase, Writesonic; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 - [Lindy alternatives](https://toolpick-ai.vercel.app/alternatives/lindy.html): 3 same-job tools (AI agents): Zapier Agents, Taskade, Relevance AI; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 
+## AI team plan costs (v50)
+- [What AI tools cost for your team](https://toolpick-ai.vercel.app/ai-team-plans.html): 22 team/business plans (ChatGPT Business, Claude Team, Le Chat Team, Perplexity Enterprise Pro, Microsoft 365 Copilot Business, GitHub Copilot Business, Cursor Teams, Windsurf Teams, Bolt Teams, Lovable Business, Otter, Fireflies, Fathom, Notion Business, Gamma, Beautiful.ai, Plus AI, Canva Business, Ideogram, Recraft, Descript, CapCut) with per-seat price, seat minimum/maximum, flat workspace prices and plan fees; monthly and yearly totals for any team size; lowest price per job; official pages read 2026-10-26. Params: ?seats=10&bill=y&cat=coding
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.
