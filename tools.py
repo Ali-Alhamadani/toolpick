@@ -9,7 +9,7 @@ CATEGORIES = [
   {"name":"Luma Dream Machine","url":"https://lumalabs.ai","pricing":"https://lumalabs.ai/pricing","price":"Plus $30/mo ($25 yearly); Pro $90 ($75); Ultra $300 ($250)","free":"No free plan listed on pricing page","about":"Ray models plus third-party video/image models, commercial use on Plus."},
   {"name":"Kling AI","url":"https://klingai.com","pricing":"https://klingai.com/global/membership/membership-plan","price":"check site","free":"check site","about":"Text/image-to-video generator (pricing page loads via app, could not verify)."},
   {"name":"HeyGen","url":"https://www.heygen.com","pricing":"https://www.heygen.com/pricing","price":"Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat","free":"Free: 3 videos/mo, up to 1 min each","about":"AI avatar videos, voice cloning and video translation."},
-  {"name":"Synthesia","url":"https://www.synthesia.io","pricing":"https://www.synthesia.io/pricing","price":"Starter $29/mo (yearly from $18/mo); Pro $89/mo ($64 yearly)","free":"Basic free: 10 min video/mo + 500 credits, watermarked","about":"Business/training videos with AI presenters in 140+ languages."},
+  {"name":"Synthesia","url":"https://www.synthesia.io","pricing":"https://www.synthesia.io/pricing","price":"Starter $19/mo ($14/mo yearly, $168/yr); Pro $89/mo ($59/mo yearly, $708/yr). Promotional: Starter $9 first month then $19/mo; Pro $49 first month then $89/mo (monthly billing)","free":"Basic free: 10 min video/mo + 500 credits, watermarked","about":"Business/training videos with AI presenters in 140+ languages."},
   {"name":"Descript","url":"https://www.descript.com","pricing":"https://www.descript.com/pricing","price":"Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50)","free":"Free: 1 media hour/mo, 720p export","about":"Edit video by editing the transcript; AI clean-up tools."},
   {"name":"CapCut","url":"https://www.capcut.com","pricing":"https://www.capcut.com/pricing","price":"Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo","free":"Free plan with basic editing and templates","about":"Easy editor for short-form social video, AI features built in."},
   {"name":"InVideo","url":"https://invideo.io","pricing":"https://invideo.io/pricing","price":"Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150","free":"Free editor available","about":"Prompt-to-video for explainer and social videos."},
@@ -150,7 +150,7 @@ for _c in CATEGORIES:
 # Entry paid plan: (monthly billing, per-month when billed yearly, cost per output). None = not verified.
 PRICE_TABLE = {
  "Runway":(15,12,"Gen-4.5: 60 credits per 5s; Standard's 625 credits ≈ 52s of Gen-4.5"),"Pika":(10,8,"Seedance 2.5 720p 5s = 122 credits; Starter 900 credits ≈ 7 clips"),
- "Luma Dream Machine":(30,25,None),"HeyGen":(29,24,None),"Synthesia":(29,18,"~100 credits per finished video minute"),"Descript":(24,16,None),"CapCut":(19.99,None,None),
+ "Luma Dream Machine":(30,25,None),"HeyGen":(29,24,None),"Synthesia":(19,14,"~100 credits per finished video minute"),"Descript":(24,16,None),"CapCut":(19.99,None,None),
  "InVideo":(20,10,None),"Claude":(20,17,None),"Claude (Pro)":(20,17,None),"Grammarly":(30,12,None),"Notion AI":(12,10,None),"Copy.ai":(29,24,None),"GitHub Copilot":(10,None,None),
  "Cursor":(8,None,None),"Windsurf":(20,None,None),"Bolt":(25,18,None),"v0":(30,None,None),"Leonardo":(12,None,None),"Midjourney":(10,8,"Extra Fast GPU time $4/hr"),
  "Ideogram":(20,15,"Pay-as-you-go 1¢ per credit"),"Krea":(9,None,None),"ElevenLabs":(6,None,None),"Suno":(None,8,None),"Murf":(None,None,"$0.01-$0.03 per 1,000 characters (API)"),
@@ -848,6 +848,15 @@ for _c in CATEGORIES:
 PRICE_NOTES["2026-10-24|ChatGPT"] = ("changed", "ChatGPT's prices are unchanged (Go $8/mo, Plus $20/mo, Pro from $100/mo). New: we now also show Business at $25/seat/mo billed monthly, or $20 billed annually.")
 for _n in ("Perplexity", "Gamma", "Canva"):
     PRICE_SKIP[f"2026-10-24|{_n}"] = "Re-checked 2026-10-24; only the checked date changed, prices unchanged."
+
+# Daily ops 2026-10-27: synthesia.io/pricing (Starter cut to $19, Pro yearly $59, first-month offers), github.com/features/copilot/plans and suno.com/pricing unchanged.
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in ("Synthesia","GitHub Copilot","Suno"): _t["checked"] = "2026-10-27"
+PRICE_NOTES["2026-10-27|Synthesia"] = ("down", "Synthesia Starter is now $19/mo billed monthly, or $14/mo billed yearly ($168/yr). Before, it was $29/mo (yearly from $18/mo). Pro is still $89/mo, and billed yearly it is now $59/mo ($708/yr), down from $64. New: first-month offers, Starter $9 and Pro $49.")
+PRICE_NOTES["2026-10-27|ElevenLabs"] = ("changed", "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). New: a $1 first-month Starter offer, shown until Nov 1 (seen on the pricing page 2026-10-26).")
+for _n in ("GitHub Copilot", "Suno"):
+    PRICE_SKIP[f"2026-10-27|{_n}"] = "Re-checked 2026-10-27; only the checked date changed, prices unchanged."
 
 # --- v50: AI team plan costs (/ai-team-plans.html) ---
 # Every row read on the official pricing page on TEAM_CHECKED (curl + headless-Chrome render, text saved in /workspace/v50/raw).

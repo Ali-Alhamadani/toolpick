@@ -20,7 +20,7 @@
 - [Luma Dream Machine](https://toolpick-ai.vercel.app/tools/luma-dream-machine.html): Plus $30/mo ($25 yearly); Pro $90 ($75); Ultra $300 ($250) | free: No free plan listed on pricing page
 - [Kling AI](https://toolpick-ai.vercel.app/tools/kling-ai.html): List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $207/mo ($1,490/yr); Ultra+ $619/mo ($4,457/yr). Promotional: Standard $6.99 first month then $8.8/mo; Pro $25.99 first month then $32.56/mo; Premier $135 first month then $181.99/mo; Ultra+ $402 first month then $544.99/mo | free: Basic: free
 - [HeyGen](https://toolpick-ai.vercel.app/tools/heygen.html): Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat | free: Free: 3 videos/mo, up to 1 min each
-- [Synthesia](https://toolpick-ai.vercel.app/tools/synthesia.html): Starter $29/mo (yearly from $18/mo); Pro $89/mo ($64 yearly) | free: Basic free: 10 min video/mo + 500 credits, watermarked
+- [Synthesia](https://toolpick-ai.vercel.app/tools/synthesia.html): Starter $19/mo ($14/mo yearly, $168/yr); Pro $89/mo ($59/mo yearly, $708/yr). Promotional: Starter $9 first month then $19/mo; Pro $49 first month then $89/mo (monthly billing) | free: Basic free: 10 min video/mo + 500 credits, watermarked
 - [Descript](https://toolpick-ai.vercel.app/tools/descript.html): Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50) | free: Free: 1 media hour/mo, 720p export
 - [CapCut](https://toolpick-ai.vercel.app/tools/capcut.html): Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo | free: Free plan with basic editing and templates
 - [InVideo](https://toolpick-ai.vercel.app/tools/invideo.html): Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150 | free: Free editor available
