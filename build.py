@@ -2839,6 +2839,139 @@ for _p in ["/free-alternative-to-elevenlabs.html", "/pay-less.html"] + [f"/compa
     _v51ins(_p, "</h1>", f'<p class="small v51">{_EL2}</p>', after=True)
 open("public/llms.txt", "a").write(f"\n## ElevenLabs plans\n- [ElevenLabs pricing]({BASE}/elevenlabs-pricing.html): every plan with monthly and yearly price, credits, minutes, first-month offers and credit costs per product (elevenlabs.io/pricing, {ELC})\n- [Is ElevenLabs worth it?]({BASE}/is-elevenlabs-worth-it.html): Free vs Starter vs Creator, when to pay and when to skip ({ELC})\n")
 
+# --- v52: Can I get a refund? Refund windows + how to cancel (/ai-refund-policies.html) ---
+# Rules read on each tool's official help page on REFUND_CHECKED (tools.py REFUNDS, exact words in q).
+# Checker: tool + when you were charged (+ billing) -> inside / at the edge / past the refund window, how to ask, how to cancel.
+REFUND_CHECKED = _tm0.REFUND_CHECKED; REFUNDS = sorted(_tm0.REFUNDS, key=lambda r: r["t"].lower()); REFUND_LEFT_OUT = _tm0.REFUND_LEFT_OUT
+R_PATH = "/ai-refund-policies.html"
+for _r in REFUNDS:
+    assert _r["t"] in TOOL and _r["k"] in "wcn" and _r["q"] and _r["sr"].startswith("https://") and _r["sc"].startswith("https://") and _r["cancel"], _r["t"]
+    if _r["k"] == "n": assert _r["wm"] is None and _r["wy"] is None, _r["t"]
+_RK = {"w": "Refund window", "c": "Case by case", "n": "No refunds"}
+def _rwin(h): return None if h is None else (f"{h}-hour" if h < 72 else f"{h // 24}-day")
+def _rshort(r):
+    """One plain line: the refund rule."""
+    if r["k"] == "n": return f"{r['t']} doesn't give refunds. Cancelling only stops the next charge."
+    wm, wy = r["wm"], r["wy"]
+    if wm is None and wy is None:
+        return (f"Only if {r['cond'][4:] if r['cond'].startswith('you ') else r['cond']}." if r["k"] == "w" else f"Case by case: {r['cond']}.")
+    w = (f"within {_rwin(wm).replace('-', ' ')}s" if wm == wy else f"within {_rwin(wm).replace('-', ' ')}s (monthly) or {_rwin(wy).replace('-', ' ')}s (yearly)")
+    return ("Case by case, " if r["k"] == "c" else "Possible ") + w + " of the charge" + _RSUF.get(r["t"], "") + "."
+_RSUF = {"ChatGPT": ", if the subscription is unused (their call)", "Cursor": ", if you haven't used it that billing period", "ElevenLabs": ", if you haven't used any credits",
+         "Gamma": " when you first subscribe, only through support and under a credit limit", "HeyGen": ", less likely if you used a lot of credits", "Notion AI": ", asked from the owner or billing email",
+         "Runway": ", if unused or close to unused (their call)", "Fireflies": ", depending on how many meetings you logged", "Jasper": ", after you cancel", "Perplexity": ", one refund per account"}
+def _rdet(r):
+    a = []
+    if r["cond"]: a.append(f'<li><b>{"Who qualifies" if r["k"] != "n" else "Rule"}:</b> {e(r["cond"][0].upper() + r["cond"][1:])}.</li>')
+    if r["how"]: a.append(f'<li><b>{"How to ask" if r["k"] != "n" else "Billing problem"}:</b> {e(r["how"])}</li>')
+    if r["eu"]: a.append(f'<li><b>Where you live matters:</b> {e(r["eu"])}</li>')
+    a.append(f'<li><b>How to cancel:</b> {e(r["cancel"])}{(" — do it " + e(r["notice"])) if r["notice"] else ""}.</li>')
+    if r["after"]: a.append(f'<li><b>After you cancel:</b> {e(r["after"])}</li>')
+    if r["app"]: a.append(f'<li><b>Paid in the iPhone or Android app?</b> Apple or Google handles that refund and cancel, not {e(r["t"])}.</li>')
+    return ("<ul class=\"r52l\">" + "".join(a) + f'</ul><p class="small r52q">In their words: “{e(r["q"])}”</p>'
+            f'<p class="small">Read {REFUND_CHECKED}: <a href="{e(r["sr"])}" rel="noopener" target="_blank">refund page<span class="skip"> for {e(r["t"])} (opens in a new tab)</span></a>'
+            + (f' · <a href="{e(r["sc"])}" rel="noopener" target="_blank">cancel page<span class="skip"> for {e(r["t"])} (opens in a new tab)</span></a>' if r["sc"] != r["sr"] else "") + "</p>")
+def _rcard(r):
+    s = slug(r["t"])
+    return (f'<article class="r52c r52{r["k"]}" id="r-{s}" data-k="{r["k"]}"><h3><a href="{turl(r["t"])}">{e(r["t"])}</a> <span class="r52b">{_RK[r["k"]]}</span></h3>'
+            f'<p>{e(_rshort(r))}</p>' + (f'<p class="small check">Cancel {e(r["notice"])} or you may be charged again.</p>' if r["notice"] else "")
+            + f'<details><summary>How to ask and how to cancel</summary>{_rdet(r)}</details><p class="small"><a href="{R_PATH}?tool={s}#check">Check my dates for {e(r["t"])}</a></p></article>')
+_rn = len(REFUNDS); _rc = {k: sum(1 for r in REFUNDS if r["k"] == k) for k in "wcn"}
+_r_opts = '<option value="">Choose a tool…</option>' + "".join(f'<option value="{slug(r["t"])}">{e(r["t"])}</option>' for r in REFUNDS)
+_WHEN = [("pre", "I haven't paid yet", None, None), ("h24", "Less than 24 hours ago", 0, 24), ("d2", "1–2 days ago", 24, 48), ("d3", "2–3 days ago", 48, 72),
+         ("d7", "4–7 days ago", 72, 168), ("d14", "8–14 days ago", 168, 336), ("d30", "15–30 days ago", 336, 720), ("old", "More than 30 days ago", 720, None)]
+_w_opts = "".join(f'<option value="{k}">{e(l)}</option>' for k, l, a, b in _WHEN)
+_r_chips = (f'<button type="button" class="on" aria-pressed="true" data-k="">All {_rn}</button>' + "".join(f'<button type="button" aria-pressed="false" data-k="{k}">{_RK[k]} ({_rc[k]})</button>' for k in "wcn"))
+def _rjs(r): return {"s": slug(r["t"]), "t": r["t"], "k": r["k"], "wm": r["wm"], "wy": r["wy"], "c": r["cond"], "sh": _rshort(r), "d": _rdet(r), "n": r["notice"]}
+_r_short = sorted([r for r in REFUNDS if r["wm"]], key=lambda r: r["wm"])
+_r_tips = [
+    "Shortest refund windows: " + ", ".join(f'<a href="#r-{slug(r["t"])}">{e(r["t"])}</a> ({_rwin(r["wm"])}' + (f" monthly, {_rwin(r['wy'])} yearly" if r["wy"] != r["wm"] else "") + ")" for r in _r_short if r["wm"] <= 72) + ". Try the free plan first, then test hard on day one.",
+    "Cancel early: " + ", ".join(f'<a href="#r-{slug(r["t"])}">{e(r["t"])}</a> ({e(r["notice"])})' for r in REFUNDS if r["notice"]) + ".",
+    "No refunds at all: " + ", ".join(f'<a href="#r-{slug(r["t"])}">{e(r["t"])}</a>' for r in REFUNDS if r["k"] == "n") + ". Start monthly, not yearly, until you're sure.",
+    "Pause instead of cancelling: Canva (up to 3 months), Jasper (30, 60 or 90 days), Otter (once) and HeyGen offer a pause.",
+    "You can lose things when you cancel: Synthesia removes access to your videos after the period ends, ElevenLabs and HeyGen unused credits go, Lovable freezes unused credits. Export first."]
+_r_left = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: {e(w)}.</li>' if n in TOOL else f'<li>{e(n)}: {e(w)}.</li>' for n, w in REFUND_LEFT_OUT)
+_qa_r = [("Can I get a refund on ChatGPT Plus?", f"Payments are generally non-refundable, but OpenAI says a discretionary refund may be available for an unused individual subscription if you ask within seven days of the charge, through the Help Center chat. In the EU, UK and Turkey you get a prorated refund if you cancel within 14 days. Read {REFUND_CHECKED}."),
+         ("Can I get a refund on Claude Pro?", f"Anthropic says all payments are non-refundable except where its Consumer Terms or the law say otherwise. You can check eligibility under Get help → Send us a message → Claude Refund Request. EEA and UK users can get a refund within 14 days, reduced for use. Read {REFUND_CHECKED}."),
+         ("Which AI tools give refunds?", f"Of the {_rn} tools we checked on {REFUND_CHECKED}, {_rc['w']} state a refund window or rule (for example Cursor and ElevenLabs: 14 days if unused; Runway: 30 days if unused or close to unused), {_rc['c']} decide case by case, and {_rc['n']} don't refund: " + ", ".join(r["t"] for r in REFUNDS if r["k"] == "n") + "."),
+         ("Does cancelling give me my money back?", "No. On every tool here, cancelling only stops the next renewal. You keep access until the end of the period you paid for. A refund is a separate request, usually to support, and most have a short window."),
+         ("I paid in the iPhone app. Who refunds me?", "Apple. App Store subscriptions are refunded and cancelled through Apple (Google Play for Android), not by the tool itself. Several help pages say this, including ChatGPT, Notion, Canva and Perplexity.")]
+_R_CSS = ("<style>.r52g{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:var(--s4);margin:var(--s4) 0}"
+          ".r52c{background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--mu);border-radius:var(--r);padding:var(--s4);box-shadow:var(--sh)}.r52c.r52w{border-left-color:var(--ok)}.r52c.r52c{border-left-color:var(--warn)}.r52c[hidden]{display:none}"
+          ".r52c h3{margin:0 0 6px;font-size:1.05rem}.r52c h3 a{min-height:32px}.r52c p{margin:6px 0}.r52b{display:inline-block;font-size:.72rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--sf2);color:var(--tx);vertical-align:middle}"
+          ".r52c details summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:600;color:var(--ac)}.r52l{padding-left:18px;margin:6px 0}.r52l li{margin:4px 0}.r52q{font-style:italic}"
+          ".r52f{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);align-items:flex-end}.r52f label{display:block;font-weight:600;margin-bottom:6px}.r52f select{font-size:1rem;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 10px;min-width:min(100%,240px)}.r52f>div{max-width:100%}"
+          "#r52out{margin:var(--s4) 0}#r52out h2{margin:0 0 6px;font-size:1.25rem}#r52out.r52in{border-left:4px solid var(--ok)}#r52out.r52edge,#r52out.r52case{border-left:4px solid var(--warn)}#r52out.r52out,#r52out.r52no{border-left:4px solid var(--mu)}"
+          ".r52tips li{margin:6px 0}#r52msg:empty{display:none}</style>")
+_r_body = f"""{_R_CSS}<p class="small"><a href="/save-money.html">Save money</a> › Refunds and cancelling</p><h1>Can I get a refund? AI subscription refund and cancel rules</h1>
+<p class="tag">Pick your tool and when you paid. We tell you if you're still inside its refund window, how to ask, and how to cancel. Rules for {_rn} AI tools, read on each official help page on {REFUND_CHECKED}.</p>
+<div class="builder" id="check"><div class="r52f"><div><label for="r52t">Tool</label><select id="r52t">{_r_opts}</select></div><div><label for="r52w">When were you charged?</label><select id="r52w">{_w_opts}</select></div>
+<fieldset class="seg"><legend>Billing</legend><input type="radio" name="r52b" id="r52bm" value="m" checked><label for="r52bm">Monthly</label><input type="radio" name="r52b" id="r52by" value="y"><label for="r52by">Yearly</label></fieldset></div>
+<div class="pick" id="r52out" aria-live="polite"><h2 id="r52h">Choose a tool to see its refund rule</h2><div id="r52d"><p class="small">Or scroll down: every tool's rule is listed below.</p></div><p class="small" style="margin:6px 0 0"><button type="button" class="bbtn" id="r52share">Copy link to this answer</button> <span id="r52msg" role="status"></span></p></div></div>
+<p class="small">Refund rules change, and most say a refund “may” be given. We show what the official page says; the company decides. Not legal advice.</p>
+<h2>Before you subscribe</h2><ul class="r52tips">{"".join(f"<li>{t}</li>" for t in _r_tips)}</ul>
+<h2>All {_rn} tools at a glance</h2><div class="needs" role="group" aria-label="Show tools with" id="r52k">{_r_chips}</div>
+<div class="r52g" id="r52all">{"".join(_rcard(r) for r in REFUNDS)}</div>
+<h2>Not included yet</h2><p class="small">We leave a tool out when its official page doesn't state the rule clearly (read {REFUND_CHECKED}):</p><ul class="small">{_r_left}</ul>
+<p class="small">Related: <a href="/my-ai-costs.html#audit">Subscription audit</a> · <a href="/my-ai-costs.html#reminders">Renewal reminders</a> · <a href="/monthly-or-yearly.html">Monthly or yearly?</a> · <a href="/pay-less.html">Pay less for the same job</a> · <a href="/alternatives.html">Alternatives to popular AI tools</a></p>
+{_faq(_qa_r)}
+<script>__R52JS__</script>"""
+_R_JS = r"""(function(){const R=__DATA__,W=__WHEN__,S=document.getElementById('r52t'),WS=document.getElementById('r52w'),H=document.getElementById('r52h'),D=document.getElementById('r52d'),O=document.getElementById('r52out'),M=document.getElementById('r52msg'),CH=[...document.querySelectorAll('#r52k button')],CA=[...document.querySelectorAll('.r52c')];
+const by={};R.forEach(r=>by[r.s]=r);const wf=h=>h<72?h+'-hour':(h/24)+'-day';let bill='m',kind='';
+function render(){const r=by[S.value],w=W[WS.value]||W.pre;O.className='pick';M.textContent='';
+if(!r){H.textContent='Choose a tool to see its refund rule';D.innerHTML='<p class="small">Or scroll down: every tool\'s rule is listed below.</p>';}
+else{const h=bill=='y'?r.wy:r.wm;let t,c;
+if(r.k=='n'){t=r.t+" doesn't give refunds";c='r52no'}
+else if(h==null){t=r.k=='w'?r.t+': depends on how much you used, not on the date':r.t+': refunds are case by case';c='r52case'}
+else if(w.a==null){t=r.t+' has a '+wf(h)+' refund window'+(r.k=='c'?' (case by case)':'')+' after you pay';c='r52case'}
+else if(w.b!=null&&w.b<=h){t="You're inside "+r.t+"'s "+wf(h)+' refund window'+(r.k=='c'?' (they decide case by case)':'');c='r52in'}
+else if(w.a>=h){t=r.t+"'s "+wf(h)+' refund window has passed';c='r52out'}
+else{t="You're at the edge of "+r.t+"'s "+wf(h)+' refund window. Ask today';c='r52edge'}
+O.classList.add(c);H.textContent=t;let lead=(c=='r52out'||c=='r52no')?'<p><b>Cancel now to stop the next charge.</b>'+(r.n?' Do it '+r.n+'.':'')+'</p>':(c=='r52in'||c=='r52edge')?'<p><b>Ask soon, and check the conditions below.</b></p>':'';
+D.innerHTML=lead+'<p>'+r.sh+'</p>'+r.d}
+CA.forEach(a=>{a.hidden=!!kind&&a.dataset.k!=kind});CH.forEach(b=>{const on=b.dataset.k==kind;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+const u=new URLSearchParams();if(S.value)u.set('tool',S.value);if(WS.value!='pre')u.set('when',WS.value);if(bill=='y')u.set('bill','y');if(kind)u.set('k',kind);const s=u.toString();history.replaceState(null,'',location.pathname+(s?'?'+s:'')+location.hash)}
+const p=new URLSearchParams(location.search);if(by[p.get('tool')])S.value=p.get('tool');if(W[p.get('when')])WS.value=p.get('when');if(p.get('bill')=='y'){bill='y';document.getElementById('r52by').checked=true}if('wcn'.includes(p.get('k')||'x'))kind=p.get('k');
+S.addEventListener('change',render);WS.addEventListener('change',render);document.querySelectorAll('input[name=r52b]').forEach(x=>x.addEventListener('change',()=>{bill=x.value;render()}));CH.forEach(b=>b.addEventListener('click',()=>{kind=b.dataset.k;render()}));
+document.querySelectorAll('.r52c a[href*="?tool="]').forEach(a=>a.addEventListener('click',ev=>{ev.preventDefault();S.value=new URL(a.href).searchParams.get('tool');render();document.getElementById('check').scrollIntoView({block:'start'});S.focus()}));
+document.getElementById('r52share').addEventListener('click',()=>{const t=location.href,ok=()=>{M.textContent='Link copied.'};if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>prompt('Copy this link:',t));else prompt('Copy this link:',t)});
+render();if(location.hash&&location.hash!='#check'){const el=document.getElementById(location.hash.slice(1));if(el){const d=el.querySelector('details');if(d)d.open=true;el.scrollIntoView({block:'center'})}}})();"""
+_R_JS = _R_JS.replace("__DATA__", json.dumps([_rjs(r) for r in REFUNDS], separators=(",", ":")).replace("</", "<\\/")).replace("__WHEN__", json.dumps({k: {"a": a, "b": b} for k, l, a, b in _WHEN}, separators=(",", ":")))
+page(R_PATH, f"Can I Get a Refund? AI Subscription Refund & Cancel Rules ({REFUND_CHECKED[:4]}): ChatGPT, Claude, Cursor & More | ToolPick",
+     f"Refund windows and cancel steps for {_rn} AI tools: ChatGPT, Claude, Perplexity, Midjourney, Cursor, Copilot, ElevenLabs, Canva, Notion, Runway and more. Check if you're still inside the window. Official help pages read {REFUND_CHECKED}.",
+     _r_body.replace("__R52JS__", _R_JS),
+     [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI subscription refund checker", "url": BASE + R_PATH, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
+       "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": f"Refund windows, conditions and cancel steps for {_rn} AI subscriptions, from official help pages read {REFUND_CHECKED}."},
+      {"@context": "https://schema.org", "@type": "ItemList", "name": "AI subscription refund policies", "url": BASE + R_PATH,
+       "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": f'{r["t"]} refund policy', "url": BASE + R_PATH + "#r-" + slug(r["t"])} for i, r in enumerate(REFUNDS)]},
+      _ld_faq(_qa_r), crumbs([("ToolPick", "/"), ("Save money", "/save-money.html"), ("Refunds and cancelling", R_PATH)])])
+V52_CHANGED = [R_PATH]
+def _v52ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v52"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V52_CHANGED.append(path); return True
+_RB = {r["t"]: r for r in REFUNDS}
+for _r in REFUNDS:
+    _line = f'<p class="pick small v52"><b>Refunds:</b> {e(_rshort(_r))} (checked {REFUND_CHECKED}) <a href="{R_PATH}?tool={slug(_r["t"])}#check">Refund and cancel steps →</a></p>'
+    if not _v52ins(turl(_r["t"]), '<section class="card tbp"', _line): _v52ins(turl(_r["t"]), '<section class="verdict', _line)
+for _x in COMPARISONS:
+    _ns = [n for n in cnames(_x) if n in _RB]
+    if len(_ns) >= 2:
+        _v52ins(f"/compare/{_x[0]}.html", "</h1>", '<p class="small v52"><b>Refund rules:</b> ' + " · ".join((f'{e(n)}: {_rwin(_RB[n]["wm"])} refund window' if _RB[n]["k"] == "w" and _RB[n]["wm"] and _RB[n]["wm"] == _RB[n]["wy"] else f'{e(n)}: {_RK[_RB[n]["k"]].lower()}') for n in _ns) + f'. <a href="{R_PATH}?tool={slug(_ns[0])}#check">Check before you pay →</a></p>', after=True)
+_R_LINE = f'<p class="small v52">Paid and changed your mind? <a href="{R_PATH}">Refund windows and cancel steps for {_rn} AI tools →</a></p>'
+for _pp in ["/save-money.html", "/monthly-or-yearly.html", "/pay-less.html", "/renewal-reminders.html", "/subscription-audit.html", "/alternatives.html", "/ai-subscription-costs.html"]:
+    _v52ins(_pp, "</h1>", _R_LINE, after=True)
+_v52ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v52\"><a href='{R_PATH}'>Can I get a refund? AI subscription refund and cancel rules</a></li>", after=True)
+# Finder: a search that mentions refunds or cancelling shows a one-tap link (doesn't change results)
+_RH = f'<p class="pick v52 rfhint" hidden><b>Want your money back?</b> <a id="rflink" href="{R_PATH}">Refund and cancel rules for {_rn} AI tools →</a></p>'
+_h = open("public/index.html").read()
+assert '<div id="out" aria-live="polite">' in _h
+_RSL = json.dumps({r["t"].lower(): [slug(r["t"]), r["t"]] for r in REFUNDS})
+open("public/index.html", "w").write(_h.replace('<div id="out" aria-live="polite">', _RH + '<style>.rfhint[hidden]{display:none!important}.rfhint{margin:var(--s3) auto;max-width:720px;text-align:left}</style><div id="out" aria-live="polite">' + '<script>(function(){const q=document.getElementById("q"),H=document.querySelector(".rfhint"),A=document.getElementById("rflink"),T=' + _RSL + ';if(!q||!H)return;const f=()=>{const v=q.value.toLowerCase(),m=/\\b(refunds?|refundable|money back|cancel(l?ing|l?ed|lation)?|unsubscribe)\\b/.test(v);H.hidden=!m;if(m){const k=Object.keys(T).find(n=>v.includes(n));A.href="' + R_PATH + '"+(k?"?tool="+T[k][0]+"#check":"");A.textContent=k?"Refund and cancel rules for "+T[k][1]+" →":"Refund and cancel rules for ' + str(_rn) + ' AI tools →"}};q.addEventListener("input",f);addEventListener("load",f);f()})()</script>', 1)); V52_CHANGED.append("/")
+open("public/llms.txt", "a").write(f"\n## Refunds and cancelling (v52)\n- [Can I get a refund? AI subscription refund and cancel rules]({BASE}{R_PATH}): {_rn} AI tools ({', '.join(r['t'] for r in REFUNDS)}): refund window and conditions (monthly/yearly), how to ask, exact cancel steps, cancel-notice deadlines, what you lose after cancelling, app-store note, official refund and cancel page links, read {REFUND_CHECKED}. Checker params: ?tool=chatgpt&when=d7&bill=y (when = pre, h24, d2, d3, d7, d14, d30, old)\n" + "".join(f"  - {r['t']}: {_RK[r['k']]}. {_rshort(r)}\n" for r in REFUNDS))
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -2932,6 +3065,9 @@ for _u in V49_CHANGED: _lm[_u] = ALT49_DATE
 for _n, _s in _alt49_summ.items(): _lm[_s["p"]] = _s["lm"]
 _lm["/alternatives.html"] = ALT49_DATE
 for _u in V51_CHANGED + ["/my-ai-costs.html"]: _lm[_u] = ELC
+_fpm = "public/my-ai-costs.html"; _hm = open(_fpm).read()
+if ' v52"' not in _hm and "</h1>" in _hm: open(_fpm, "w").write(_hm.replace("</h1>", f'</h1><p class="small v52">Want to stop paying for one? <a href="{R_PATH}">Refund and cancel rules for {_rn} AI tools →</a></p>', 1)); V52_CHANGED.append("/my-ai-costs.html")
+for _u in V52_CHANGED: _lm[_u] = REFUND_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))

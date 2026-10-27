@@ -286,6 +286,31 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [ElevenLabs pricing](https://toolpick-ai.vercel.app/elevenlabs-pricing.html): every plan with monthly and yearly price, credits, minutes, first-month offers and credit costs per product (elevenlabs.io/pricing, 2026-10-26)
 - [Is ElevenLabs worth it?](https://toolpick-ai.vercel.app/is-elevenlabs-worth-it.html): Free vs Starter vs Creator, when to pay and when to skip (2026-10-26)
 
+## Refunds and cancelling (v52)
+- [Can I get a refund? AI subscription refund and cancel rules](https://toolpick-ai.vercel.app/ai-refund-policies.html): 22 AI tools (Bolt, Canva, ChatGPT, Claude, Cursor, Descript, ElevenLabs, Fireflies, Gamma, GitHub Copilot, Grammarly, HeyGen, Ideogram, Jasper, Lovable, Midjourney, Notion AI, Otter, Perplexity, Runway, Suno, Synthesia): refund window and conditions (monthly/yearly), how to ask, exact cancel steps, cancel-notice deadlines, what you lose after cancelling, app-store note, official refund and cancel page links, read 2026-10-27. Checker params: ?tool=chatgpt&when=d7&bill=y (when = pre, h24, d2, d3, d7, d14, d30, old)
+  - Bolt: No refunds. Bolt doesn't give refunds. Cancelling only stops the next charge.
+  - Canva: Case by case. Case by case: Canva reviews every request but says most subscriptions aren't refundable.
+  - ChatGPT: Refund window. Possible within 7 days of the charge, if the subscription is unused (their call).
+  - Claude: Case by case. Case by case: only payments their Consumer Terms call refundable, or where the law requires.
+  - Cursor: Refund window. Possible within 14 days of the charge, if you haven't used it that billing period.
+  - Descript: Refund window. Possible within 48 hours of the charge.
+  - ElevenLabs: Refund window. Possible within 14 days of the charge, if you haven't used any credits.
+  - Fireflies: Refund window. Possible within 7 days of the charge, depending on how many meetings you logged.
+  - Gamma: Refund window. Possible within 3 days of the charge when you first subscribe, only through support and under a credit limit.
+  - GitHub Copilot: No refunds. GitHub Copilot doesn't give refunds. Cancelling only stops the next charge.
+  - Grammarly: No refunds. Grammarly doesn't give refunds. Cancelling only stops the next charge.
+  - HeyGen: Case by case. Case by case, within 15 days of the charge, less likely if you used a lot of credits.
+  - Ideogram: No refunds. Ideogram doesn't give refunds. Cancelling only stops the next charge.
+  - Jasper: Refund window. Possible within 7 days of the charge, after you cancel.
+  - Lovable: No refunds. Lovable doesn't give refunds. Cancelling only stops the next charge.
+  - Midjourney: Refund window. Only if you've used less than 20 GPU minutes in your account's whole lifetime (Fast, Turbo and Relax all count). No time limit is stated.
+  - Notion AI: Refund window. Possible within 3 days (monthly) or 30 days (yearly) of the charge, asked from the owner or billing email.
+  - Otter: No refunds. Otter doesn't give refunds. Cancelling only stops the next charge.
+  - Perplexity: Refund window. Possible within 24 hours (monthly) or 3 days (yearly) of the charge, one refund per account.
+  - Runway: Refund window. Possible within 30 days of the charge, if unused or close to unused (their call).
+  - Suno: Case by case. Case by case: Suno decides. Their examples: a subscription with zero songs made is likely refunded, an accidental yearly payment may get a partial refund, “changed your mind” isn't.
+  - Synthesia: No refunds. Synthesia doesn't give refunds. Cancelling only stops the next charge.
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.
