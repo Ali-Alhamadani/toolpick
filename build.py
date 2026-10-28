@@ -630,7 +630,7 @@ for c in CATEGORIES:
 <div class="sponsor">Sponsored slot available for this category — <a href="/sponsor.html">sponsor ToolPick</a></div>
 <h2>Price table</h2><p class="small">Entry paid plan. Monthly = billed monthly; Annual = per-month cost when billed yearly. "—" = not shown/verified on the official page.</p>
 <div class="tw"><table><tr><th>Tool</th><th>Monthly</th><th>Annual (per mo)</th><th>Cost per output</th><th>All plans</th><th>Free tier</th><th>Checked</th></tr>{rows}</table></div><h2>All tools</h2><div class="grid">{''.join(card(t,c) for t in c['tools'])}</div>
-{complinks(comps_for([t['name'] for t in c['tools']]))}<p><a href="/compare-builder.html">Build your own comparison →</a> Pick any 2–3 tools and share the result.</p>{"".join(f'<p><a href="{role_path(r[0])}">Starter stack for {e(r[2].lower())} →</a> Free, Under $30 and Pro stacks that include {e(n.lower())} tools.</p>' for r in ROLES if c["id"] in r[3])}{f'<p><a href="/free.html?job={c["id"]}">Can I do this for free? →</a> Every {e(n.lower())} tool with a real free plan, and the cheapest upgrade.</p>' if FREE_V21 else ''}<p><a href="/tools.html?category={c['id']}">Browse {e(n.lower())} tools in the full directory →</a> Filter by free plan, verified price, billing and seat pricing.</p><p><a href="/help-me-choose.html?category={c['id']}">Help me choose {e(n.lower())} tools →</a> Answer 5 quick questions and get a ranked shortlist for this category.</p>{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> Every video tool with a verified entry price under $20/mo, ranked cheapest first.</p>' if c['id']=='video' else ''}{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Images tools with a verified real free plan.</p>' if c['id']=='images' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Writing tools with a verified real free plan.</p>' if c['id']=='writing' else ''}"""
+{complinks(comps_for([t['name'] for t in c['tools']]))}<p><a href="/compare-builder.html">Build your own comparison →</a> Pick any 2–3 tools and share the result.</p>{"".join(f'<p><a href="{role_path(r[0])}">Starter stack for {e(r[2].lower())} →</a> Free, Under $30 and Pro stacks that include {e(n.lower())} tools.</p>' for r in ROLES if c["id"] in r[3])}{f'<p><a href="/free.html?job={c["id"]}">Can I do this for free? →</a> Every {e(n.lower())} tool with a real free plan, and the cheapest upgrade.</p>' if FREE_V21 else ''}<p><a href="/tools.html?category={c['id']}">Browse {e(n.lower())} tools in the full directory →</a> Search, and filter by what it does, free plan, verified price and billing.</p><p><a href="/help-me-choose.html?category={c['id']}">Help me choose {e(n.lower())} tools →</a> Answer 5 quick questions and get a ranked shortlist for this category.</p>{'<p><a href="/best-ai-video-tools-under-20.html">Best AI video tools under $20 →</a> Every video tool with a verified entry price under $20/mo, ranked cheapest first.</p>' if c['id']=='video' else ''}{'<p><a href="/free-alternative-to-recraft.html">Free alternatives to Recraft →</a> Images tools with a verified real free plan.</p>' if c['id']=='images' else ''}{'<p><a href="/free-alternative-to-rytr.html">Free alternatives to Rytr →</a> Writing tools with a verified real free plan.</p>' if c['id']=='writing' else ''}"""
     il = {"@context":"https://schema.org","@type":"ItemList","name":title,"itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+turl(t["name"]),"name":t["name"]} for i,t in enumerate(c["tools"])]}
     page(path, title, d, body, [il, crumbs([("ToolPick","/"),(f"Best AI {n} tools",path)])])
 # tool pages
@@ -711,7 +711,7 @@ def tool_verdict(name, cats, t):
     if a is not None: alt_parts.append("Billed yearly: " + cmp(ca, "annual", a))
     rows.append((f"Cheapest same-job alternative ({e(cap_label(name))})", " · ".join(alt_parts) if (cm or ca) else NO_LIKE))
     rows.append(("Best real-free alternative", f'<a href="{turl(fa["name"])}">{e(fa["name"])}</a> — {e(fa["free"])}' if fa else "None with the same main job in our list"))
-    rows.append(("What it does (main job first)", e(", ".join(CAP_LABEL.get(k, k) for k in CAPS[name])))); rows.append(("Categories", ", ".join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)))
+    rows.append(("What it does (main job first)", ", ".join(f'<a href="/tools.html?job={k}">{e(CAP_LABEL.get(k, k))}</a>' for k in CAPS[name]) + ' <span class="small">(see every tool that does it)</span>')); rows.append(("Categories", ", ".join(f'<a href="/best-ai-{cc["id"]}-tools.html">{e(cc["name"])}</a>' for cc in cats)))
     ch = CHANGES_BY_TOOL.get(name, [])
     if ch: rows.append(("Recent price change", f'{e(ch[0]["label"])}, {ch[0]["date"]}: {e(ch[0]["summary"])} <a href="/price-changes.html#{ch[0]["date"]}-{ch[0]["s"]}">Details</a>'))
     btns = f'<a class="bbtn primary" href="/pay-less.html?tool={s}">Can I pay less?</a>'
@@ -1512,11 +1512,12 @@ page(MY_PATH, "Monthly or Yearly? AI Tool Annual Discounts & Break-Even, Checked
       crumbs([("ToolPick","/"),("Monthly or yearly?",MY_PATH)])])
 
 
-# --- Browse all tools directory (v12 preview) ---
+# --- Browse all tools directory (v53: search + "what it does" + one-tap filters) ---
 # Filters use only verified fields already in tools.py/PRICE_TABLE: category membership,
 # realfree(), PRICE_TABLE monthly/annual availability, lowest numeric entry rate,
-# and _perseat() wording in the verified entry price text. No usage-based, team-plan,
-# skill or use-case fields exist across tools, so none are offered (category is labelled category).
+# _perseat() wording in the verified entry price text, and CAPS (what each tool's own site
+# says it does, checked 2026-10-20). Search only matches our own saved text (name, about,
+# job labels, category); it never invents prices or features.
 _dmap = {}
 for _c in CATEGORIES:
     for _t in _c["tools"]:
@@ -1524,75 +1525,207 @@ for _c in CATEGORIES:
         if _k not in _dmap:
             _dmap[_k] = dict(s=_k, n=_t["name"], d=_t["about"], p=_t["price"], f=_t["free"], k=_t.get("checked", CHECKED),
                              u=turl(_t["name"]), dm=dom(_t["url"]), pr=_t["pricing"], m=_t["monthly"], a=_t["annual"],
-                             ps=_perseat(_t), fr=realfree(_t), cats=[], bestFor=[])
+                             ps=_perseat(_t), fr=realfree(_t), cats=[], bestFor=[], j=list(CAPS[_t["name"]]))
         if _c["id"] not in [x["id"] for x in _dmap[_k]["cats"]]: _dmap[_k]["cats"].append(dict(id=_c["id"], name=_c["name"]))
         if _t["name"] == _c["best"] and _c["id"] not in _dmap[_k]["bestFor"]: _dmap[_k]["bestFor"].append(_c["id"])
-DDATA = json.dumps(sorted(_dmap.values(), key=lambda x: x["n"].lower())).replace("</", "<\\/")
-DCATOPTS = "".join(f'<option value="{c["id"]}">{e(c["name"])}</option>' for c in CATEGORIES)
-directory_body = f"""<h1>Browse all AI tools</h1><p class="tag">Every tool on ToolPick — {total_tools} tools across {len(CATEGORIES)} categories — with filters that only use verified data: category, a real free plan, the lowest verified entry price in our price table, whether a monthly or annual-billing entry rate is verified, and whether that entry price itself is stated per seat / per user / per member / per person. Prices show their checked date and link to the official pricing page.</p>
-<div class="builder"><h2 style="margin-top:0;font-size:1.05rem">Filter and sort tools</h2><form id="dform"><div class="dform">
-<div><label for="d-cat">Category</label><select id="d-cat" name="category"><option value="">All categories</option>{DCATOPTS}</select></div>
+_DLIST = sorted(_dmap.values(), key=lambda x: x["n"].lower())
+DDATA = json.dumps(_DLIST).replace("</", "<\\/")
+_JOBC = {}
+for _v in _DLIST:
+    for _j in _v["j"]: _JOBC[_j] = _JOBC.get(_j, 0) + 1
+JOBDATA = json.dumps({k: CAP_LABEL.get(k, k) for k in _JOBC})
+CATDATA = json.dumps([dict(id=c["id"], n=c["name"], need=c["need"]) for c in CATEGORIES])
+DIR_DATE = "2026-10-28"
+def _d_pv(v):
+    if v is None: return None
+    if isinstance(v, (int, float)): return (float(v), "$")
+    m = _re.search(r"([€$£])\s*([\d.]+)", str(v))
+    if m: return (float(m.group(2)), m.group(1))
+    m = _re.search(r"([\d.]+)", str(v)); return (float(m.group(1)), "$") if m else None
+def _d_entry(t):
+    vs = [x for x in (_d_pv(t["m"]), _d_pv(t["a"])) if x]
+    return sorted(vs)[0] if vs else None
+def _d_money(amt, cur):
+    r = round(amt * 100) / 100
+    return cur + (str(int(r)) if r == int(r) else f"{r:.2f}")
+def _d_card(t):  # mirrors card() in the page script, used to pre-render the default list (no JS needed, no layout shift)
+    en = _d_entry(t); bv = bool(t["bestFor"])
+    jobs = [CAP_LABEL.get(k, k) for k in t["j"]]
+    b = ('<span class="badge b-best">BEST VALUE</span>' if bv else '') + ('<span class="badge b-free">FREE PLAN</span>' if t["fr"] else '') + ('' if en else '<span class="badge b-rank">PRICE NOT VERIFIED</span>')
+    ent = (f'<p class="dent"><b>From {_d_money(*en)}/mo</b> <span class="small">lowest verified entry{" · per seat" if t["ps"] else ""}</span></p>' if en
+           else '<p class="small check">No verified numeric entry price — check the official page.</p>')
+    return (f'<article class="card dcard{" best" if bv else ""}" data-s="{t["s"]}"><div class="th"><span class="logo"><img src="https://www.google.com/s2/favicons?domain={t["dm"]}&amp;sz=64" alt="{e(t["n"])} logo" width="28" height="28" loading="lazy"></span><div><div class="badges">{b}</div><h3><a href="{t["u"]}">{e(t["n"])}</a></h3></div></div>'
+            f'<p class="djob"><span class="small">Main job:</span> {e(jobs[0])}{(" <span class=small>· also " + e(", ".join(jobs[1:])) + "</span>") if len(jobs) > 1 else ""}</p><p>{e(t["d"])}</p>{ent}<p class="price small">{e(t["p"])}</p><p class="small">{e(t["f"])}</p>'
+            f'<p class="small meta">{e(", ".join(c["name"] for c in t["cats"]))} · checked {t["k"]} · <a href="{e(t["pr"])}" rel="noopener" target="_blank">Official pricing</a></p>'
+            f'<div class="dact"><a class="bbtn" href="{t["u"]}">Details</a><button type="button" class="bbtn addbtn" data-add="{t["s"]}" aria-pressed="false">+ Compare</button></div></article>')
+def _d_sortkey(t):
+    en = _d_entry(t)
+    return (0 if t["bestFor"] else 1, (0 if t["fr"] else 1) if en else 2, en[0] if en else 1e9, t["n"].lower())
+_D_SSR = "".join(_d_card(t) for t in sorted(_DLIST, key=_d_sortkey))
+_D_CHIPS = '<button type="button" class="dchip" data-cat="" aria-pressed="true">All <span class="dn2">' + str(len(_DLIST)) + '</span></button>' + "".join(
+    f'<button type="button" class="dchip" data-cat="{c["id"]}" aria-pressed="false">{e(c["name"])} <span class="dn2">{len({slug(t["name"]) for t in c["tools"]})}</span></button>' for c in CATEGORIES)
+_D_QUICK = "".join(f'<button type="button" class="dchip dq" data-q="{k}" aria-pressed="false">{lab}</button>' for k, lab in
+                   [("free", "Free plan"), ("u10", "Under $10/mo"), ("bv", "Best Value picks"), ("monthly", "Pay monthly")])
+_D_JOBOPTS = '<option value="">Any job</option>' + "".join(f'<option value="{k}">{e(CAP_LABEL.get(k, k))} ({n})</option>' for k, n in sorted(_JOBC.items(), key=lambda x: CAP_LABEL.get(x[0], x[0]).lower()))
+DIR_CSS = """<style>
+.dhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}.dhead h1{margin-bottom:4px}
+.dshort{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 var(--s3)}
+.dbar{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);box-shadow:var(--sh);padding:var(--s4);margin:var(--s3) 0 var(--s4)}
+.dsearch{position:relative;display:flex;gap:8px;align-items:center}
+.dsearch input{flex:1;min-width:0;min-height:52px;font:inherit;font-size:1.05rem;border:2px solid var(--bd);border-radius:12px;padding:0 44px 0 14px;background:var(--sf);color:var(--tx)}
+.dsearch input:focus{border-color:var(--ac);outline:none}
+.dx{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;background:none;font-size:1.3rem;color:var(--mu);cursor:pointer;border-radius:10px}
+.dx[hidden]{display:none}.dsearch input::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.drow{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s3);overflow-x:auto;scrollbar-width:thin;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.drow.wrapr{flex-wrap:wrap;overflow:visible}
+.dchip{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-size:.92rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.dchip:hover{border-color:var(--ac)}
+.dchip[aria-pressed=true]{background:var(--ac);border-color:var(--ac);color:#fff}
+.dchip[disabled]{opacity:.45;cursor:default}
+.dn2{font-weight:500;font-size:.8rem;color:var(--mu)}.dchip[aria-pressed=true] .dn2{color:#fff}
+.dq[aria-pressed=true]::before{content:"\\2713"}
+.dlab{font-size:.8rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:var(--s3) 0 0}
+.dsel{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--s3);margin-top:var(--s3)}
+.dsel label{font-weight:600;display:block;font-size:.92rem}
+.dsel select{width:100%;min-height:48px;margin-top:6px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 var(--s3);font:inherit}
+.dmore{margin-top:var(--s3)}.dmore>summary{cursor:pointer;min-height:44px;display:inline-flex;align-items:center;font-weight:600;color:var(--ac)}
+.dres{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin:var(--s4) 0 var(--s2)}
+.dres h2{margin:0;font-size:1.2rem}
+.dtools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dtools select{min-height:44px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 10px;font:inherit}
+.dview{display:inline-flex;border:1px solid var(--bd);border-radius:999px;overflow:hidden}
+.dview button{min-height:44px;padding:0 14px;border:0;background:var(--sf);color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+.dview button[aria-pressed=true]{background:var(--tx);color:var(--sf)}
+.dact2{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 var(--s3)}
+.dact2:empty{display:none}
+.dact2 .dchip{background:var(--acs);border-color:var(--ac);color:var(--tx)}
+.dact2 .dchip::after{content:"\\00d7";font-size:1.15rem;line-height:1;margin-left:2px}
+.dclr{background:none;border:0;color:var(--ac);font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;min-height:44px;padding:0 6px}
+.djob{margin:0;font-weight:600}
+.dent{margin:4px 0 0;font-size:1.05rem}
+.dact{display:flex;gap:8px;margin-top:auto;padding-top:var(--s2)}
+.dact .bbtn{min-height:44px}
+.addbtn[aria-pressed=true]{background:var(--acs);border-color:var(--ac)}
+.dempty{background:var(--sf);border:1px solid var(--bd);border-left:4px solid var(--warn);border-radius:var(--r);padding:var(--s4)}
+.dempty .drow{flex-wrap:wrap;overflow:visible}
+.dtab{overflow-x:auto;border:1px solid var(--bd);border-radius:var(--r);background:var(--sf);box-shadow:var(--sh)}
+.dtab table{border:0;display:table;min-width:720px;width:100%;border-radius:0}
+.dtab th,.dtab td{padding:10px 12px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top;font-size:.92rem}
+.dtab th:first-child,.dtab td:first-child{position:sticky;left:0;background:var(--sf);z-index:1}
+.dtab thead th:first-child{background:var(--sf2)}.dtab tbody th{font-weight:600}
+.dtab td .bbtn{min-height:44px;padding:0 12px;font-size:.88rem;white-space:nowrap}
+.yes{color:var(--ok);font-weight:700}
+.dtray{position:sticky;bottom:10px;z-index:20;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;background:var(--tx);color:#fff;border-radius:var(--r);box-shadow:0 8px 24px rgba(16,24,40,.25);padding:10px 12px 10px 16px;margin:var(--s4) 0}
+.dtray[hidden]{display:none}
+.dtray .tl{flex:1 1 220px;min-width:0;font-size:.92rem}
+.dtray .tl b{display:block}
+.dtray .bbtn{min-height:44px;flex:none}
+.dtray .bbtn.primary{background:#fff;color:var(--tx);border-color:#fff}
+.dtray .bbtn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.dnote{margin-top:var(--s5)}
+@media(max-width:640px){.dtag2,#d-qh,.dlab{display:none}.dhead+.tag{font-size:.98rem}.drow,.drow.wrapr{flex-wrap:nowrap;overflow-x:auto}.dempty .drow{flex-wrap:wrap}.dshort{font-size:.82rem;gap:2px 12px}.dbar{padding:var(--s3)}.dres h2{font-size:1.05rem}.dtray .tl{flex-basis:100%}.dtray .bbtn{flex:1 1 0}}
+</style>"""
+directory_body = DIR_CSS + f"""<div class="dhead"><h1>Browse all AI tools</h1></div>
+<p class="tag" style="margin:0 0 var(--s2)">{total_tools} AI tools in {len(CATEGORIES)} categories. Search by name or job, tap a filter, and compare up to 3.<span class="dtag2"> Every price is copied from the official pricing page, with the date we checked it.</span></p>
+<p class="small dshort v53">Shortcuts: <a href="/ai-team-plans.html">Team plans by team size</a> <a href="/alternatives.html">Same-job alternatives</a> <a href="/ai-student-discounts.html">Student discounts</a> <a href="/free-plan-limits.html">Free plan limits</a></p>
+<form class="dbar" id="dform" role="search" onsubmit="return false"><label for="d-q" class="skip">Search AI tools</label>
+<div class="dsearch"><input id="d-q" name="q" type="search" autocomplete="off" enterkeyhint="search" placeholder="Search: voiceover, slides, meeting notes, Cursor…" aria-describedby="d-qh"><button type="button" class="dx" id="d-qx" aria-label="Clear search" hidden>×</button></div>
+<p class="small" id="d-qh" style="margin:6px 0 0">Matches tool names, what each tool does, and categories.</p>
+<p class="dlab" id="d-catl">Category</p><div class="drow" id="d-cats" role="group" aria-labelledby="d-catl">{_D_CHIPS}</div>
+<p class="dlab" id="d-ql">Quick filters</p><div class="drow wrapr" id="d-quick" role="group" aria-labelledby="d-ql">{_D_QUICK}</div>
+<details class="dmore" id="d-more"><summary>More filters<span class="dtag2">: what it does, price range, billing, seats</span></summary><div class="dsel">
+<div><label for="d-job">What it does</label><select id="d-job" name="job">{_D_JOBOPTS}</select></div>
+<div><label for="d-price">Starting price (verified)</label><select id="d-price" name="price"><option value="any">Any price</option><option value="free">Free to start (real free plan)</option><option value="u10">Under $10/mo</option><option value="10-25">$10–$25/mo</option><option value="over25">Over $25/mo</option><option value="unverified">Price not verified</option></select></div>
 <div><label for="d-free">Free plan</label><select id="d-free" name="free"><option value="any">Any</option><option value="yes">Has a real free plan</option><option value="no">No real free plan</option></select></div>
-<div><label for="d-price">Starting price (verified entry)</label><select id="d-price" name="price"><option value="any">Any price</option><option value="free">Free to start (verified free plan)</option><option value="u10">Under $10/mo</option><option value="10-25">$10–$25/mo</option><option value="over25">Over $25/mo</option><option value="unverified">Price not verified (no numeric entry rate)</option></select></div>
-<div><label for="d-billing">Billing availability (verified)</label><select id="d-billing" name="billing"><option value="any">Any</option><option value="monthly">Has verified monthly rate</option><option value="annual">Has verified annual rate</option><option value="both">Both monthly &amp; annual verified</option></select></div>
-<div><label for="d-seat">Seat pricing</label><select id="d-seat" name="seat"><option value="any">Any</option><option value="perseat">Per-seat entry price only</option><option value="flat">Not stated per-seat for entry price</option></select></div>
-<div><label for="d-sort">Sort by</label><select id="d-sort" name="sort"><option value="value">Best Value</option><option value="price">Lowest verified starting price</option><option value="name">Name A–Z</option></select></div>
-</div><div class="bactions"><button type="button" class="bbtn primary" id="dCopy">Copy share link</button><button type="button" class="bbtn" id="dClear">Clear all filters</button><span class="small bstatus" id="dStatus" role="status"></span></div></form>
-<p class="small" style="margin:12px 0 0">How prices are bucketed: the lowest verified monthly or annual-billing entry rate in ToolPick's price table. Tools with no numeric entry rate there (“check site”, custom or usage-only with no entry rate in our table) only appear under <b>Price not verified</b> — they are never assumed into a price range, and they sort last by price. We don't offer usage-based, team-plan or use-case filters because those fields aren't verified across our tools; category above is the category, nothing more.</p></div>
-<h2>Results</h2><p id="dir-count" role="status" aria-live="polite"></p>
-<div class="tray" id="dir-tray"><span id="tray-count"><b>Compare tray: 0 of 3 selected</b></span><span id="tray-list" class="small">Add up to 3 tools from the cards below.</span><a class="bbtn primary" id="dir-go" href="/compare-builder.html">Compare these tools →</a><button type="button" class="bbtn" id="tray-clear">Clear compare tray</button></div>
-<div id="dir-out"></div>
-<p class="small">Want a ready-made set? <a href="/stacks.html">AI starter stacks by role →</a> <a href="/best-ai-tools-for-students.html">Students</a> · <a href="/best-ai-tools-for-marketers.html">Marketers</a> · <a href="/best-ai-tools-for-developers.html">Developers</a> · <a href="/best-ai-tools-for-content-creators.html">Content creators</a> · <a href="/best-ai-tools-for-small-business.html">Small business</a> · <a href="/best-ai-tools-for-researchers.html">Researchers</a></p><p class="small">Paying for one tool? <a href="/pay-less.html">See if you can pay less for the same job →</a></p><p class="small">Already paying for some of these? <a href="/subscription-audit.html">Run the Subscription Audit →</a> · Found a shortlist? <a href="/help-me-choose.html">Help me choose in 5 steps →</a> · <a href="/cost-calculator.html">What will it really cost? →</a> Prices change — always confirm on the official pricing page linked on every card.</p>
-<script>const DD={DDATA};
-const byS={{}};DD.forEach(t=>byS[t.s]=t);
-const X=v=>String(v==null?'':v).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}}[c]));
-function pv(v){{if(v==null)return null;if(typeof v=='number')return{{amt:v,cur:'$'}};const m=String(v).match(/([€$£])\\s*([\\d.]+)/);if(m)return{{amt:parseFloat(m[2]),cur:m[1]}};const n=String(v).match(/([\\d.]+)/);return n?{{amt:parseFloat(n[1]),cur:'$'}}:null}}
-function entry(t){{const vals=[pv(t.m),pv(t.a)].filter(Boolean);if(!vals.length)return null;vals.sort((a,b)=>a.amt-b.amt);return vals[0]}}
-function money(amt,cur){{const r=Math.round(amt*100)/100;return cur+(Number.isInteger(r)?String(r):r.toFixed(2))}}
-let compareSel=[];
-const ids={{cat:'d-cat',free:'d-free',price:'d-price',billing:'d-billing',seat:'d-seat',sort:'d-sort'}};
-function vals(){{return{{category:document.getElementById(ids.cat).value,free:document.getElementById(ids.free).value,price:document.getElementById(ids.price).value,billing:document.getElementById(ids.billing).value,seat:document.getElementById(ids.seat).value,sort:document.getElementById(ids.sort).value}}}}
-function sharePath(v){{const q=new URLSearchParams();if(v.category)q.set('category',v.category);if(v.free!='any')q.set('free',v.free);if(v.price!='any')q.set('price',v.price);if(v.billing!='any')q.set('billing',v.billing);if(v.seat!='any')q.set('seat',v.seat);if(v.sort!='value')q.set('sort',v.sort);const s=q.toString();return '/tools.html'+(s?('?'+s):'')}}
-function matches(t,v){{const en=entry(t);
-if(v.category&&!t.cats.some(c=>c.id==v.category))return false;
-if(v.free=='yes'&&!t.fr)return false; if(v.free=='no'&&t.fr)return false;
-if(v.price=='free'&&!t.fr)return false;
-if(v.price=='u10'&&!(en&&en.amt<10))return false;
-if(v.price=='10-25'&&!(en&&en.amt>=10&&en.amt<=25))return false;
-if(v.price=='over25'&&!(en&&en.amt>25))return false;
-if(v.price=='unverified'&&en)return false;
-if(v.billing=='monthly'&&t.m==null)return false;
-if(v.billing=='annual'&&t.a==null)return false;
-if(v.billing=='both'&&(t.m==null||t.a==null))return false;
-if(v.seat=='perseat'&&!t.ps)return false;
-if(v.seat=='flat'&&t.ps)return false;
-return true}}
-function isBV(t,v){{return v.category?t.bestFor.includes(v.category):t.bestFor.length>0}}
-function sortList(list,v){{const en=t=>entry(t);
-if(v.sort=='name')return list.sort((a,b)=>a.n.localeCompare(b.n));
-if(v.sort=='price')return list.sort((a,b)=>{{const ea=en(a),eb=en(b);if(ea&&eb&&ea.amt!=eb.amt)return ea.amt-eb.amt;if(ea&&!eb)return -1;if(!ea&&eb)return 1;return a.n.localeCompare(b.n)}});
-return list.sort((a,b)=>{{const ba=isBV(a,v)?0:1,bb=isBV(b,v)?0:1;if(ba!=bb)return ba-bb;const ea=en(a),eb=en(b);const ga=ea?(a.fr?0:1):2,gb=eb?(b.fr?0:1):2;if(ga!=gb)return ga-gb;if(ea&&eb&&ea.amt!=eb.amt)return ea.amt-eb.amt;if(ea&&!eb)return -1;if(!ea&&eb)return 1;return a.n.localeCompare(b.n)}})}}
-function tray(){{const tc=document.getElementById('tray-count'),tl=document.getElementById('tray-list'),go=document.getElementById('dir-go');
-tc.innerHTML='<b>Compare tray: '+compareSel.length+' of 3 selected</b>';
-tl.innerHTML=compareSel.length?compareSel.map(s=>'<span>'+X(byS[s].n)+' <button type="button" class="bbtn" data-rm="'+X(s)+'" aria-label="Remove '+X(byS[s].n)+' from compare">Remove</button></span>').join(' · '):'Add up to 3 tools from the cards below.';
-go.href=compareSel.length>=2?('/compare-builder.html?tools='+compareSel.join(',')):'/compare-builder.html';
-go.textContent=compareSel.length>=2?('Compare '+compareSel.length+' tools →'):'Compare these tools → (pick 2–3)';
-tl.querySelectorAll('[data-rm]').forEach(b=>b.addEventListener('click',()=>{{compareSel=compareSel.filter(x=>x!=b.dataset.rm);tray();render(false);document.getElementById('dStatus').textContent=byS[b.dataset.rm].n+' removed from compare tray.'}}))}}
-function card(t,v){{const en=entry(t);const bv=isBV(t,v);const added=compareSel.includes(t.s);
-return `<article class="card${{bv?' best':''}}"><div class="th"><span class="logo"><img src="https://www.google.com/s2/favicons?domain=${{t.dm}}&amp;sz=64" alt="${{X(t.n)}} logo" width="28" height="28" loading="lazy" onerror="this.replaceWith(document.createTextNode('${{X(t.n[0])}}'))"></span><div><div class="badges">${{bv?'<span class="badge b-best">BEST VALUE</span>':''}}${{t.fr?'<span class="badge b-free">FREE PLAN</span>':''}}${{!en?'<span class="badge b-rank">PRICE NOT VERIFIED</span>':''}}</div><h3><a href="${{t.u}}">${{X(t.n)}}</a></h3></div></div><p>${{X(t.d)}}</p><p class="price">${{X(t.p)}}</p>${{en?`<p class="small">Lowest verified entry: <b>${{money(en.amt,en.cur)}}/mo</b> (monthly or annual billing, from our price table)${{t.ps?' · per-seat entry price as listed':''}}</p>`:`<p class="small check">No verified numeric entry rate in our price table — not placed in a price range.</p>`}}<p class="small">${{X(t.f)}}</p><p class="small meta">${{X(t.cats.map(c=>c.name).join(', '))}} · checked ${{t.k}} · <a href="${{X(t.pr)}}" rel="noopener" target="_blank">Official pricing page</a></p><p class="small"><a href="${{t.u}}">Tool page →</a></p><button type="button" class="bbtn addbtn" data-add="${{t.s}}" ${{added?'disabled':''}}>${{added?'Added to compare ✓':'Add to compare'}}</button></article>`}}
-function render(push=true){{const v=vals();const list=sortList(DD.filter(t=>matches(t,v)),v);const out=document.getElementById('dir-out');
-document.getElementById('dir-count').textContent=list.length+' of '+DD.length+' tools shown';
-out.innerHTML=list.length?('<div class="grid">'+list.map(t=>card(t,v)).join('')+'</div>'):'<div class="pick"><b>No tools match those filters.</b><p class="small" style="margin-bottom:0">Try a wider price range or another category. Tools with no verified numeric entry price only appear under “Price not verified”.</p></div>';
-out.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>{{const s=b.dataset.add;if(compareSel.includes(s))return;if(compareSel.length>=3){{document.getElementById('dStatus').textContent='Compare holds a maximum of 3 tools. Remove one from the tray first.';return}}compareSel.push(s);b.disabled=true;b.textContent='Added to compare ✓';tray();document.getElementById('dStatus').textContent=byS[s].n+' added to compare ('+compareSel.length+' of 3).'}}));
-if(push)history.replaceState(null,'',sharePath(v));}}
-Object.values(ids).forEach(id=>document.getElementById(id).addEventListener('change',()=>render()));
-document.getElementById('dCopy').addEventListener('click',async()=>{{const v=vals();const url=location.origin+sharePath(v);const st=document.getElementById('dStatus');try{{await navigator.clipboard.writeText(url);st.textContent='Share link copied: '+url}}catch(err){{st.textContent='Copy this share link: '+url;window.prompt('Copy this share link',url)}}}});
-document.getElementById('dClear').addEventListener('click',()=>{{document.getElementById(ids.cat).value='';document.getElementById(ids.free).value='any';document.getElementById(ids.price).value='any';document.getElementById(ids.billing).value='any';document.getElementById(ids.seat).value='any';document.getElementById(ids.sort).value='value';render();document.getElementById('dStatus').textContent='All filters cleared.';document.getElementById(ids.cat).focus()}});
-document.getElementById('tray-clear').addEventListener('click',()=>{{compareSel=[];tray();render(false);document.getElementById('dStatus').textContent='Compare tray cleared.'}});
-(function init(){{const q=new URLSearchParams(location.search);const set=(id,val)=>{{if(!val)return;const el=document.getElementById(id);if([...el.options].some(o=>o.value==val))el.value=val}};set(ids.cat,q.get('category'));set(ids.free,q.get('free'));set(ids.price,q.get('price'));set(ids.billing,q.get('billing'));set(ids.seat,q.get('seat'));set(ids.sort,q.get('sort'));tray();render(false);}})();
+<div><label for="d-billing">Billing (verified)</label><select id="d-billing" name="billing"><option value="any">Any</option><option value="monthly">Can pay monthly</option><option value="annual">Has a yearly-billing price</option><option value="both">Both monthly and yearly</option></select></div>
+<div><label for="d-seat">Seat pricing</label><select id="d-seat" name="seat"><option value="any">Any</option><option value="perseat">Entry price is per seat</option><option value="flat">Entry price not per seat</option></select></div>
+</div></details></form>
+<div class="dres"><h2><span id="dir-count" role="status" aria-live="polite">{len(_DLIST)} tools</span></h2><div class="dtools"><label for="d-sort" class="skip">Sort by</label><select id="d-sort" name="sort" aria-label="Sort by"><option value="value">Sort: Best Value first</option><option value="price">Sort: Lowest price</option><option value="name">Sort: Name A–Z</option></select><div class="dview" role="group" aria-label="View"><button type="button" data-v="cards" aria-pressed="true">Cards</button><button type="button" data-v="table" aria-pressed="false">Table</button></div></div></div>
+<div class="dact2" id="d-active" aria-label="Active filters"></div>
+<div id="dir-out"><div class="grid">{_D_SSR}</div></div>
+<div class="dtray" id="dir-tray" hidden><div class="tl" id="tray-list" aria-live="polite"></div><a class="bbtn primary" id="dir-go" href="/compare-builder.html">Compare</a><button type="button" class="bbtn ghost" id="tray-clear">Clear</button></div>
+<details class="bnote dnote"><summary><h2 style="display:inline;margin:0;font-size:1.05rem">How these filters work</h2></summary><p class="small" style="margin:8px 0 0"><b>What it does</b> comes from each tool's own website (checked 2026-10-20); the first job listed is the tool's main job, which is what “same job” means everywhere on ToolPick. <b>Price filters</b> use the lowest verified monthly or yearly-billing entry price in our price table. Tools without a numeric entry price (“check site”, custom or usage-only) only appear under “Price not verified” and sort last by price — we never guess them into a range. <b>Free plan</b> means a real free plan; free trials and one-time credits don't count. <b>Best Value</b> is ToolPick's pick for a category. Search only looks at our saved text, so it can't promise a feature a tool's site doesn't state.</p><p class="small" style="margin:12px 0 0">Want a ranked answer instead? <a href="/">Describe your need in the finder →</a> · <a href="/help-me-choose.html">Help me choose in 5 steps</a> · <a href="/stacks.html">Starter stacks by role</a> · <a href="/pay-less.html">Pay less for a tool you use</a></p></details>
+<script>const DD=__DD__,JOBS=__JOBS__,CATS=__CATS__;</script>""" + r"""<script>
+(function(){
+const byS={};DD.forEach(t=>byS[t.s]=t);const $=id=>document.getElementById(id);
+document.addEventListener('error',ev=>{const i=ev.target;if(i&&i.tagName=='IMG'&&i.closest('.logo')){i.replaceWith(document.createTextNode((i.alt||'?')[0]))}},true);
+const X=v=>String(v==null?'':v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function pv(v){if(v==null)return null;if(typeof v=='number')return{amt:v,cur:'$'};const m=String(v).match(/([€$£])\s*([\d.]+)/);if(m)return{amt:parseFloat(m[2]),cur:m[1]};const n=String(v).match(/([\d.]+)/);return n?{amt:parseFloat(n[1]),cur:'$'}:null}
+function entry(t){const v=[pv(t.m),pv(t.a)].filter(Boolean);if(!v.length)return null;v.sort((a,b)=>a.amt-b.amt);return v[0]}
+function money(a,c){const r=Math.round(a*100)/100;return c+(Number.isInteger(r)?String(r):r.toFixed(2))}
+const catName={};CATS.forEach(c=>catName[c.id]=c.n);
+const SYN={voice:'speech',voiceover:'speech',voiceovers:'speech',tts:'speech',narration:'speech',slides:'presentation',slide:'presentation',deck:'presentation',decks:'presentation',powerpoint:'presentation',ppt:'presentation',pitch:'presentation',notes:'notes',notetaker:'notes',meeting:'meeting',meetings:'meeting',chat:'chat',chatbot:'chat',assistant:'assistant',code:'cod',coding:'cod',programming:'cod',developer:'cod',ide:'cod',logo:'logo',logos:'logo',music:'music',song:'music',songs:'music',transcribe:'transcri',transcript:'transcri',transcription:'transcri',subtitles:'transcri',picture:'image',pictures:'image',photo:'photo',photos:'photo',image:'image',images:'image',art:'image',website:'website',site:'website',app:'app',apps:'app',seo:'seo',social:'social',instagram:'social',tiktok:'social',ads:'ad',ad:'ad',calendar:'calendar',schedule:'schedul',scheduling:'schedul',automate:'automat',automation:'automat',papers:'paper',paper:'paper',academic:'paper',pdf:'doc',pdfs:'doc',documents:'doc',video:'video',videos:'video',clip:'clip',clips:'clip',avatar:'avatar',podcast:'podcast',agent:'agent',agents:'agent',support:'support',email:'mail',emails:'mail',writing:'writ',write:'writ',essay:'writ',grammar:'grammar',research:'research',search:'search',edit:'edit',editing:'edit',editor:'edit',design:'design',upscale:'upscal',music:'music',translate:'translat',dub:'dub',dubbing:'dub',tasks:'task',project:'project'};
+const STOP=new Set(['a','an','the','for','to','and','or','ai','tool','tools','i','need','want','best','with','my','me','of','in','that','can','on','make','making','something','some','good','use','using','help','is','it','do','how','free','cheap']);
+DD.forEach(t=>{t.jl=t.j.map(k=>JOBS[k]||k);t.hay=(t.n+' '+t.d+' '+t.jl.join(' ')+' '+t.j.join(' ')+' '+t.cats.map(c=>c.name).join(' ')).toLowerCase();t.nl=t.n.toLowerCase()});
+function toks(q){return q.toLowerCase().replace(/[^a-z0-9.+#\s-]/g,' ').split(/\s+/).filter(w=>w&&!STOP.has(w))}
+function tokHit(t,w){if(t.hay.includes(w))return true;const s=SYN[w];if(s&&t.hay.includes(s))return true;if(w.length>4&&w.endsWith('s')&&t.hay.includes(w.slice(0,-1)))return true;return false}
+let sel=[];try{sel=JSON.parse(sessionStorage.getItem('tpCmp')||'[]').filter(s=>byS[s]).slice(0,3)}catch(e){}
+const S={q:'',category:'',job:'',free:'any',price:'any',billing:'any',seat:'any',bv:false,sort:'value',view:'cards'};
+function share(){const p=new URLSearchParams();if(S.q.trim())p.set('q',S.q.trim());if(S.category)p.set('category',S.category);if(S.job)p.set('job',S.job);['free','price','billing','seat'].forEach(k=>{if(S[k]!='any')p.set(k,S[k])});if(S.bv)p.set('bv','1');if(S.sort!='value')p.set('sort',S.sort);if(S.view!='cards')p.set('view',S.view);const s=p.toString();return '/tools.html'+(s?'?'+s:'')}
+function match(t,v,skip){skip=skip||'';const en=entry(t);
+if(skip!='category'&&v.category&&!t.cats.some(c=>c.id==v.category))return false;
+if(skip!='job'&&v.job&&!t.j.includes(v.job))return false;
+if(skip!='free'&&(v.free=='yes'&&!t.fr||v.free=='no'&&t.fr))return false;
+if(skip!='price'){if(v.price=='free'&&!t.fr)return false;if(v.price=='u10'&&!(en&&en.amt<10))return false;if(v.price=='10-25'&&!(en&&en.amt>=10&&en.amt<=25))return false;if(v.price=='over25'&&!(en&&en.amt>25))return false;if(v.price=='unverified'&&en)return false}
+if(skip!='billing'&&(v.billing=='monthly'&&t.m==null||v.billing=='annual'&&t.a==null||v.billing=='both'&&(t.m==null||t.a==null)))return false;
+if(skip!='seat'&&(v.seat=='perseat'&&!t.ps||v.seat=='flat'&&t.ps))return false;
+if(skip!='bv'&&v.bv&&!(v.category?t.bestFor.includes(v.category):t.bestFor.length))return false;
+if(skip!='q'&&v.q.trim()){const w=toks(v.q);if(w.length&&!w.every(x=>tokHit(t,x)))return false}
+return true}
+function isBV(t){return S.category?t.bestFor.includes(S.category):t.bestFor.length>0}
+function qscore(t){const w=toks(S.q);if(!w.length)return 0;let s=0;w.forEach(x=>{if(t.nl==x||t.nl.startsWith(x))s+=10;else if(t.nl.includes(x))s+=6;if(t.jl[0]&&(t.jl[0].toLowerCase().includes(x)||(SYN[x]&&t.jl[0].toLowerCase().includes(SYN[x]))))s+=4});return s}
+function sorted(list){const en=entry;
+if(S.sort=='name')return list.sort((a,b)=>a.n.localeCompare(b.n));
+if(S.sort=='price')return list.sort((a,b)=>{const ea=en(a),eb=en(b);if(ea&&eb&&ea.amt!=eb.amt)return ea.amt-eb.amt;if(ea&&!eb)return -1;if(!ea&&eb)return 1;return a.n.localeCompare(b.n)});
+return list.sort((a,b)=>{const qa=qscore(a),qb=qscore(b);if(qa!=qb)return qb-qa;const ba=isBV(a)?0:1,bb=isBV(b)?0:1;if(ba!=bb)return ba-bb;const ea=en(a),eb=en(b);const ga=ea?(a.fr?0:1):2,gb=eb?(b.fr?0:1):2;if(ga!=gb)return ga-gb;if(ea&&eb&&ea.amt!=eb.amt)return ea.amt-eb.amt;if(ea&&!eb)return -1;if(!ea&&eb)return 1;return a.n.localeCompare(b.n)})}
+function cbtn(t,cls){const on=sel.includes(t.s);return `<button type="button" class="bbtn addbtn${cls||''}" data-add="${t.s}" aria-pressed="${on}" aria-label="${on?'Remove '+X(t.n)+' from compare':'Add '+X(t.n)+' to compare'}">${on?'✓ In compare':'+ Compare'}</button>`}
+function card(t){const en=entry(t),bv=isBV(t);
+return `<article class="card dcard${bv?' best':''}" data-s="${t.s}"><div class="th"><span class="logo"><img src="https://www.google.com/s2/favicons?domain=${t.dm}&amp;sz=64" alt="${X(t.n)} logo" width="28" height="28" loading="lazy"></span><div><div class="badges">${bv?'<span class="badge b-best">BEST VALUE</span>':''}${t.fr?'<span class="badge b-free">FREE PLAN</span>':''}${en?'':'<span class="badge b-rank">PRICE NOT VERIFIED</span>'}</div><h3><a href="${t.u}">${X(t.n)}</a></h3></div></div><p class="djob"><span class="small">Main job:</span> ${X(t.jl[0])}${t.jl.length>1?' <span class=small>· also '+X(t.jl.slice(1).join(', '))+'</span>':''}</p><p>${X(t.d)}</p>${en?`<p class="dent"><b>From ${money(en.amt,en.cur)}/mo</b> <span class="small">lowest verified entry${t.ps?' · per seat':''}</span></p>`:'<p class="small check">No verified numeric entry price — check the official page.</p>'}<p class="price small">${X(t.p)}</p><p class="small">${X(t.f)}</p><p class="small meta">${X(t.cats.map(c=>c.name).join(', '))} · checked ${t.k} · <a href="${X(t.pr)}" rel="noopener" target="_blank">Official pricing</a></p><div class="dact"><a class="bbtn" href="${t.u}">Details</a>${cbtn(t)}</div></article>`}
+function table(list){return '<div class="dtab" tabindex="0" role="region" aria-label="Tools table, scroll sideways for more"><table><caption class="skip">AI tools matching your filters</caption><thead><tr><th scope="col">Tool</th><th scope="col">Main job</th><th scope="col">From (verified)</th><th scope="col">Free plan</th><th scope="col">Billing verified</th><th scope="col">Checked</th><th scope="col">Compare</th></tr></thead><tbody>'+list.map(t=>{const en=entry(t);const bill=[t.m!=null?'monthly':'',t.a!=null?'yearly':''].filter(Boolean).join(' + ')||'—';return `<tr><th scope="row"><a href="${t.u}">${X(t.n)}</a>${isBV(t)?' <span class="badge b-best">BEST VALUE</span>':''}</th><td>${X(t.jl[0])}</td><td>${en?'<b>'+money(en.amt,en.cur)+'/mo</b>'+(t.ps?' per seat':''):'<span class="small">not verified</span>'}</td><td>${t.fr?'<span class="yes">Yes</span>':'No'}</td><td>${bill}</td><td>${t.k}</td><td>${cbtn(t)}</td></tr>`}).join('')+'</tbody></table></div>'}
+const LAB={free:{yes:'Free plan',no:'No free plan'},price:{free:'Free to start',u10:'Under $10/mo','10-25':'$10–$25/mo',over25:'Over $25/mo',unverified:'Price not verified'},billing:{monthly:'Pay monthly',annual:'Yearly price',both:'Monthly + yearly'},seat:{perseat:'Per-seat price',flat:'Not per seat'}};
+function actives(){const a=[];if(S.q.trim())a.push(['q','“'+S.q.trim()+'”']);if(S.category)a.push(['category',catName[S.category]]);if(S.job)a.push(['job',JOBS[S.job]]);['free','price','billing','seat'].forEach(k=>{if(S[k]!='any')a.push([k,LAB[k][S[k]]])});if(S.bv)a.push(['bv','Best Value picks']);return a}
+function reset(k){if(k=='q')S.q='';else if(k=='category'||k=='job')S[k]='';else if(k=='bv')S.bv=false;else S[k]='any'}
+function syncUI(){$('d-q').value!==S.q&&($('d-q').value=S.q);$('d-qx').hidden=!S.q;$('d-job').value=S.job;['free','price','billing','seat'].forEach(k=>$('d-'+k).value=S[k]);$('d-sort').value=S.sort;
+document.querySelectorAll('#d-cats .dchip').forEach(b=>{const on=b.dataset.cat==S.category;b.setAttribute('aria-pressed',on);const n=DD.filter(t=>(!b.dataset.cat||t.cats.some(c=>c.id==b.dataset.cat))&&match(t,S,'category')).length;b.querySelector('.dn2').textContent=n;b.disabled=!n&&!on});
+const Q={free:S.free=='yes'||S.price=='free',u10:S.price=='u10',bv:S.bv,monthly:S.billing=='monthly'};document.querySelectorAll('#d-quick .dq').forEach(b=>b.setAttribute('aria-pressed',!!Q[b.dataset.q]));
+document.querySelectorAll('.dview button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==S.view));
+const jc={};DD.filter(t=>match(t,S,'job')).forEach(t=>t.j.forEach(k=>jc[k]=(jc[k]||0)+1));[...$('d-job').options].forEach(o=>{if(!o.value)return;const n=jc[o.value]||0;o.textContent=JOBS[o.value]+' ('+n+')';o.disabled=!n&&o.value!=S.job});
+if(S.job||S.price!='any'&&S.price!='u10'&&S.price!='free'||S.billing!='any'&&S.billing!='monthly'||S.seat!='any'||S.free=='no')$('d-more').open=true}
+function render(push){const list=sorted(DD.filter(t=>match(t,S)));const out=$('dir-out');
+$('dir-count').textContent=list.length==DD.length?DD.length+' tools':list.length+' of '+DD.length+' tools';
+const a=actives();$('d-active').innerHTML=a.length?a.map(([k,l])=>`<button type="button" class="dchip" data-rm="${k}" aria-label="Remove filter: ${X(l)}">${X(l)}</button>`).join('')+'<button type="button" class="dclr" id="d-clear">Clear all</button>':'';
+if(!list.length){const tips=a.map(([k,l])=>{const n=DD.filter(t=>match(t,S,k)).length;return n?`<button type="button" class="dchip" data-rm="${k}">Remove ${k=='q'?X(l):'“'+X(l)+'”'} → ${n} tool${n>1?'s':''}</button>`:''}).filter(Boolean).join('');
+const fq=S.q.trim()?`<p class="small" style="margin:12px 0 0">Or ask the finder, which reads whole sentences: <a href="/?q=${encodeURIComponent(S.q.trim())}">“${X(S.q.trim())}” in the finder →</a></p>`:'';
+out.innerHTML=`<div class="dempty"><b>No tools match all of these.</b>${tips?'<p class="small" style="margin:8px 0 0">Try one change:</p><div class="drow">'+tips+'</div>':''}${fq}</div>`}
+else out.innerHTML=S.view=='table'?table(list):'<div class="grid">'+list.map(card).join('')+'</div>';
+syncUI();tray();if(push!==false)history.replaceState(null,'',share())}
+function tray(){const tr=$('dir-tray');tr.hidden=!sel.length;try{sessionStorage.setItem('tpCmp',JSON.stringify(sel))}catch(e){}if(!sel.length)return;
+$('tray-list').innerHTML='<b>Compare '+sel.length+' of 3</b>'+X(sel.map(s=>byS[s].n).join(' · '))+(sel.length<2?' — add one more':'');
+const go=$('dir-go');go.href=sel.length>=2?'/compare-builder.html?tools='+sel.join(','):'#';go.setAttribute('aria-disabled',sel.length<2);go.textContent=sel.length>=2?'Compare '+sel.length+' →':'Pick 2+';}
+function toggle(s,btn){const i=sel.indexOf(s);if(i>=0)sel.splice(i,1);else{if(sel.length>=3){$('tray-list').innerHTML='<b>Compare holds 3 tools.</b>Remove one first: '+X(sel.map(x=>byS[x].n).join(' · '));clearTimeout(window._tpT);window._tpT=setTimeout(tray,3500);return}sel.push(s)}
+document.querySelectorAll('[data-add="'+s+'"]').forEach(b=>{const on=sel.includes(s);b.setAttribute('aria-pressed',on);b.textContent=on?'✓ In compare':'+ Compare';b.setAttribute('aria-label',(on?'Remove ':'Add ')+byS[s].n+(on?' from compare':' to compare'))});tray()}
+document.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
+if(b.dataset.add){toggle(b.dataset.add,b);return}
+if(b.dataset.rm){reset(b.dataset.rm);render();return}
+if(b.id=='d-clear'){Object.assign(S,{q:'',category:'',job:'',free:'any',price:'any',billing:'any',seat:'any',bv:false});render();$('d-q').focus();return}
+if(b.dataset.cat!=null&&b.closest('#d-cats')){S.category=b.dataset.cat;render();return}
+if(b.dataset.q){const k=b.dataset.q,on=b.getAttribute('aria-pressed')=='true';if(k=='free'){S.free=on?'any':'yes';if(on&&S.price=='free')S.price='any'}else if(k=='u10')S.price=on?'any':'u10';else if(k=='bv')S.bv=!on;else if(k=='monthly')S.billing=on?'any':'monthly';render();return}
+if(b.dataset.v){S.view=b.dataset.v;render();return}
+if(b.id=='d-qx'){S.q='';render();$('d-q').focus();return}
+if(b.id=='tray-clear'){sel=[];document.querySelectorAll('[data-add]').forEach(x=>{x.setAttribute('aria-pressed',false);x.textContent='+ Compare'});tray();return}});
+$('dir-go').addEventListener('click',ev=>{if(sel.length<2)ev.preventDefault()});
+let tm;$('d-q').addEventListener('input',ev=>{S.q=ev.target.value;$('d-qx').hidden=!S.q;clearTimeout(tm);tm=setTimeout(()=>render(),120)});
+$('d-q').addEventListener('keydown',ev=>{if(ev.key=='Escape'&&S.q){S.q='';render()}});
+['job','free','price','billing','seat','sort'].forEach(k=>$('d-'+k).addEventListener('change',ev=>{S[k]=ev.target.value;render()}));
+const p=new URLSearchParams(location.search);const ok=(id,v)=>v&&[...$(id).options].some(o=>o.value==v);
+S.q=(p.get('q')||'').slice(0,80);if(p.get('category')&&catName[p.get('category')])S.category=p.get('category');if(p.get('job')&&JOBS[p.get('job')])S.job=p.get('job');
+['free','price','billing','seat','sort'].forEach(k=>{if(ok('d-'+k,p.get(k)))S[k]=p.get(k)});S.bv=p.get('bv')=='1';if(p.get('view')=='table')S.view='table';
+const any=[...p.keys()].length>0;if(any)render(false);else{syncUI();tray();document.querySelectorAll('#dir-out [data-add]').forEach(b=>{if(sel.includes(b.dataset.add)){b.setAttribute('aria-pressed',true);b.textContent='✓ In compare'}})}
+})();
 </script>"""
-page("/tools.html", "Browse All AI Tools — Filter by Category, Free Plan & Verified Price | ToolPick", f"Browse all {total_tools} AI tools with filters for category, real free plans, verified starting price, monthly/annual billing availability and per-seat pricing. Add up to 3 tools to compare, with checked dates and official pricing links.", directory_body,
-     [{"@context":"https://schema.org","@type":"ItemList","name":"All AI tools on ToolPick","itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+v["u"],"name":v["n"]} for i,v in enumerate(sorted(_dmap.values(), key=lambda x: x["n"].lower()))]}, crumbs([("ToolPick","/"),("Browse all tools","/tools.html")])])
+directory_body = directory_body.replace("__DD__", DDATA).replace("__JOBS__", JOBDATA).replace("__CATS__", CATDATA)
+page("/tools.html", "Browse All AI Tools — Search & Filter by Job, Free Plan, Price | ToolPick", f"Search and filter all {total_tools} AI tools by what they do, category, real free plan, verified starting price and billing. Compare up to 3 side by side, with checked dates and official pricing links.", directory_body,
+     [{"@context":"https://schema.org","@type":"ItemList","name":"All AI tools on ToolPick","itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+v["u"],"name":v["n"]} for i,v in enumerate(_DLIST)]}, crumbs([("ToolPick","/"),("Browse all tools","/tools.html")])])
 
 
 # best AI tool for [job] pages
@@ -2992,7 +3125,7 @@ for _sp in SEO_URLS:
         if _tn:
             _cs = tool_pages[_tn]; _as = list(dict.fromkeys(x["name"] for cc in _cs for x in cc["tools"] if x["name"] != _tn and hasfree(x, cc)))
             _lm[_sp] = max(find(_a).get("checked", CHECKED) for _a in [_tn] + _as)
-_lm["/tools.html"] = "2026-10-19"
+_lm["/tools.html"] = DIR_DATE
 _lm["/stacks.html"] = STACK_BUILD_DATE
 _lm[PAYLESS_PATH] = PAYLESS_DATE
 _lm[MY_PATH] = MY_DATE
@@ -3102,6 +3235,12 @@ for t, p, n in MERGED: _ll = _ll.replace(BASE + p, f"{BASE}/my-ai-costs.html#{t}
 open("public/llms.txt", "w").write(_ll + f"\n\n## My AI costs\n- [My AI costs]({BASE}/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.\n")
 
 open("public/llms.txt", "a").write(f"\n## Smart search (v45)\n- [Finder]({BASE}/?q=voiceover%20under%20%2410): type a whole sentence. It reads the job, a budget (\"under $10\", \"$120/year\"), team size (\"team of 5\": per-seat totals only where the verified entry price is per seat), billing (\"no annual plan\"), \"free\", \"cheap\", and tool names: \"cheaper than ChatGPT\" (same main job, same billing, like-for-like tiers), \"like ElevenLabs but free\", \"ChatGPT vs Claude\" (links the full comparison). Shareable: {BASE}/?q=cheaper%20than%20ChatGPT\n")
+# --- v53: directory page clean-up + llms.txt ---
+_lm["/tools.html"] = DIR_DATE
+_fpd = "public/tools.html"; _hd = open(_fpd).read()
+_hd = _re.sub(r'<p class="small v(48|49|50)">.*?</p>', '', _hd)
+open(_fpd, "w").write(_hd)
+open("public/llms.txt", "a").write(f"\n## Tools directory (v53)\n- [Browse all AI tools]({BASE}/tools.html): search all {total_tools} tools by name or job (e.g. /tools.html?q=voiceover), filter by what each tool does (?job=text-to-speech, from each tool's own site), category (?category=video), real free plan (?free=yes), verified starting price (?price=u10), billing (?billing=monthly), Best Value picks (?bv=1); card or table view (?view=table); compare up to 3. Prices from official pricing pages with checked dates.\n")
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))
 print("pages:", len(URLS), "unique tools:", total_tools, {c["id"]:len(c["tools"]) for c in CATEGORIES})

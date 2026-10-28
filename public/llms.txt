@@ -317,3 +317,6 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## Smart search (v45)
 - [Finder](https://toolpick-ai.vercel.app/?q=voiceover%20under%20%2410): type a whole sentence. It reads the job, a budget ("under $10", "$120/year"), team size ("team of 5": per-seat totals only where the verified entry price is per seat), billing ("no annual plan"), "free", "cheap", and tool names: "cheaper than ChatGPT" (same main job, same billing, like-for-like tiers), "like ElevenLabs but free", "ChatGPT vs Claude" (links the full comparison). Shareable: https://toolpick-ai.vercel.app/?q=cheaper%20than%20ChatGPT
+
+## Tools directory (v53)
+- [Browse all AI tools](https://toolpick-ai.vercel.app/tools.html): search all 82 tools by name or job (e.g. /tools.html?q=voiceover), filter by what each tool does (?job=text-to-speech, from each tool's own site), category (?category=video), real free plan (?free=yes), verified starting price (?price=u10), billing (?billing=monthly), Best Value picks (?bv=1); card or table view (?view=table); compare up to 3. Prices from official pricing pages with checked dates.
