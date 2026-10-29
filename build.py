@@ -3105,6 +3105,130 @@ _RSL = json.dumps({r["t"].lower(): [slug(r["t"]), r["t"]] for r in REFUNDS})
 open("public/index.html", "w").write(_h.replace('<div id="out" aria-live="polite">', _RH + '<style>.rfhint[hidden]{display:none!important}.rfhint{margin:var(--s3) auto;max-width:720px;text-align:left}</style><div id="out" aria-live="polite">' + '<script>(function(){const q=document.getElementById("q"),H=document.querySelector(".rfhint"),A=document.getElementById("rflink"),T=' + _RSL + ';if(!q||!H)return;const f=()=>{const v=q.value.toLowerCase(),m=/\\b(refunds?|refundable|money back|cancel(l?ing|l?ed|lation)?|unsubscribe)\\b/.test(v);H.hidden=!m;if(m){const k=Object.keys(T).find(n=>v.includes(n));A.href="' + R_PATH + '"+(k?"?tool="+T[k][0]+"#check":"");A.textContent=k?"Refund and cancel rules for "+T[k][1]+" →":"Refund and cancel rules for ' + str(_rn) + ' AI tools →"}};q.addEventListener("input",f);addEventListener("load",f);f()})()</script>', 1)); V52_CHANGED.append("/")
 open("public/llms.txt", "a").write(f"\n## Refunds and cancelling (v52)\n- [Can I get a refund? AI subscription refund and cancel rules]({BASE}{R_PATH}): {_rn} AI tools ({', '.join(r['t'] for r in REFUNDS)}): refund window and conditions (monthly/yearly), how to ask, exact cancel steps, cancel-notice deadlines, what you lose after cancelling, app-store note, official refund and cancel page links, read {REFUND_CHECKED}. Checker params: ?tool=chatgpt&when=d7&bill=y (when = pre, h24, d2, d3, d7, d14, d30, old)\n" + "".join(f"  - {r['t']}: {_RK[r['k']]}. {_rshort(r)}\n" for r in REFUNDS))
 
+# --- v54: Does this AI train on my data? Privacy checker (/ai-data-privacy.html) ---
+# Facts read on each tool's official privacy / help / trust page on PRIVACY_CHECKED (tools.py PRIVACY, exact words in q).
+PRIVACY_CHECKED = _tm0.PRIVACY_CHECKED; PRIVACY = sorted(_tm0.PRIVACY, key=lambda r: r["t"].lower()); PRIVACY_LEFT_OUT = _tm0.PRIVACY_LEFT_OUT
+P_PATH = "/ai-data-privacy.html"
+for _p in PRIVACY:
+    assert _p["t"] in TOOL and _p["k"] in "yxcnu" and _p["bk"] in "nau" and _p["q"] and _p["src"].startswith("https://") and _p["ind"] and _p["biz"], _p["t"]
+    if _p["k"] in "yc": assert _p["steps"], _p["t"]
+_PK = {"y": "Trains by default", "x": "Trains, no opt-out found", "c": "Only if you allow it", "n": "Doesn't train by default", "u": "Unclear — see policy"}
+_PB = {"n": "Protected by default", "a": "Admin decides", "u": "Unclear — see policy"}
+_PORD = {"x": 0, "y": 1, "u": 2, "c": 3, "n": 4}; _BORD = {"u": 0, "a": 1, "n": 2}
+def _pans(p):
+    t = p["t"]
+    return {"y": f"Yes, by default. {t} can train on your content, but you can turn it off.",
+            "x": f"Yes. {t} may train on your content, and we found no way to opt out.",
+            "c": f"Only if you allow it. {t} asks for your permission.",
+            "n": f"No. {t} doesn't train on your content by default.",
+            "u": f"Unclear — see policy. {t}'s official pages don't say what the default is."}[p["k"]]
+def _pbans(p):
+    t = p["t"]
+    return {"n": f"No. {t}'s team and business plans are protected by default.",
+            "a": f"It depends on your admin. {t} lets a team admin control it.",
+            "u": f"Unclear — see policy. {t} doesn't state the business-plan default on the pages we read."}[p["bk"]]
+def _psrc(p):
+    a = [f'<a href="{e(p["src"])}" rel="noopener" target="_blank">official page<span class="skip"> for {e(p["t"])} (opens in a new tab)</span></a>']
+    if p["sb"] and p["sb"] != p["src"]: a.append(f'<a href="{e(p["sb"])}" rel="noopener" target="_blank">business page<span class="skip"> for {e(p["t"])} (opens in a new tab)</span></a>')
+    a += [f'<a href="{e(u)}" rel="noopener" target="_blank">{e(l)}<span class="skip"> for {e(p["t"])} (opens in a new tab)</span></a>' for l, u in p["more"]]
+    return f'Checked {PRIVACY_CHECKED}: ' + " · ".join(a)
+def _pdet(p, plan):
+    a = [f'<li><b>{"Free and personal paid plans" if plan == "i" else "Team and business plans"}:</b> {e(p["ind"] if plan == "i" else p["biz"])}</li>']
+    if plan == "i":
+        a.append(f'<li><b>How to opt out:</b> {e(p["steps"]) if p["steps"] else ("Nothing to switch off." if p["k"] == "n" else "No opt-out setting found on the official pages we read.")}</li>')
+    else:
+        a.append(f'<li><b>On a personal plan instead:</b> {e(_PK[p["k"]])}.</li>')
+    if p["keep"]: a.append(f'<li><b>How long it&#39;s kept:</b> {e(p["keep"])}</li>')
+    if p["note"]: a.append(f'<li><b>Watch out:</b> {e(p["note"])}</li>')
+    return '<ul class="p54l">' + "".join(a) + f'</ul><p class="small p54q">In their words: “{e(p["q"])}”</p><p class="small">{_psrc(p)}</p>'
+_pn = len(PRIVACY); _pc = {k: sum(1 for p in PRIVACY if p["k"] == k) for k in "yxcnu"}
+_pf = {"n": sum(1 for p in PRIVACY if p["k"] == "n"), "o": sum(1 for p in PRIVACY if p["steps"]), "b": sum(1 for p in PRIVACY if p["bk"] == "n")}
+_PF = [("n", "Doesn't train by default"), ("o", "Opt-out available"), ("b", "Business plans protected")]
+def _prow(p):
+    s = slug(p["t"])
+    return (f'<tr id="p-{s}" data-t="{e(p["t"].lower())}" data-k="{_PORD[p["k"]]}" data-b="{_BORD[p["bk"]]}" data-fn="{int(p["k"] == "n")}" data-fo="{int(bool(p["steps"]))}" data-fb="{int(p["bk"] == "n")}">'
+            f'<th scope="row" data-l="Tool"><a href="{turl(p["t"])}">{e(p["t"])}</a></th>'
+            f'<td data-l="Free & personal plans"><span class="p54b p54k{p["k"]}">{_PK[p["k"]]}</span><br>{e(p["ind"])}</td>'
+            f'<td data-l="How to opt out">{e(p["steps"]) if p["steps"] else ("Nothing to switch off." if p["k"] == "n" else "No opt-out found.")}</td>'
+            f'<td data-l="Team & business plans"><span class="p54b p54b{p["bk"]}">{_PB[p["bk"]]}</span><br>{e(p["biz"])}</td>'
+            f'<td data-l="Source" class="small">{_psrc(p)} · <a href="{P_PATH}?tool={s}#check">Check {e(p["t"])}</a></td></tr>')
+_p_opts = '<option value="">Choose a tool…</option>' + "".join(f'<option value="{slug(p["t"])}">{e(p["t"])}</option>' for p in PRIVACY)
+_p_chips = (f'<button type="button" class="on" aria-pressed="true" data-f="">All {_pn}</button>' + "".join(f'<button type="button" aria-pressed="false" data-f="{k}">{l} ({_pf[k]})</button>' for k, l in _PF))
+def _pjs(p): return {"s": slug(p["t"]), "t": p["t"], "k": p["k"], "bk": p["bk"], "a": _pans(p), "ab": _pbans(p), "di": _pdet(p, "i"), "db": _pdet(p, "b"), "u": turl(p["t"])}
+_p_left = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: {e(w)}.</li>' if n in TOOL else f'<li>{e(n)}: {e(w)}.</li>' for n, w in PRIVACY_LEFT_OUT)
+_p_no = [p["t"] for p in PRIVACY if p["k"] == "n"]; _p_yes = [p["t"] for p in PRIVACY if p["k"] in "yx"]
+_qa_p = [("Does ChatGPT train on my data?", f"On Free, Plus and Pro, OpenAI may use your chats to train its models unless you turn off “Improve the model for everyone” in Settings → Data controls. Temporary chats aren't used for training. ChatGPT Business, Enterprise and Edu aren't used for training by default. Checked {PRIVACY_CHECKED} on OpenAI's help center."),
+         ("Does Claude train on my chats?", f"On Free, Pro and Max, Anthropic uses your chats for training only if you allow it in Settings → Privacy (or if you send feedback, or a chat is flagged for safety review). Claude Team, Enterprise and the API aren't used for training by default. Checked {PRIVACY_CHECKED} on Anthropic's privacy center."),
+         ("Which AI tools don't train on my data by default?", f"Of the {_pn} tools we checked on {PRIVACY_CHECKED}: " + ", ".join(_p_no) + ". Claude and Descript only train if you allow it."),
+         ("Which AI tools train on my data unless I opt out?", ", ".join(_p_yes) + f" (on free and personal paid plans). All except Runway show a setting to switch it off. Checked {PRIVACY_CHECKED}."),
+         ("Are team and business plans safer?", "Usually. On most tools here, team, business and enterprise plans aren't used for training by default. A few leave it to your admin (Grammarly team accounts bought on the website start with training on), and a few don't say."),
+         ("Does opting out delete what they already used?", "Not necessarily. Opting out stops future use. Perplexity says data collected before you switch it off can't be removed, and OpenAI says turning off training doesn't delete your saved chats. Delete chats separately if you want them gone.")]
+_P_CSS = ("<style>.p54f{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);align-items:flex-end}.p54f label{display:block;font-weight:600;margin-bottom:6px}.p54f select{font-size:1rem;min-height:48px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 10px;min-width:min(100%,240px)}.p54f>div{max-width:100%}"
+          "#p54out{margin:var(--s4) 0;border-left:4px solid var(--mu)}#p54out h2{margin:0 0 6px;font-size:1.25rem}#p54out.p54ok{border-left-color:var(--ok)}#p54out.p54warn{border-left-color:var(--warn)}#p54msg:empty{display:none}"
+          ".p54l{padding-left:18px;margin:6px 0}.p54l li{margin:4px 0}.p54q{font-style:italic}"
+          ".p54b{display:inline-block;font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--sf2);color:var(--tx);margin-bottom:4px;border-left:4px solid var(--mu)}.p54kn,.p54bn{border-left-color:var(--ok)}.p54ky,.p54kx,.p54ku,.p54bu,.p54ba,.p54kc{border-left-color:var(--warn)}"
+          ".p54tw table{min-width:900px}.p54tw th button{font:inherit;font-weight:600;background:none;border:0;color:var(--ac);cursor:pointer;min-height:44px;padding:0;text-align:left}.p54tw tr[hidden]{display:none}.p54tw td,.p54tw th{font-size:.9rem}"
+          ".p54s{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;margin:var(--s3) 0}.p54s input{min-height:48px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 12px;font-size:1rem;width:min(100%,320px)}"
+          "@media(max-width:760px){.p54tw{overflow:visible;border:0;box-shadow:none;background:none}.p54tw table{min-width:0;display:block}.p54tw thead{display:none}.p54tw tbody,.p54tw tr{display:block}.p54tw tr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin:0 0 var(--s3);padding:var(--s3)}.p54tw td,.p54tw th{display:block;border:0;padding:6px 4px}.p54tw td::before{content:attr(data-l);display:block;font-weight:700;font-size:.78rem;color:var(--mu);text-transform:uppercase;letter-spacing:.02em}.p54tw th[scope=row]{font-size:1.05rem}.p54tw th[scope=row] a{display:inline-flex;align-items:center;min-height:44px}}"
+          ".p54tw td a{display:inline-block;min-height:24px;padding:10px 0}</style>")
+_p_body = f"""{_P_CSS}<p class="small"><a href="/guides.html">Guides</a> › AI data privacy</p><h1>Does this AI train on my data?</h1>
+<p class="tag">Pick a tool and your plan. We tell you in plain words whether it uses your chats, files or recordings to train its AI, and exactly how to switch it off. {_pn} AI tools, read on each official privacy or help page on {PRIVACY_CHECKED}.</p>
+<div class="builder" id="check"><div class="p54f"><div><label for="p54t">Tool</label><select id="p54t">{_p_opts}</select></div>
+<fieldset class="seg"><legend>Your plan</legend><input type="radio" name="p54p" id="p54pi" value="i" checked><label for="p54pi">Free or personal</label><input type="radio" name="p54p" id="p54pb" value="b"><label for="p54pb">Team or business</label></fieldset></div>
+<div class="pick" id="p54out" aria-live="polite"><h2 id="p54h">Choose a tool to see if it trains on your data</h2><div id="p54d"><p class="small">Or scroll down: every tool is in the table below.</p></div><p class="small" style="margin:6px 0 0"><button type="button" class="bbtn" id="p54share">Copy link to this answer</button> <span id="p54msg" role="status"></span></p></div></div>
+<p class="small">Policies change. We show what the official page said on {PRIVACY_CHECKED} and link to it. Not legal advice.</p>
+<h2>What “training on your data” means</h2><ul>
+<li><b>Training</b> means the company uses what you type, upload or record to improve its next AI models. Some also let staff read samples.</li>
+<li><b>Opting out</b> usually only stops future use. It often doesn't delete what was already collected, and it doesn't delete your chat history.</li>
+<li><b>Feedback buttons count.</b> On ChatGPT, Claude and Le Chat, a thumbs up or down can let them use that conversation even after you opt out.</li>
+<li><b>Business plans</b> are usually protected by contract, but check: on some tools your admin decides.</li></ul>
+<h2>All {_pn} tools at a glance</h2><div class="needs" role="group" aria-label="Show tools that" id="p54k">{_p_chips}</div>
+<div class="p54s"><label for="p54q" class="skip">Search tools</label><input type="search" id="p54q" placeholder="Search a tool, e.g. Gemini" autocomplete="off"><span class="small" id="p54c" role="status">{_pn} tools</span></div>
+<div class="tw p54tw" role="region" aria-label="AI data training table" tabindex="0"><table><caption class="skip">Does each AI tool train on your data, by plan. Checked {PRIVACY_CHECKED}.</caption><thead><tr><th scope="col" aria-sort="ascending"><button type="button" data-s="t">Tool</button></th><th scope="col"><button type="button" data-s="k">Free &amp; personal plans</button></th><th scope="col">How to opt out</th><th scope="col"><button type="button" data-s="b">Team &amp; business plans</button></th><th scope="col">Source</th></tr></thead>
+<tbody id="p54rows">{"".join(_prow(p) for p in PRIVACY)}</tbody></table></div>
+<h2>Not included yet</h2><p class="small">We leave a tool out when its official pages don't say it clearly (read {PRIVACY_CHECKED}):</p><ul class="small">{_p_left}</ul>
+<p class="small">Related: <a href="/ai-refund-policies.html">Refund and cancel rules</a> · <a href="/ai-team-plans.html">Team plans by team size</a> · <a href="/alternatives.html">Alternatives to popular AI tools</a> · <a href="/tools.html">Browse all tools</a></p>
+{_faq(_qa_p)}
+<script>__P54JS__</script>"""
+_P_JS = r"""(function(){const R=__DATA__,S=document.getElementById('p54t'),H=document.getElementById('p54h'),D=document.getElementById('p54d'),O=document.getElementById('p54out'),M=document.getElementById('p54msg'),Q=document.getElementById('p54q'),C=document.getElementById('p54c'),TB=document.getElementById('p54rows'),CH=[...document.querySelectorAll('#p54k button')],SB=[...document.querySelectorAll('.p54tw th button')];
+const by={};R.forEach(r=>by[r.s]=r);let plan='i',f='',sk='t',dir=1;
+function rows(){const q=(Q.value||'').trim().toLowerCase();const tr=[...TB.rows];let n=0;
+tr.sort((a,b)=>{const x=sk=='t'?a.dataset.t.localeCompare(b.dataset.t):(+a.dataset[sk]-+b.dataset[sk])||a.dataset.t.localeCompare(b.dataset.t);return x*dir}).forEach(r=>TB.appendChild(r));
+tr.forEach(r=>{const h=(f&&r.dataset['f'+f]!='1')||(q&&!r.dataset.t.includes(q));r.hidden=h;if(!h)n++});C.textContent=n+(n==1?' tool':' tools');
+SB.forEach(b=>b.parentNode.setAttribute('aria-sort',b.dataset.s==sk?(dir>0?'ascending':'descending'):'none'));CH.forEach(b=>{const on=b.dataset.f==f;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})}
+function render(){const r=by[S.value];O.className='pick';M.textContent='';
+if(!r){H.textContent='Choose a tool to see if it trains on your data';D.innerHTML='<p class="small">Or scroll down: every tool is in the table below.</p>'}
+else{const k=plan=='b'?r.bk:r.k;O.classList.add(k=='n'?'p54ok':'p54warn');H.textContent=plan=='b'?r.ab:r.a;D.innerHTML=(plan=='b'?r.db:r.di)+'<p class="small"><a href="'+r.u+'">'+r.t+' tool page</a> · <a href="#p-'+r.s+'">See it in the table</a></p>'}
+const u=new URLSearchParams();if(S.value)u.set('tool',S.value);if(plan=='b')u.set('plan','business');if(f)u.set('f',f);const s=u.toString();history.replaceState(null,'',location.pathname+(s?'?'+s:'')+location.hash);rows()}
+const p=new URLSearchParams(location.search);if(by[p.get('tool')])S.value=p.get('tool');if(p.get('plan')=='business'){plan='b';document.getElementById('p54pb').checked=true}if('nob'.includes(p.get('f')||'x'))f=p.get('f');
+S.addEventListener('change',render);document.querySelectorAll('input[name=p54p]').forEach(x=>x.addEventListener('change',()=>{plan=x.value;render()}));CH.forEach(b=>b.addEventListener('click',()=>{f=b.dataset.f;render()}));Q.addEventListener('input',rows);
+SB.forEach(b=>b.addEventListener('click',()=>{if(sk==b.dataset.s)dir=-dir;else{sk=b.dataset.s;dir=1}rows()}));
+document.querySelectorAll('#p54rows a[href*="?tool="]').forEach(a=>a.addEventListener('click',ev=>{ev.preventDefault();S.value=new URL(a.href).searchParams.get('tool');render();document.getElementById('check').scrollIntoView({block:'start'});S.focus()}));
+document.getElementById('p54share').addEventListener('click',()=>{const t=location.href,ok=()=>{M.textContent='Link copied.'};if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>prompt('Copy this link:',t));else prompt('Copy this link:',t)});
+render()})();"""
+_P_JS = _P_JS.replace("__DATA__", json.dumps([_pjs(p) for p in PRIVACY], separators=(",", ":")).replace("</", "<\\/"))
+page(P_PATH, f"Does This AI Train on My Data? Opt-Out Checker for {_pn} AI Tools ({PRIVACY_CHECKED[:4]}) | ToolPick",
+     f"Does ChatGPT, Claude, Gemini, Copilot, Perplexity, Grammarly or Canva train on your chats and files? Plain answers by plan, exact opt-out steps and official sources for {_pn} AI tools, checked {PRIVACY_CHECKED}.",
+     _p_body.replace("__P54JS__", _P_JS),
+     [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI data training checker", "url": BASE + P_PATH, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
+       "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": f"Whether {_pn} AI tools train on your content by default, how to opt out, and the team/business plan default, from official pages read {PRIVACY_CHECKED}."},
+      {"@context": "https://schema.org", "@type": "ItemList", "name": "AI tools data training policies", "url": BASE + P_PATH,
+       "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": f'Does {p["t"]} train on your data?', "url": BASE + P_PATH + "#p-" + slug(p["t"])} for i, p in enumerate(PRIVACY)]},
+      _ld_faq(_qa_p), crumbs([("ToolPick", "/"), ("Guides", "/guides.html"), ("AI data privacy", P_PATH)])])
+V54_CHANGED = [P_PATH]
+def _v54ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v54"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V54_CHANGED.append(path); return True
+for _p in PRIVACY:
+    _line = (f'<p class="pick small v54"><b>Trains on your data?</b> Free &amp; personal plans: {e(_PK[_p["k"]].lower() if _p["k"] != "u" else "unclear, see policy")}. '
+             f'Team &amp; business: {e(_PB[_p["bk"]].lower() if _p["bk"] != "u" else "unclear, see policy")}. (checked {PRIVACY_CHECKED}) <a href="{P_PATH}?tool={slug(_p["t"])}#check">{"Privacy details" if _p["k"] == "n" else "How to opt out"} →</a></p>')
+    if not _v54ins(turl(_p["t"]), '<section class="card tbp"', _line): _v54ins(turl(_p["t"]), '<section class="verdict', _line)
+_v54ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v54\"><a href='{P_PATH}'>Does this AI train on my data? Opt-out checker for {_pn} AI tools</a></li>", after=True)
+open("public/llms.txt", "a").write(f"\n## AI data privacy (v54)\n- [Does this AI train on my data?]({BASE}{P_PATH}): {_pn} AI tools: whether free/personal plans train on your content by default (yes / only if you allow / no / unclear), exact opt-out steps, team/business plan default, retention notes, official source links, read {PRIVACY_CHECKED}. Checker params: ?tool=chatgpt&plan=business; filters ?f=n (doesn't train by default), ?f=o (opt-out available), ?f=b (business plans protected)\n" + "".join(f"  - {p['t']}: personal plans: {_PK[p['k']]}; team/business: {_PB[p['bk']]}. {p['ind']}{(' Opt out: ' + p['steps']) if p['steps'] else ''} Source: {p['src']}\n" for p in PRIVACY) + "".join(f"  - Left out: {n} ({w})\n" for n, w in PRIVACY_LEFT_OUT))
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -3201,6 +3325,7 @@ for _u in V51_CHANGED + ["/my-ai-costs.html"]: _lm[_u] = ELC
 _fpm = "public/my-ai-costs.html"; _hm = open(_fpm).read()
 if ' v52"' not in _hm and "</h1>" in _hm: open(_fpm, "w").write(_hm.replace("</h1>", f'</h1><p class="small v52">Want to stop paying for one? <a href="{R_PATH}">Refund and cancel rules for {_rn} AI tools →</a></p>', 1)); V52_CHANGED.append("/my-ai-costs.html")
 for _u in V52_CHANGED: _lm[_u] = REFUND_CHECKED
+for _u in V54_CHANGED: _lm[_u] = PRIVACY_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
