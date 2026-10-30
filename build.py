@@ -3229,6 +3229,254 @@ for _p in PRIVACY:
 _v54ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v54\"><a href='{P_PATH}'>Does this AI train on my data? Opt-out checker for {_pn} AI tools</a></li>", after=True)
 open("public/llms.txt", "a").write(f"\n## AI data privacy (v54)\n- [Does this AI train on my data?]({BASE}{P_PATH}): {_pn} AI tools: whether free/personal plans train on your content by default (yes / only if you allow / no / unclear), exact opt-out steps, team/business plan default, retention notes, official source links, read {PRIVACY_CHECKED}. Checker params: ?tool=chatgpt&plan=business; filters ?f=n (doesn't train by default), ?f=o (opt-out available), ?f=b (business plans protected)\n" + "".join(f"  - {p['t']}: personal plans: {_PK[p['k']]}; team/business: {_PB[p['bk']]}. {p['ind']}{(' Opt out: ' + p['steps']) if p['steps'] else ''} Source: {p['src']}\n" for p in PRIVACY) + "".join(f"  - Left out: {n} ({w})\n" for n, w in PRIVACY_LEFT_OUT))
 
+# --- v55: AI budget planner — build my AI stack under $X/mo (/ai-budget-planner.html) ---
+# Entry-plan prices re-read on each official pricing page on PLANNER_CHECKED (tools.py PLANNER_PRICES, words seen in the quote).
+PLANNER_CHECKED = _tm0.PLANNER_CHECKED; PLANNER_PRICES = _tm0.PLANNER_PRICES; PLANNER_FREE = set(_tm0.PLANNER_FREE); PLANNER_LEFT_OUT = _tm0.PLANNER_LEFT_OUT
+B_PATH = "/ai-budget-planner.html"
+_BJOBS = [(s, l, c, list(r)) for s, l, c, r in list(JOBS) + list(_tm0.PLANNER_EXTRA_JOBS)]
+_BJOBS = [_BJOBS[-1]] + _BJOBS[:-1]  # everyday assistant first
+_BJ = {j[0]: j for j in _BJOBS}
+_BCAT = {c["id"]: c["name"] for c in CATEGORIES}
+for _n, _v in PLANNER_PRICES.items():
+    assert _n in TOOL and len(_v) == 4 and (_v[1] or _v[2]) and _v[3], _n
+for _n in PLANNER_FREE: assert _n in TOOL and realfree(TOOL[_n]), _n
+_bnames = list(dict.fromkeys(n for j in _BJOBS for n in j[3]))
+def _bc(x): return None if x is None else int(round(x * 100))
+def _bcost(n, bill):
+    p = PLANNER_PRICES.get(n)
+    if not p: return None
+    m, y = _bc(p[1]), _bc(p[2])
+    if bill == "m": return m
+    return min([v for v in (m, y) if v is not None])
+def _bbill(n, bill):  # which billing the chosen price is
+    p = PLANNER_PRICES[n]; m, y = _bc(p[1]), _bc(p[2])
+    if bill == "m" or y is None or (m is not None and m <= y): return "m"
+    return "y"
+def _bopts(j, bill):
+    o = []
+    for i, n in enumerate(j[3]):
+        c = _bcost(n, bill)
+        if c is not None: o.append((n, i, "p", 2 * i, c))
+    for i, n in enumerate(j[3]):
+        if n in PLANNER_FREE: o.append((n, i, "f", 2 * i + 3, 0)); break
+    o.append((None, -1, "x", 20, 0))
+    return o
+def _bsolve(js, bill):
+    opts = [_bopts(_BJ[s], bill) for s in js]; best = {}; allc = [None]; cur = []
+    def rec(k):
+        if k == len(opts):
+            paid = {}
+            for o in cur:
+                if o[2] == "p": paid[o[0]] = o[4]
+            tot = sum(paid.values()); sc = sum(o[3] for o in cur)
+            if tot not in best or sc < best[tot][0]: best[tot] = (sc, list(cur))
+            if all(o[2] != "x" for o in cur) and (allc[0] is None or tot < allc[0][0] or (tot == allc[0][0] and sc < allc[0][1])): allc[0] = (tot, sc, list(cur))
+            return
+        for o in opts[k]:
+            cur.append(o); rec(k + 1); cur.pop()
+    rec(0)
+    fr = []; mn = None
+    for tot in sorted(best):
+        sc, combo = best[tot]
+        if mn is None or sc < mn: fr.append((tot, sc, combo)); mn = sc
+    return fr, allc[0]
+def _bmoney(c):
+    return f"${c // 100:,}" if c % 100 == 0 else f"${c / 100:,.2f}"
+def _bwhy(o):
+    if o[2] == "x": return "Nothing fits this budget"
+    if o[2] == "f": return f"Free plan of our #{o[1] + 1} pick"
+    return f"Our #{o[1] + 1} pick, paid plan"
+def _bjs_data():
+    T = {}
+    for n in _bnames:
+        t = TOOL[n]; p = PLANNER_PRICES.get(n)
+        T[n] = {"u": turl(n), "r": t["pricing"], "f": int(n in PLANNER_FREE), "fd": t["free"] if n in PLANNER_FREE else "",
+                "p": p[0] if p else "", "m": _bc(p[1]) if p else None, "y": _bc(p[2]) if p else None, "q": p[3] if p else "",
+                "per": _tm0.PLANNER_PER.get(n, ""), "no": _tm0.PLANNER_NOTES.get(n, "")}
+    return {"J": [{"s": s, "l": l, "c": _BCAT[c], "t": r} for s, l, c, r in _BJOBS], "T": T, "d": PLANNER_CHECKED}
+_BPRESETS = [("Student", ["everyday-assistant", "literature-review", "class-presentations", "grammar-checking", "chat-with-pdfs"]),
+             ("Creator", ["youtube-shorts", "voiceovers", "social-media-graphics", "video-editing-beginners", "ai-music"]),
+             ("Small business", ["everyday-assistant", "social-scheduling", "meeting-notes", "customer-support-bot", "product-photos", "email-assistant"]),
+             ("Developer", ["everyday-assistant", "code-autocomplete", "code-review", "building-web-apps-no-code"])]
+for _pn5, _pj in _BPRESETS: assert all(x in _BJ for x in _pj) and len(_pj) <= 6
+_BDEF = (["everyday-assistant", "youtube-shorts", "meeting-notes", "social-media-graphics"], 2000, "m")
+def _bprice_line(n, bill):
+    p = PLANNER_PRICES[n]; t = TOOL[n]; b = _bbill(n, bill); per = _tm0.PLANNER_PER.get(n, "")
+    if b == "m": s = f"{_bmoney(_bc(p[1]))}/mo billed monthly"
+    else: s = f"{_bmoney(_bc(p[2]))}/mo billed yearly (about {_bmoney(int(round(_bc(p[2]) * 12 / 100.0)) * 100)} a year)"
+    return s + (f", {per}" if per else "")
+def _bcard_py(s, o, shared, bill):
+    j = _BJ[s]; n = o[0]
+    if o[2] == "x":
+        alts = [(c, x) for x, c in ((x, _bcost(x, bill)) for x in j[3]) if c is not None]
+        hint = f" Cheapest paid pick: {e(min(alts)[1])} at {_bmoney(min(alts)[0])}/mo." if alts else " None of our picks has a verified price for this billing."
+        return (f'<li class="p55c p55x"><span class="p55j">{e(j[1])}</span><b class="p55t">No pick within budget</b>'
+                f'<span class="small">None of our 3 picks has a free plan we could confirm.{hint} <a href="/best-ai-tool-for-{s}.html">See the picks</a></span></li>')
+    t = TOOL[n]
+    if o[2] == "f":
+        badge = '<span class="badge b-free">Free plan</span>'; line = e(t["free"])
+        src = f'Free plan confirmed {PLANNER_CHECKED} on the <a href="{e(t["pricing"])}" rel="noopener" target="_blank">official pricing page<span class="skip"> for {e(n)} (opens in a new tab)</span></a>'
+    else:
+        p = PLANNER_PRICES[n]
+        badge = f'<span class="badge b-rank">{e(p[0])} plan</span>'; line = e(_bprice_line(n, bill)) + (f'. Note: {e(_tm0.PLANNER_NOTES[n])}' if n in _tm0.PLANNER_NOTES else "")
+        src = f'Price checked {PLANNER_CHECKED} on the <a href="{e(t["pricing"])}" rel="noopener" target="_blank">official pricing page<span class="skip"> for {e(n)} (opens in a new tab)</span></a>: “{e(p[3])}”'
+    sh = f'<span class="p55sh">Also covers: {e(", ".join(shared))}</span>' if shared else ""
+    return (f'<li class="p55c{" p55f" if o[2] == "f" else ""}"><span class="p55j">{e(j[1])}</span><b class="p55t"><a href="{turl(n)}">{e(n)}</a> {badge}</b>'
+            f'<span class="p55w">{_bwhy(o)} · {line}</span>{sh}<span class="small">{src}</span></li>')
+def _bdefault_html():
+    js, bud, bill = _BDEF; fr, _ = _bsolve(js, bill)
+    pick = [f for f in fr if f[0] <= bud][-1]; tot, sc, combo = pick
+    cards = []; seen = set()
+    for s, o in zip(js, combo):
+        sh = [_BJ[s2][1] for s2, o2 in zip(js, combo) if s2 != s and o2[2] == "p" and o[2] == "p" and o2[0] == o[0]]
+        if o[2] == "p" and o[0] in seen: cards.append(_bcard_py(s, o, [], bill).replace('class="p55c"', 'class="p55c p55dup"', 1))
+        else: cards.append(_bcard_py(s, o, sh, bill))
+        if o[2] == "p": seen.add(o[0])
+    return (f'<h2 id="p55h">Your AI stack: {_bmoney(tot)}/mo</h2><p class="p55sum">{_bsum(combo, len(js))} · {_bmoney(bud - tot)} left of your {_bmoney(bud)} budget · about {_bmoney(int(round(tot * 12 / 100.0)) * 100)} a year</p>'
+            f'<ol class="p55list">{"".join(cards)}</ol>')
+def _bsum(combo, n):
+    cv = sum(1 for o in combo if o[2] != "x"); pd = sum(1 for o in combo if o[2] == "p"); fr = sum(1 for o in combo if o[2] == "f")
+    return f"{cv} of {n} jobs covered ({pd} paid, {fr} free)"
+# Static table: every job, the free option and cheapest verified paid plan of each pick (works without JavaScript)
+def _bcell(n):
+    a = [f'<a href="{turl(n)}">{e(n)}</a>']
+    if n in PLANNER_FREE: a.append('<span class="badge b-free">Free plan</span>')
+    p = PLANNER_PRICES.get(n)
+    if p:
+        bits = []
+        if p[1] is not None: bits.append(f"{_bmoney(_bc(p[1]))}/mo monthly")
+        if p[2] is not None: bits.append(f"{_bmoney(_bc(p[2]))}/mo yearly")
+        a.append(f'<span class="small">{e(p[0])}: {" or ".join(bits)}</span>')
+    else: a.append('<span class="small">Paid price not verified tonight</span>')
+    return "<br>".join(a)
+_b_rows = "".join(f'<tr id="j-{s}"><th scope="row" data-l="Job"><a href="/best-ai-tool-for-{s}.html">{e(l[:1].upper() + l[1:])}</a>' if s in {j[0] for j in JOBS} else f'<tr id="j-{s}"><th scope="row" data-l="Job">{e(l[:1].upper() + l[1:])}'
+                  for s, l, c, r in [_BJOBS[0]]) + "</th>" + "".join(f'<td data-l="#{i + 1} pick">{_bcell(n)}</td>' for i, n in enumerate(_BJOBS[0][3][:3])) + "</tr>"
+_b_rows += "".join(f'<tr id="j-{s}"><th scope="row" data-l="Job"><a href="/best-ai-tool-for-{s}.html">{e(l[:1].upper() + l[1:])}</a></th>' + "".join(f'<td data-l="#{i + 1} pick">{_bcell(n)}</td>' for i, n in enumerate(r[:3])) + "</tr>" for s, l, c, r in _BJOBS[1:])
+_bcats = list(dict.fromkeys(c for s, l, c, r in _BJOBS))
+_b_chips = "".join(f'<div class="p55g"><h3>{e(_BCAT[c])}</h3><div class="needs">' + "".join(f'<button type="button" aria-pressed="{"true" if s in _BDEF[0] else "false"}"{" class=\"on\"" if s in _BDEF[0] else ""} data-j="{s}">{e(l[:1].upper() + l[1:])}</button>' for s, l, c2, r in _BJOBS if c2 == c) + "</div></div>" for c in _bcats)
+_b_presets = "".join(f'<button type="button" class="bbtn" data-p="{",".join(js)}">{e(n)}</button>' for n, js in _BPRESETS)
+_b_quick = "".join(f'<button type="button" data-b="{v}">${v}</button>' for v in (0, 10, 20, 30, 50, 100))
+_b_left = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: {e(w)}.</li>' if n in TOOL else f'<li>{e(n)}: {e(w)}.</li>' for n, w in PLANNER_LEFT_OUT)
+_bnp = len(PLANNER_PRICES); _bnf = len(PLANNER_FREE); _bnj = len(_BJOBS)
+_qa_b = [("What's the cheapest way to get good AI tools?", f"Start with free plans: {_bnf} of the tools we rank have a free plan we confirmed on {PLANNER_CHECKED}. Pick your jobs in the planner with a $0 budget to see a free-only stack, then raise the budget to see which single upgrade helps most."),
+         ("How does the planner choose?", "For each job you pick, it looks at ToolPick's top 3 tools for that job. A paid plan of our #1 pick scores best, then #2 and #3, then free plans, then nothing. It tries every combination and returns the best one whose monthly total fits your budget. If one paid tool covers two of your jobs, you only pay for it once."),
+         ("Are these prices current?", f"Every paid price was read on the tool's official pricing page on {PLANNER_CHECKED}, and each card quotes the words we saw. We use the cheapest paid (entry) plan. Taxes, add-on credits, promos for the first month and seat minimums aren't included. Prices change, so check the linked page before you buy."),
+         ("What does “Yearly billing OK” change?", "Many tools are cheaper per month when you pay for a year up front. With yearly billing on, the planner uses the lower per-month price and shows what you'd pay for the year. Some plans are only sold yearly, so they only appear with this option on."),
+         ("Why is a tool missing?", f"We leave a paid plan out when its official page didn't show a clear US-dollar price on {PLANNER_CHECKED}. The list is on this page under “Left out tonight”. The tool's free plan can still be used if we confirmed it."),
+         ("Is ChatGPT in the planner?", f"Yes, its free plan is (unlimited text chats on GPT-6, with limits on other features, per OpenAI's pricing page on {PLANNER_CHECKED}). Its paid plans aren't, because the pricing page didn't show amounts to our check tonight. For a paid everyday assistant the planner can pick Le Chat Pro ($14.99/mo) or Claude Pro ($20/mo, or $17/mo yearly).")]
+_B_CSS = ("<style>.p55step{font-size:1.15rem;margin:0 0 var(--s2)}.p55pre{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin:0 0 var(--s3)}.p55pre .bbtn{min-height:44px}.p55gs{columns:3 210px;column-gap:var(--s4)}.p55g{break-inside:avoid;padding-bottom:var(--s2)}@media(pointer:fine) and (min-width:761px){.p55g .needs button{min-height:36px}}"
+          ".p55g h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mu);margin:var(--s2) 0 6px}.p55g .needs{display:flex;flex-wrap:wrap;gap:6px}.p55g .needs button{font-size:.88rem;padding:0 12px;min-height:44px;text-align:left}"
+          ".needs button.on{background:var(--ac);color:var(--sf);border-color:var(--ac)}.needs button[aria-disabled=true]{opacity:.5}"
+          ".p55row{display:flex;flex-wrap:wrap;gap:var(--s3) var(--s5);align-items:flex-end;margin-top:var(--s4)}.p55row label{display:block;font-weight:600;margin-bottom:6px}.p55bud{display:flex;align-items:center;gap:6px}.p55bud input{width:110px;min-height:48px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 12px;font-size:1.1rem}"
+          ".p55q{display:flex;flex-wrap:wrap;gap:6px}.p55q button{min-height:44px;min-width:52px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;cursor:pointer}.p55q button.on{background:var(--ac);color:var(--sf);border-color:var(--ac)}"
+          "#p55out{border-left:4px solid var(--ok)}#p55out h2{margin:0 0 4px;font-size:1.4rem}.p55sum{margin:0 0 var(--s3);color:var(--mu)}.p55list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s3)}"
+          ".p55c{display:flex;flex-direction:column;gap:4px;background:var(--sf2);border-radius:12px;padding:var(--s3) var(--s4);border-left:4px solid var(--ok)}.p55c.p55f{border-left-color:var(--ac)}.p55c.p55x{border-left-color:var(--warn)}.p55c.p55dup{border-left-color:var(--mu)}"
+          ".p55j{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu)}.p55t{font-size:1.1rem}.p55t a{color:var(--tx)}.p55w{font-size:.95rem}.p55sh{font-size:.85rem;font-weight:600;color:var(--ok)}.p55c .small a{display:inline-block;min-height:24px}"
+          ".p55up{margin:var(--s4) 0 0;padding:var(--s3) var(--s4);background:var(--sf2);border-radius:12px}.p55up p{margin:0 0 6px}.p55lad{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0}@media(max-width:760px){.p55lad{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px}.p55lad button{flex:none;max-width:200px}}.p55lad button{min-height:44px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-size:.88rem;padding:4px 12px;cursor:pointer;text-align:left}.p55lad button.on{border-color:var(--ok);box-shadow:inset 0 0 0 1px var(--ok)}.p55lad b{display:block}"
+          "#p55msg:empty{display:none}.p55act{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin-top:var(--s4)}.p55act .bbtn{min-height:44px}"
+          ".p55tw table{min-width:760px}.p55tw td,.p55tw th{font-size:.9rem;vertical-align:top}"
+          "@media(max-width:760px){.p55list{grid-template-columns:1fr}.p55tw{overflow:visible;border:0;box-shadow:none;background:none}.p55tw table{min-width:0;display:block}.p55tw thead{display:none}.p55tw tbody,.p55tw tr{display:block}.p55tw tr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin:0 0 var(--s3);padding:var(--s3)}.p55tw td,.p55tw th{display:block;border:0;padding:6px 4px}.p55tw td::before{content:attr(data-l);display:block;font-weight:700;font-size:.78rem;color:var(--mu);text-transform:uppercase}.p55tw th[scope=row] a{display:inline-flex;align-items:center;min-height:44px}}"
+          ".p55tw td a{display:inline-block;min-height:24px;padding:10px 0}</style>")
+_b_body = f"""{_B_CSS}<p class="small"><a href="/guides.html">Guides</a> › AI budget planner</p><h1>Build my AI stack under $X a month</h1>
+<p class="tag">Pick what you need AI for and how much you want to spend. We pick the best mix of ToolPick's top-ranked tools that fits your budget, count a tool once if it covers two jobs, and show the next upgrade worth paying for. {_bnp} paid plans and {_bnf} free plans, read on official pricing pages on {PLANNER_CHECKED}.</p>
+<div class="builder" id="plan"><h2 class="p55step">1. What do you need AI for? <span class="small" id="p55n">(4 of 6 picked)</span></h2>
+<div class="p55pre"><span class="small">Quick start:</span>{_b_presets}<button type="button" class="bbtn" id="p55clr">Clear</button></div>
+<div class="p55gs" id="p55jobs">{_b_chips}</div>
+<div class="p55row"><div><h2 class="p55step">2. Your monthly budget</h2><div class="p55bud"><label for="p55b" class="skip">Budget in US dollars per month</label><span aria-hidden="true">$</span><input type="number" id="p55b" min="0" max="1000" step="1" value="20" inputmode="numeric"><span class="small">/ month</span></div></div>
+<div class="p55q" role="group" aria-label="Quick budgets">{_b_quick}</div>
+<fieldset class="seg"><legend>Billing</legend><input type="radio" name="p55bill" id="p55bm" value="m" checked><label for="p55bm">Pay monthly</label><input type="radio" name="p55bill" id="p55by" value="y"><label for="p55by">Yearly billing OK</label></fieldset></div>
+<div class="pick" id="p55out" aria-live="polite">{_bdefault_html()}<div id="p55more"></div></div>
+<div class="p55act"><button type="button" class="bbtn" id="p55share">Copy link to this stack</button><button type="button" class="bbtn" id="p55copy">Copy as a list</button><span id="p55msg" class="small" role="status"></span></div></div>
+<p class="small">Prices are each tool's entry paid plan in US dollars before tax, read on the official pricing page on {PLANNER_CHECKED}. First-month promos, add-on credits and team minimums aren't counted. Check the linked page before you buy. Rankings are ToolPick's job picks, <a href="/how-we-pick.html">how we pick</a>.</p>
+<h2>How the planner picks</h2><ol><li>For each job, it looks at our top 3 tools for that job.</li><li>Best is a paid plan of our #1 pick, then #2, then #3. A confirmed free plan comes next, and “no pick” is last.</li><li>It tries every combination and keeps the best one that fits your budget. A tool that covers two of your jobs is only paid once.</li><li>It also shows the next upgrade, so you can see what an extra few dollars buys.</li></ol>
+<h2>Every job: free plans and entry prices</h2><p class="small">All {_bnj} jobs with our top 3 picks. Checked {PLANNER_CHECKED}.</p>
+<div class="tw p55tw" role="region" aria-label="Free plans and entry prices by job" tabindex="0"><table><caption class="skip">Free plan and cheapest verified paid plan for each of our top 3 picks per job, checked {PLANNER_CHECKED}.</caption><thead><tr><th scope="col">Job</th><th scope="col">#1 pick</th><th scope="col">#2 pick</th><th scope="col">#3 pick</th></tr></thead><tbody>{_b_rows}</tbody></table></div>
+<h2>Left out tonight</h2><p class="small">Paid plans we didn't use because the official page wasn't clear on {PLANNER_CHECKED}. Their free plans can still appear if we confirmed them.</p><ul class="small">{_b_left}</ul>
+<p class="small">Related: <a href="/stacks.html">AI stacks by role</a> · <a href="/help-me-choose.html">Help me choose</a> · <a href="/cost-calculator.html">AI cost calculator</a> · <a href="/free.html">Free AI tools</a> · <a href="/ai-team-plans.html">Team plans</a></p>
+{_faq(_qa_b)}
+<script>__P55JS__</script>"""
+_B_SOLVER = r"""function p55opts(j,bill,T){const o=[];j.t.forEach((n,i)=>{const c=p55cost(T[n],bill);if(c!=null)o.push([n,i,'p',2*i,c])});for(let i=0;i<j.t.length;i++){if(T[j.t[i]].f){o.push([j.t[i],i,'f',2*i+3,0]);break}}o.push([null,-1,'x',20,0]);return o}
+function p55cost(t,bill){if(bill=='m')return t.m;const v=[t.m,t.y].filter(x=>x!=null);return v.length?Math.min(...v):null}
+function p55solve(js,bill,T){const opts=js.map(j=>p55opts(j,bill,T)),best=new Map(),cur=[];let all=null;
+(function rec(k){if(k==opts.length){const paid={};cur.forEach(o=>{if(o[2]=='p')paid[o[0]]=o[4]});let tot=0;for(const n in paid)tot+=paid[n];let sc=0;cur.forEach(o=>sc+=o[3]);
+const b=best.get(tot);if(!b||sc<b[0])best.set(tot,[sc,cur.slice()]);if(cur.every(o=>o[2]!='x')&&(!all||tot<all[0]||(tot==all[0]&&sc<all[1])))all=[tot,sc,cur.slice()];return}
+for(const o of opts[k]){cur.push(o);rec(k+1);cur.pop()}})(0);
+const fr=[];let mn=null;[...best.keys()].sort((a,b)=>a-b).forEach(t=>{const[sc,c]=best.get(t);if(mn==null||sc<mn){fr.push([t,sc,c]);mn=sc}});return[fr,all]}"""
+_B_JS = r"""(function(){const D=__DATA__,J=D.J,T=D.T,by={};J.forEach(j=>by[j.s]=j);
+__SOLVER__
+const MAX=6,CH=[...document.querySelectorAll('#p55jobs button')],B=document.getElementById('p55b'),Q=[...document.querySelectorAll('.p55q button')],O=document.getElementById('p55out'),N=document.getElementById('p55n'),M=document.getElementById('p55msg');
+let sel=__DEF__,bill='m',last='';
+const X=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $m=c=>'$'+(c%100==0?(c/100).toLocaleString('en-US'):(c/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));
+const yr=c=>$m(Math.round(c*12/100)*100);
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+function why(o){return o[2]=='x'?'Nothing fits this budget':o[2]=='f'?'Free plan of our #'+(o[1]+1)+' pick':'Our #'+(o[1]+1)+' pick, paid plan'}
+function bb(n){const t=T[n];return(bill=='m'||t.y==null||(t.m!=null&&t.m<=t.y))?'m':'y'}
+function pl(n){const t=T[n],b=bb(n);return(b=='m'?$m(t.m)+'/mo billed monthly':$m(t.y)+'/mo billed yearly (about '+yr(t.y)+' a year)')+(t.per?', '+t.per:'')}
+const ext=n=>' rel="noopener" target="_blank">official pricing page<span class="skip"> for '+X(n)+' (opens in a new tab)</span></a>';
+function card(j,o,sh,dup){const n=o[0];
+if(o[2]=='x'){const a=j.t.map(x=>[p55cost(T[x],bill),x]).filter(a=>a[0]!=null).sort((a,b)=>a[0]-b[0]);
+return '<li class="p55c p55x"><span class="p55j">'+X(j.l)+'</span><b class="p55t">No pick within budget</b><span class="small">None of our 3 picks has a free plan we could confirm.'+(a.length?' Cheapest paid pick: '+X(a[0][1])+' at '+$m(a[0][0])+'/mo.':' None of our picks has a verified price for this billing.')+' <a href="/best-ai-tool-for-'+j.s+'.html">See the picks</a></span></li>'}
+const t=T[n];let badge,line,src;
+if(o[2]=='f'){badge='<span class="badge b-free">Free plan</span>';line=X(t.fd);src='Free plan confirmed '+D.d+' on the <a href="'+X(t.r)+'"'+ext(n)}
+else{badge='<span class="badge b-rank">'+X(t.p)+' plan</span>';line=X(pl(n))+(t.no?'. Note: '+X(t.no):'');src='Price checked '+D.d+' on the <a href="'+X(t.r)+'"'+ext(n)+': “'+X(t.q)+'”'}
+return '<li class="p55c'+(o[2]=='f'?' p55f':'')+(dup?' p55dup':'')+'"><span class="p55j">'+X(j.l)+'</span><b class="p55t"><a href="'+t.u+'">'+X(n)+'</a> '+badge+'</b><span class="p55w">'+why(o)+' · '+(dup?'Already paid for above, no extra cost':line)+'</span>'+(sh.length?'<span class="p55sh">Also covers: '+X(sh.join(', '))+'</span>':'')+'<span class="small">'+src+'</span></li>'}
+function cards(js,combo){const seen=new Set();return js.map((j,i)=>{const o=combo[i],dup=o[2]=='p'&&seen.has(o[0]);const sh=dup||o[2]!='p'?[]:js.filter((j2,k)=>k!=i&&combo[k][2]=='p'&&combo[k][0]==o[0]).map(j2=>j2.l);if(o[2]=='p')seen.add(o[0]);return card(j,o,sh,dup)}).join('')}
+function lab(o,j){return o[2]=='x'?'no pick':o[0]+(o[2]=='f'?' free':' '+T[o[0]].p)}
+function render(){const js=sel.map(s=>by[s]),bud=Math.max(0,Math.round((+B.value||0)*100));
+N.textContent='('+sel.length+' of '+MAX+' picked)';CH.forEach(b=>{const on=sel.includes(b.dataset.j);b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);b.setAttribute('aria-disabled',!on&&sel.length>=MAX)});
+Q.forEach(b=>b.classList.toggle('on',+b.dataset.b*100==bud));
+const u=new URLSearchParams();if(sel.length)u.set('jobs',sel.join(','));u.set('b',bud/100);if(bill=='y')u.set('bill','y');history.replaceState(null,'',location.pathname+'?'+u.toString()+location.hash);
+if(!js.length){O.innerHTML='<h2 id="p55h">Pick at least one job above</h2><p class="p55sum">Or tap a quick start: Student, Creator, Small business or Developer.</p>';last='';return}
+const[fr,all]=p55solve(js,bill,T);let pi=0;fr.forEach((f,i)=>{if(f[0]<=bud)pi=i});const[tot,sc,combo]=fr[pi],nx=fr[pi+1];
+const cnt=(c,k)=>c.filter(o=>o[2]==k).length;
+let h='<h2 id="p55h">Your AI stack: '+$m(tot)+'/mo</h2><p class="p55sum">'+(js.length-cnt(combo,'x'))+' of '+js.length+' jobs covered ('+cnt(combo,'p')+' paid, '+cnt(combo,'f')+' free) · '+$m(bud-tot)+' left of your '+$m(bud)+' budget · about '+yr(tot)+' a year</p><ol class="p55list">'+cards(js,combo)+'</ol>';
+let up='';
+if(nx){const d=js.map((j,i)=>[j,combo[i],nx[2][i]]).filter(a=>a[1][0]!=a[2][0]||a[1][2]!=a[2][2]),g=d.filter(a=>a[2][3]<a[1][3]).map(a=>X(a[0].l)+': '+X(lab(a[2]))+' instead of '+X(lab(a[1]))),w=d.filter(a=>a[2][3]>=a[1][3]).map(a=>X(a[0].l)+' moves to '+X(lab(a[2])));
+up+='<p><b>Next upgrade: +'+$m(nx[0]-tot)+'/mo</b> (total '+$m(nx[0])+'/mo) upgrades '+g.join('; ')+(w.length?' (to fit, '+w.join('; ')+')':'')+'. <button type="button" class="bbtn" data-go="'+nx[0]+'" style="min-height:44px;margin-left:4px">Use '+$m(nx[0])+' budget</button></p>'}
+else up+='<p><b>This is the best stack we can build for these jobs.</b> Spending more won\'t get a better-ranked pick.</p>';
+if(all&&combo.some(o=>o[2]=='x'))up+='<p>Cheapest way to cover all '+js.length+' jobs: <b>'+$m(all[0])+'/mo</b>. <button type="button" class="bbtn" data-go="'+all[0]+'" style="min-height:44px;margin-left:4px">Use '+$m(all[0])+' budget</button></p>';
+if(fr.length>1)up+='<p class="small" style="margin-top:8px">Price ladder for these jobs (tap to try):</p><div class="p55lad">'+fr.slice(0,10).map((f,i)=>'<button type="button" data-go="'+f[0]+'"'+(i==pi?' class="on" aria-current="true"':'')+'><b>'+(f[0]?$m(f[0])+'/mo':'Free')+'</b>'+X(i?'Paid: '+[...new Set(f[2].filter(o=>o[2]=='p').map(o=>o[0]))].join(', '):'Free plans only'+(cnt(f[2],'x')?' ('+cnt(f[2],'x')+' not covered)':''))+'</button>').join('')+'</div>';
+O.innerHTML=h+'<div class="p55up">'+up+'</div>';
+last='My AI stack ('+$m(tot)+'/mo, prices checked '+D.d+'):\n'+js.map((j,i)=>{const o=combo[i];return '- '+cap(j.l)+': '+(o[2]=='x'?'no pick':o[0]+(o[2]=='f'?' (free plan)':' '+T[o[0]].p+' ('+pl(o[0])+')'))}).join('\n')+'\nBuilt with ToolPick: '+location.href}
+O.addEventListener('click',ev=>{const b=ev.target.closest('[data-go]');if(!b)return;B.value=+b.dataset.go/100;render();O.focus&&O.scrollIntoView({block:'nearest'})});
+CH.forEach(b=>b.addEventListener('click',()=>{const s=b.dataset.j,i=sel.indexOf(s);if(i>=0)sel.splice(i,1);else if(sel.length<MAX)sel.push(s);else{M.textContent='You can pick up to '+MAX+' jobs. Remove one first.';return}M.textContent='';render()}));
+document.querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',()=>{sel=b.dataset.p.split(',');M.textContent='';render()}));
+document.getElementById('p55clr').addEventListener('click',()=>{sel=[];render()});
+B.addEventListener('input',render);Q.forEach(b=>b.addEventListener('click',()=>{B.value=b.dataset.b;render()}));
+document.querySelectorAll('input[name=p55bill]').forEach(x=>x.addEventListener('change',()=>{bill=x.value;render()}));
+const cp=(t,msg)=>{const ok=()=>{M.textContent=msg};if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>prompt('Copy this:',t));else prompt('Copy this:',t)};
+document.getElementById('p55share').addEventListener('click',()=>cp(location.href,'Link copied.'));document.getElementById('p55copy').addEventListener('click',()=>{if(last)cp(last,'List copied.')});
+const p=new URLSearchParams(location.search);if(p.get('jobs')!=null){sel=[...new Set(p.get('jobs').split(',').filter(s=>by[s]))].slice(0,MAX)}if(p.get('b')!=null&&!isNaN(+p.get('b')))B.value=Math.max(0,Math.min(1000,+p.get('b')));if(p.get('bill')=='y'){bill='y';document.getElementById('p55by').checked=true}
+render()})();"""
+_B_JS = (_B_JS.replace("__SOLVER__", _B_SOLVER).replace("__DEF__", json.dumps(_BDEF[0]))
+         .replace("__DATA__", json.dumps(_bjs_data(), separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")))
+_bt = "/tmp/p55"; os.makedirs(_bt, exist_ok=True)
+open(_bt + "/p55-solver.js", "w").write(_B_SOLVER + "\nmodule.exports={p55solve};\n")
+open(_bt + "/p55-data.json", "w").write(json.dumps(_bjs_data()))
+open(_bt + "/p55-py.json", "w").write(json.dumps({f"{','.join(js)}|{bill}": [[f[0], f[1], [o[0] for o in f[2]], [o[2] for o in f[2]]] for f in _bsolve(js, bill)[0]] for js in [p[1] for p in _BPRESETS] + [_BDEF[0], ["text-to-video", "ai-art", "product-photos", "code-review", "pitch-decks", "blog-seo"]] for bill in "my"}))
+page(B_PATH, f"AI Budget Planner: Build Your AI Tool Stack Under $X a Month ({PLANNER_CHECKED[:4]}) | ToolPick",
+     f"Pick what you need AI for and your monthly budget. Get the best mix of top-ranked AI tools that fits, with free plans, verified entry prices for {_bnp} paid plans (checked {PLANNER_CHECKED}) and the next upgrade worth paying for.",
+     _b_body.replace("__P55JS__", _B_JS),
+     [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI budget planner", "url": BASE + B_PATH, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
+       "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": f"Builds the best AI tool stack for your jobs under a monthly budget from ToolPick's top-3 picks per job, using entry prices read on official pricing pages on {PLANNER_CHECKED}."},
+      _ld_faq(_qa_b), crumbs([("ToolPick", "/"), ("Guides", "/guides.html"), ("AI budget planner", B_PATH)])])
+V55_CHANGED = [B_PATH]
+def _v55ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v55"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V55_CHANGED.append(path); return True
+for _s, _l, _c, _r in JOBS:
+    _v55ins(f"/best-ai-tool-for-{_s}.html", "<h2>Comparisons</h2>", f'<p class="pick small v55"><b>On a budget?</b> See the cheapest way to cover {e(_l)} plus your other AI jobs, with free plans and prices checked {PLANNER_CHECKED}. <a href="{B_PATH}?jobs={_s}&amp;b=20">Plan my AI budget →</a></p>')
+_v55ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v55\"><a href='{B_PATH}'>AI budget planner: build your AI stack under $X a month</a></li>", after=True)
+_v55ins("/stacks.html", "<h2>FAQ</h2>", f'<p class="pick v55"><b>Got a budget?</b> Pick your jobs and a monthly limit, and we build the best stack that fits, with the next upgrade worth paying for. <a href="{B_PATH}">Open the AI budget planner →</a></p>')
+_v55ins("/help-me-choose.html", "</main>", f'<p class="small v55">Need tools for several jobs on a budget? <a href="{B_PATH}">Try the AI budget planner</a>.</p>')
+open("public/llms.txt", "a").write(f"\n## AI budget planner (v55)\n- [Build my AI stack under $X/mo]({BASE}{B_PATH}): pick up to 6 of {_bnj} jobs and a monthly budget; returns the best mix of ToolPick's top-3 picks per job that fits (paid #1 > #2 > #3 > confirmed free plan > none; a tool shared across jobs is paid once), the next upgrade and a price ladder. Params: ?jobs=youtube-shorts,meeting-notes&b=20&bill=y (yearly billing OK). Entry prices read on official pricing pages {PLANNER_CHECKED}:\n"
+                                    + "".join(f"  - {n}: {p[0]}" + (f" ${p[1]}/mo monthly" if p[1] is not None else "") + (f" ${p[2]}/mo billed yearly" if p[2] is not None else "") + f" ({TOOL[n]['pricing']})\n" for n, p in sorted(PLANNER_PRICES.items()))
+                                    + "  - Free plans confirmed: " + ", ".join(sorted(PLANNER_FREE)) + "\n" + "".join(f"  - Paid plan left out: {n} ({w})\n" for n, w in PLANNER_LEFT_OUT))
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -3326,6 +3574,7 @@ _fpm = "public/my-ai-costs.html"; _hm = open(_fpm).read()
 if ' v52"' not in _hm and "</h1>" in _hm: open(_fpm, "w").write(_hm.replace("</h1>", f'</h1><p class="small v52">Want to stop paying for one? <a href="{R_PATH}">Refund and cancel rules for {_rn} AI tools →</a></p>', 1)); V52_CHANGED.append("/my-ai-costs.html")
 for _u in V52_CHANGED: _lm[_u] = REFUND_CHECKED
 for _u in V54_CHANGED: _lm[_u] = PRIVACY_CHECKED
+for _u in V55_CHANGED: _lm[_u] = PLANNER_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
