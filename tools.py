@@ -29,7 +29,7 @@ CATEGORIES = [
   {"name":"Windsurf","url":"https://windsurf.com","pricing":"https://windsurf.com/pricing","price":"Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat","free":"Free: $0","about":"Agentic AI IDE."},
   {"name":"Claude (Pro)","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17 yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong coding model for chat-based and agentic coding."},
   {"name":"Bolt","url":"https://bolt.new","pricing":"https://bolt.new/pricing","price":"Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) (checked 2026-10-22)","free":"Free: 300K tokens/day, 1M/month","about":"Build full-stack web apps from a prompt in the browser."},
-  {"name":"v0","url":"https://v0.app","pricing":"https://v0.app/pricing","price":"Team $30/user/mo; Business $100/user/mo","free":"Free: $0 with daily credits","about":"Vercel's AI app/UI builder, deploys to Vercel."},
+  {"name":"v0","url":"https://v0.app","pricing":"https://v0.app/pricing","price":"Plus $30/user/mo (page shows $90 struck through); Business $100/user/mo","free":"Free: $0/mo, 7 messages/day (new users also get $5 in starter credits)","about":"Vercel's AI app/UI builder, deploys to Vercel."},
   {"name":"Lovable","url":"https://lovable.dev","pricing":"https://lovable.dev/pricing","price":"check site","free":"Free: 5 build credits/day (up to 30/mo)","about":"Prompt-to-app builder for non-developers."},
  ]},
  {"id":"images","name":"Images","need":"Generate or design images","best":"Leonardo","free":["Leonardo","Krea","Ideogram"],"tools":[
@@ -761,7 +761,7 @@ STUDENT_OFFERS = [
       elig="Students currently enrolled at one of v0's active schools, with a valid student email. 15 schools are listed today, e.g. Stanford, MIT, UC Berkeley, NYU, Arizona State and Waterloo.",
       claim="Choose “Join with student email” on v0.app/students.",
       src="https://v0.app/students", quote="Get 1 year of complimentary v0 access when you verify your student status at an active school",
-      reg="Team $30/user/mo", save=None, end=True),
+      reg="Plus $30/user/mo", save=None, end=True),
  dict(k="elevenlabs", tool="ElevenLabs", kind="free", badge="Free for 3 months", offer="Creator plan free for 3 months",
       gets="The ElevenLabs Creator plan for 3 months. Also on the page: 1 year of ElevenReader Ultra free with a .edu (or equivalent) email.", who="s",
       elig="Students who verify their student status.",
@@ -853,6 +853,7 @@ for _n in ("Perplexity", "Gamma", "Canva"):
 for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in ("Synthesia","GitHub Copilot","Suno"): _t["checked"] = "2026-10-27"
+        if _t["name"] in ("v0","Bolt","Google Gemini","CapCut"): _t["checked"] = "2026-10-31"
 PRICE_NOTES["2026-10-27|Synthesia"] = ("down", "Synthesia Starter is now $19/mo billed monthly, or $14/mo billed yearly ($168/yr). Before, it was $29/mo (yearly from $18/mo). Pro is still $89/mo, and billed yearly it is now $59/mo ($708/yr), down from $64. New: first-month offers, Starter $9 and Pro $49.")
 PRICE_NOTES["2026-10-27|ElevenLabs"] = ("changed", "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). New: a $1 first-month Starter offer, shown until Nov 1 (seen on the pricing page 2026-10-26).")
 for _n in ("GitHub Copilot", "Suno"):
@@ -929,7 +930,7 @@ TEAM_LEFT_OUT = [  # tool, why (all read on TEAM_CHECKED)
  ("Google Gemini", "Gemini for teams comes inside Google Workspace plans; today's page showed introductory offers and footnoted prices, so we couldn't state a clean per-seat price"),
  ("HeyGen", "Business is $149/mo plus $20 per seat, but the page doesn't say whether the $149 includes the first seat"),
  ("Jasper", "Pro includes 1 seat; adding teammates needs the Business plan, which has custom pricing"),
- ("v0", "the Team plan card showed two different per-user prices, so we couldn't tell which applies"),
+ ("v0", "the paid plan is now called Plus, and its card shows $30 per user with $90 struck through, so we're waiting to see which price sticks"),
  ("Zapier", "Team is “from $69/month” for 25 users, but the page doesn't say which billing period that is"),
  ("Grammarly", "the page shows Pro at $12 per member but didn't state the billing period in the text we could read"),
  ("ClickUp", "its AI is a separate per-user add-on on top of the workspace plan"),
@@ -1317,7 +1318,7 @@ PLANNER_LEFT_OUT = [  # paid plan left out of the planner tonight (free plan may
  ("Perplexity", "the Pro page showed no price tonight"),
  ("CapCut", "the pricing page showed only per-second video rates and a sale banner, not a clear plan price"),
  ("Surfer", "the cheapest plan (Discovery, 49 USD per month) doesn't say whether it's billed monthly or yearly"),
- ("v0", "the paid plan now shows as Plus with two different amounts ($30 and $90 per user)"),
+ ("v0", "the Plus plan shows $30 per user with $90 struck through, so we're waiting to see which price sticks"),
  ("Wordtune", "two different price sets showed tonight ($6.99/$4.89 and $6.99/$9.99 billed annually)"),
  ("ClickUp", "the plans changed (now Core $9 and Business $17 per user billed yearly); we'll update the tool data first"),
  ("Motion", "the Pro AI plan showed \"This plan is not available\""),
@@ -1379,3 +1380,6 @@ IMAGE_LEFT_OUT = [
  ("Canva", "its pricing page describes AI as a shared allowance (“10x more AI than Canva Free”) with no image count"),
  ("Photoroom", "it edits product photos (backgrounds, scenes) rather than selling image-generation credits"),
 ]
+
+# Daily ops 2026-10-31: v0.app/pricing (paid plan renamed Team -> Plus, $30/user with $90 struck through; Free now 7 messages/day), bolt.new, gemini.google/subscriptions and capcut.com/pricing unchanged.
+PRICE_NOTES["2026-10-31|v0"] = ("changed", "v0's $30-per-user plan is now called Plus (it was Team), and the page shows $90 struck through next to the $30. Business is still $100 per user. The Free plan now lists a 7 messages/day limit, and new users get $5 in one-time credits.")

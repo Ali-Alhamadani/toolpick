@@ -39,7 +39,7 @@
 - [Cursor](https://toolpick-ai.vercel.app/tools/cursor.html): Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user | free: Free: $0 with limited agent requests
 - [Windsurf](https://toolpick-ai.vercel.app/tools/windsurf.html): Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat | free: Free: $0
 - [Bolt](https://toolpick-ai.vercel.app/tools/bolt.html): Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) | free: Free: 300K tokens/day, 1M/month
-- [v0](https://toolpick-ai.vercel.app/tools/v0.html): Team $30/user/mo; Business $100/user/mo | free: Free: $0 with daily credits
+- [v0](https://toolpick-ai.vercel.app/tools/v0.html): Plus $30/user/mo (page shows $90 struck through); Business $100/user/mo | free: Free: $0/mo, 7 messages/day (new users also get $5 in starter credits)
 - [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually) | free: Free: $0 (5 build credits/day, up to 30/mo)
 - [Warp](https://toolpick-ai.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
 - [Qodo](https://toolpick-ai.vercel.app/tools/qodo.html): Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits) | free: 14-day free trial, no card; free for open source projects
@@ -398,7 +398,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Paid plan left out: Perplexity (the Pro page showed no price tonight)
   - Paid plan left out: CapCut (the pricing page showed only per-second video rates and a sale banner, not a clear plan price)
   - Paid plan left out: Surfer (the cheapest plan (Discovery, 49 USD per month) doesn't say whether it's billed monthly or yearly)
-  - Paid plan left out: v0 (the paid plan now shows as Plus with two different amounts ($30 and $90 per user))
+  - Paid plan left out: v0 (the Plus plan shows $30 per user with $90 struck through, so we're waiting to see which price sticks)
   - Paid plan left out: Wordtune (two different price sets showed tonight ($6.99/$4.89 and $6.99/$9.99 billed annually))
   - Paid plan left out: ClickUp (the plans changed (now Core $9 and Business $17 per user billed yearly); we'll update the tool data first)
   - Paid plan left out: Motion (the Pro AI plan showed "This plan is not available")
