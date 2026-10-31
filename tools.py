@@ -1324,3 +1324,58 @@ PLANNER_LEFT_OUT = [  # paid plan left out of the planner tonight (free plan may
  ("Pitch", "priced in euros only"), ("Fathom", "no single starting price on the page"), ("Qodo", "a team code-review plan, not a single-user plan"),
  ("Murf", "the pricing page needs JavaScript we couldn't read"), ("SciSpace", "no price showed on the page tonight"),
 ]
+
+# v56 (2026-10-31): Real cost of AI images (/ai-image-cost.html). Every number below was read tonight on the official page in "src".
+# Midjourney https://docs.midjourney.com/hc/en-us/articles/27870484040333-Comparing-Midjourney-Plans : "Monthly Price $10 $30 $60 $120";
+#   "Fast GPU Time 3.3 hr/month (200 minutes) | 15 hr/month | 30 hr/month | 60 hr/month"; "Relax GPU Time: Unlimited Images" (Standard, Pro, Mega);
+#   "Purchase Extra GPU Time $4/hr". GPU Speed https://docs.midjourney.com/hc/en-us/articles/32016412137741-GPU-Speed-Fast-Relax-Turbo :
+#   "SD Prompt 0.8 minutes", "HD Prompt 1.3 minutes" (approximate); Relax waits "0 to 30 minutes". Getting Started
+#   https://docs.midjourney.com/hc/en-us/articles/33329261836941-Getting-Started-Guide : each prompt "creates a set of four images".
+# Ideogram https://ideogram.ai/pricing (monthly toggle): "Plus $20 per month ... 2,400 priority credits/mo."; "Pro $60 per month ... 7,500 priority credits/mo.";
+#   "Pay as you go 1¢/credit"; "Slow credits — Unlimited Unlimited" (Plus, Pro); credit table: "4.5 Low 3 credits / 1 image, Medium 6, High 10";
+#   "4.0 (2K) Turbo 3 credits / 1 image, Balanced 6, Quality 10"; "3.0 Default 24 credits / 4 images". Free: "Eligible free accounts receive weekly credits ... the amount may vary."
+# Recraft https://www.recraft.ai/pricing ("Pay monthly"): "Basic $12 billed monthly 1,000 credits per month"; "Pro $20 billed monthly 2,000 credits per month".
+#   Credits https://www.recraft.ai/docs/plans-and-billing/credits : "Recraft V4.1 Flash 1", "Recraft V4.1 2", "Recraft V4.1 Pro 10", "Recraft V4.1 Vector 4",
+#   "Recraft V4.1 Pro Vector 12"; top-ups "200 credits $2" (packs of 200/400/800/1,600). Free: "3 generations per style per day", "Up to 2 images per generation", "No commercial use".
+# Krea https://www.krea.ai/pricing (Monthly): "Basic 5,000 units / month $9", "Pro 20,000 units / month $35", "Max 60,000 units / month $105" (60k default);
+#   image counts on Pro (20,000 units): "Krea 2 Turbo 10,000 images", "Krea 3 ~1,111", "Flux.1 Dev ~6,000", "Nano Banana 2 1K ~450", "Ideogram 4.0 turbo speed ~900",
+#   "Recraft V4.1 Flash 3,857", "Seedream 4.5 675". Compute pack prices need sign-in (not used). "Unlimited relaxed generations" only ticked on Max, "with supported
+#   in-house image models" (which models isn't listed, so not used in the maths). Free "100 units / day" ("Krea 2 Turbo 50 images/day").
+# Leonardo https://leonardo.ai/pricing : Premium $30/month "Image Generation for select models at a relaxed pace* Unlimited" (token cost per image not on the page).
+IMAGE_CHECKED = "2026-10-31"
+IMAGE_COSTS = {  # plans: (name, $/mo monthly billing, credits per month, unlimited slow mode?, top-up (credits, $) or None); models: (label, credits per image, same-model key)
+ "Midjourney": dict(src="https://docs.midjourney.com/hc/en-us/articles/27870484040333-Comparing-Midjourney-Plans", src2="https://docs.midjourney.com/hc/en-us/articles/32016412137741-GPU-Speed-Fast-Relax-Turbo",
+   unit="GPU minutes", free="No free plan", plans=[("Basic",10,200,False,(60,4)),("Standard",30,900,True,(60,4)),("Pro",60,1800,True,(60,4)),("Mega",120,3600,True,(60,4))],
+   models=[("Standard image (SD)",0.2,None),("HD image",0.325,None)], top_note="extra Fast GPU time at $4 an hour (we round up to whole hours)",
+   slow_note="Relax Mode: unlimited images on Standard, Pro and Mega, with waits of 0 to 30 minutes", per_note="One prompt makes 4 images: about 0.8 GPU minutes (SD) or 1.3 (HD)."),
+ "Ideogram": dict(src="https://ideogram.ai/pricing", unit="credits", free="Weekly free credits for eligible accounts (amount may vary)",
+   plans=[("Pay as you go",0,0,False,(1,0.01)),("Plus",20,2400,True,None),("Pro",60,7500,True,None)],
+   models=[("Ideogram 4.0 (2K), Turbo",3,"ideogram-4-turbo"),("Ideogram 4.0 (2K), Balanced",6,None),("Ideogram 4.0 (2K), Quality",10,None),
+           ("Ideogram 4.5, Low",3,None),("Ideogram 4.5, Medium",6,None),("Ideogram 4.5, High",10,None),("Ideogram 3.0, Default",6,None)],
+   top_note="pay as you go at 1¢ per credit (no plan; minimum purchase not shown)", slow_note="Plus and Pro: unlimited slow credits after priority credits run out (AI editing needs priority credits)",
+   per_note="Credit costs from Ideogram's own table (3.0 is 24 credits per 4 images)."),
+ "Recraft": dict(src="https://www.recraft.ai/pricing", src2="https://www.recraft.ai/docs/plans-and-billing/credits", unit="credits",
+   free="3 generations per style a day, up to 2 images each, not for commercial use",
+   plans=[("Basic",12,1000,False,(200,2)),("Pro",20,2000,False,(200,2))],
+   models=[("Recraft V4.1",2,None),("Recraft V4.1 Flash",1,"recraft-v41-flash"),("Recraft V4.1 Pro",10,None),("Recraft V4.1 Vector",4,None),("Recraft V4.1 Pro Vector",12,None)],
+   top_note="top-up packs of 200 credits for $2", slow_note=None, per_note="Credit costs from Recraft's credits page (Recraft Studio)."),
+ "Krea": dict(src="https://www.krea.ai/pricing", unit="units", free="100 units a day (e.g. about 50 Krea 2 Turbo images a day)",
+   plans=[("Basic",9,5000,False,None),("Pro",35,20000,False,None),("Max",105,60000,False,None)],
+   models=[("Krea 2 Turbo",20000/10000,None),("Krea 3",20000/1111,None),("Flux.1 Dev",20000/6000,None),("Nano Banana 2 (1K)",20000/450,None),
+           ("Ideogram 4.0, Turbo (resolution not stated)",20000/900,"ideogram-4-turbo"),("Recraft V4.1 Flash",20000/3857,"recraft-v41-flash"),("Seedream 4.5",20000/675,None)],
+   top_note="compute packs (price needs sign-in, so not used)", slow_note="Max lists unlimited relaxed generations with supported in-house image models (models not listed, so not counted here)",
+   per_note="Units per image worked out from Krea's own image counts for Pro (20,000 units)."),
+}
+IMAGE_FLAT = [  # cheapest plan with unlimited slow image generation, as stated on the official page tonight
+ ("Ideogram", "Plus", 20, "“Slow credits: Unlimited” on Plus and Pro", "https://ideogram.ai/pricing"),
+ ("Midjourney", "Standard", 30, "“Relax GPU Time: Unlimited Images” on Standard, Pro and Mega", "https://docs.midjourney.com/hc/en-us/articles/27870484040333-Comparing-Midjourney-Plans"),
+ ("Leonardo", "Premium", 30, "“Image Generation for select models at a relaxed pace: Unlimited” (15 Leonardo and FLUX models)", "https://leonardo.ai/pricing"),
+ ("Krea", "Max", 105, "“Unlimited relaxed generations” with supported in-house image models", "https://www.krea.ai/pricing"),
+]
+IMAGE_LEFT_OUT = [
+ ("Leonardo", "its pricing page doesn't say how many tokens an image uses (it depends on the model and settings), so we can't turn 8,500 tokens into images"),
+ ("Magnific", "plans mix yearly credit pools and “unlimited” models that change by plan and billing period, so there's no clear monthly image count to compare"),
+ ("ChatGPT", "its pricing page only says “Limited”, “More” or “Unlimited” image creation, with no number"),
+ ("Canva", "its pricing page describes AI as a shared allowance (“10x more AI than Canva Free”) with no image count"),
+ ("Photoroom", "it edits product photos (backgrounds, scenes) rather than selling image-generation credits"),
+]

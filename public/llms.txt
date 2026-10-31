@@ -408,6 +408,18 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Paid plan left out: Murf (the pricing page needs JavaScript we couldn't read)
   - Paid plan left out: SciSpace (no price showed on the page tonight)
 
+## Real cost of AI images (v56)
+- [AI image cost calculator](https://toolpick-ai.vercel.app/ai-image-cost.html): images per month you keep x tries per keeper -> cheapest plan (plan, plan + top-ups where priced, or unlimited slow mode if ?slow=1) and $ per kept image for Midjourney, Ideogram, Recraft, Krea; same-model 'cheaper' verdicts only (Ideogram 4.0 Turbo, Recraft V4.1 Flash). Params: ?n=100&t=4&slow=1&m=midjourney:0,ideogram:0,recraft:1,krea:5. Official pages checked 2026-10-31:
+  - Midjourney (https://docs.midjourney.com/hc/en-us/articles/27870484040333-Comparing-Midjourney-Plans): Basic $10/mo 200 GPU minutes; Standard $30/mo 900 GPU minutes + unlimited slow; Pro $60/mo 1,800 GPU minutes + unlimited slow; Mega $120/mo 3,600 GPU minutes + unlimited slow. Per image: Standard image (SD) 0.2 GPU minutes; HD image 0.325 GPU minutes. Extra: extra Fast GPU time at $4 an hour (we round up to whole hours).
+  - Ideogram (https://ideogram.ai/pricing): Pay as you go $0/mo 0 credits; Plus $20/mo 2,400 credits + unlimited slow; Pro $60/mo 7,500 credits + unlimited slow. Per image: Ideogram 4.0 (2K), Turbo 3 credits; Ideogram 4.0 (2K), Balanced 6 credits; Ideogram 4.0 (2K), Quality 10 credits; Ideogram 4.5, Low 3 credits; Ideogram 4.5, Medium 6 credits; Ideogram 4.5, High 10 credits; Ideogram 3.0, Default 6 credits. Extra: pay as you go at 1¢ per credit (no plan; minimum purchase not shown).
+  - Recraft (https://www.recraft.ai/pricing): Basic $12/mo 1,000 credits; Pro $20/mo 2,000 credits. Per image: Recraft V4.1 2 credits; Recraft V4.1 Flash 1 credits; Recraft V4.1 Pro 10 credits; Recraft V4.1 Vector 4 credits; Recraft V4.1 Pro Vector 12 credits. Extra: top-up packs of 200 credits for $2.
+  - Krea (https://www.krea.ai/pricing): Basic $9/mo 5,000 units; Pro $35/mo 20,000 units; Max $105/mo 60,000 units. Per image: Krea 2 Turbo 2 units; Krea 3 18 units; Flux.1 Dev 3.33 units; Nano Banana 2 (1K) 44.4 units; Ideogram 4.0, Turbo (resolution not stated) 22.2 units; Recraft V4.1 Flash 5.19 units; Seedream 4.5 29.6 units. Extra: compute packs (price needs sign-in, so not used).
+  - Left out: Leonardo (its pricing page doesn't say how many tokens an image uses (it depends on the model and settings), so we can't turn 8,500 tokens into images)
+  - Left out: Magnific (plans mix yearly credit pools and “unlimited” models that change by plan and billing period, so there's no clear monthly image count to compare)
+  - Left out: ChatGPT (its pricing page only says “Limited”, “More” or “Unlimited” image creation, with no number)
+  - Left out: Canva (its pricing page describes AI as a shared allowance (“10x more AI than Canva Free”) with no image count)
+  - Left out: Photoroom (it edits product photos (backgrounds, scenes) rather than selling image-generation credits)
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.

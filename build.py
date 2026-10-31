@@ -1917,6 +1917,7 @@ _SM = [("/pay-less.html","Pay less for a tool you use","Pick the one tool you pa
        ("/monthly-or-yearly.html","Monthly or yearly?","See how much paying yearly saves, what you pay upfront, and how many months you need to keep it."),
        ("/price-changes.html","Recent price changes","Which AI tools raised or cut prices, newest first, with old and new prices."),
        ("/ai-video-cost.html","Real cost of AI video","See how many seconds of video each Runway, Pika and Luma plan really buys and the price per minute, same model only."),
+       ("/ai-image-cost.html","Real cost of AI images","See how many images each Midjourney, Ideogram, Recraft and Krea plan really buys, the price per image, and which plans are unlimited."),
        ("/ai-voice-cost.html","Real cost of AI voice","See how many minutes of text to speech each ElevenLabs, Luma and Runway plan really buys and the price per minute."),
        ("/renewal-reminders.html","Renewal reminders","Get a calendar alert before each AI subscription renews, with the latest checked price and cheaper tools for the same job."),
        ("/watchlist.html","Price watchlist","Watch the tools you pay for and see which prices changed since you last looked. No account or email."),
@@ -3477,6 +3478,133 @@ open("public/llms.txt", "a").write(f"\n## AI budget planner (v55)\n- [Build my A
                                     + "".join(f"  - {n}: {p[0]}" + (f" ${p[1]}/mo monthly" if p[1] is not None else "") + (f" ${p[2]}/mo billed yearly" if p[2] is not None else "") + f" ({TOOL[n]['pricing']})\n" for n, p in sorted(PLANNER_PRICES.items()))
                                     + "  - Free plans confirmed: " + ", ".join(sorted(PLANNER_FREE)) + "\n" + "".join(f"  - Paid plan left out: {n} ({w})\n" for n, w in PLANNER_LEFT_OUT))
 
+# --- v56: Real cost of AI images (/ai-image-cost.html): images per plan and $ per image, from official pricing pages (tools.py IMAGE_COSTS) ---
+import math as _math
+IMG = _tm0.IMAGE_COSTS; IMAGE_CHECKED = _tm0.IMAGE_CHECKED; I_PATH = "/ai-image-cost.html"
+def _icap(c, r): return int(c / r + 1e-9)
+def _icost(t, r, need, slow):
+    best = None
+    for pn, p, c, sl, tp in t["plans"]:
+        cap = _icap(c, r)
+        if need <= cap: cand = (p, "fits", 0)
+        elif slow and sl: cand = (p, "slow", 0)
+        elif tp: k = _math.ceil((need * r - c) / tp[0] - 1e-9); cand = (round(p + k * tp[1], 2), "top", k)
+        else: continue
+        if best is None or cand[0] < best["usd"] - 1e-9: best = dict(plan=pn, price=p, cr=c, usd=cand[0], how=cand[1], k=cand[2], cap=cap, tp=tp)
+    return best
+def _m(v): return "$" + (f"{v:,.0f}" if abs(v - round(v)) < 1e-9 else f"{v:,.2f}")
+def _m3(v): return "$" + (f"{v:.3f}" if v < 0.1 else f"{v:.2f}")
+_idata = [dict(n=n, s=slug(n), u=turl(n), un=v["unit"], tn=v["top_note"], sn=v["slow_note"],
+               pl=[dict(n=a, p=b, c=c, sl=d, tp=list(x) if x else None) for a, b, c, d, x in v["plans"]],
+               md=[dict(n=a, r=round(b, 5), k=k) for a, b, k in v["models"]]) for n, v in IMG.items()]
+_IJSON = json.dumps(_idata, separators=(",", ":")).replace("</", "<\\/")
+I_DEF = dict(keep=100, tries=4, slow=False)
+def _idesc(t, md, c, keep, need):
+    if c is None: return f'<p class="vc-big">More than the biggest plan</p><p class="small" style="margin:0">Needs {need:,} images of {e(md[0])}; the biggest plan covers about {_icap(t["plans"][-1][2], md[1]):,}. Extra: {e(t["top_note"])}.</p>'
+    if c["how"] == "fits": how = f'{e(c["plan"])} plan ({c["cr"]:,} {e(t["unit"])})' if c["price"] else f'{e(c["plan"])}'
+    elif c["how"] == "slow": how = f'{e(c["plan"])} plan: about {c["cap"]:,} fast images, the rest in unlimited slow mode'
+    else: how = (f'{e(c["plan"])} plan {_m(c["price"])} + ' if c["price"] else "Pay as you go: ") + (f'{c["k"]:,} × {c["tp"][0]:,} extra {e(t["unit"])} at {_m(c["tp"][1])}' if c["tp"][0] > 1 else f'{round(need * md[1]):,} credits at {_m(c["tp"][1])}')
+    return f'<p class="vc-big">{_m(c["usd"])}/mo</p><p class="small" style="margin:0">{how} · <b>{_m3(c["usd"] / keep)} per image you keep</b></p>'
+_icards = ""
+for n, v in IMG.items():
+    md = v["models"][0]; c = _icost(v, md[1], I_DEF["keep"] * I_DEF["tries"], I_DEF["slow"])
+    _icards += (f'<article class="card i56c" id="ic-{slug(n)}"><h3 style="margin:0"><a href="{turl(n)}">{e(n)}</a></h3><p class="small" style="margin:2px 0 8px">Free: {e(v["free"])} · '
+                f'<a href="{e(v["src"])}" rel="noopener" target="_blank">official pricing<span class="skip"> for {e(n)} (opens in a new tab)</span></a></p>'
+                f'<label for="im-{slug(n)}">Model</label><select id="im-{slug(n)}" style="width:100%">' + "".join(f'<option value="{i}">{e(a)}</option>' for i, (a, b, k) in enumerate(v["models"])) + '</select>'
+                f'<div id="io-{slug(n)}" aria-live="polite">{_idesc(v, md, c, I_DEF["keep"], I_DEF["keep"] * I_DEF["tries"])}</div><p class="small" style="margin:6px 0 0">{e(v["per_note"])}</p></article>')
+_irows = ""
+def _icell(pn, p, c, r, tp):
+    if not c: return f"{e(pn)}: {_m3(r * tp[1])}/image" if tp else ""
+    k = _icap(c, r); return f"{e(pn)} {_m(p)}/mo: <b>{k:,}</b> <span class=small>({_m3(p / k)} each)</span>" if k else f"{e(pn)} {_m(p)}/mo: 0"
+for n, v in IMG.items():
+    for a, r, k in v["models"]:
+        _irows += f"<tr><th scope='row'><a href='{turl(n)}'>{e(n)}</a></th><td>{e(a)}</td><td>{r:.3g} {e(v['unit'])}</td><td>" + "<br>".join(_icell(pn, p, c, r, tp) for pn, p, c, sl, tp in v["plans"]) + "</td></tr>"
+_iplans = " · ".join(f"<b>{e(n)}</b>: " + ", ".join(f"{e(a)} {_m(b)}/mo ({c:,} {e(v['unit'])})" if b else f"{e(a)} (1¢ per credit)" for a, b, c, d, x in v["plans"]) for n, v in IMG.items())
+_iflat = "".join(f'<li><a href="{turl(n)}">{e(n)}</a> {e(p)}, {_m(pr)}/mo: {e(q)} (<a href="{e(u)}" rel="noopener" target="_blank">source<span class="skip"> for {e(n)} (opens in a new tab)</span></a>).</li>' for n, p, pr, q, u in _tm0.IMAGE_FLAT)
+_ileft = "".join(f"<li><a href='{turl(n)}'>{e(n)}</a>: {e(r)}.</li>" for n, r in _tm0.IMAGE_LEFT_OUT)
+_isrc = "".join(f'<li><a href="{turl(n)}">{e(n)}</a>: <a href="{e(v["src"])}" rel="noopener" target="_blank">pricing page<span class="skip"> for {e(n)} (opens in a new tab)</span></a>' + (f' and <a href="{e(v["src2"])}" rel="noopener" target="_blank">credit costs<span class="skip"> for {e(n)} (opens in a new tab)</span></a>' if v.get("src2") else "") + f". {e(v['per_note'])}</li>" for n, v in IMG.items())
+I_JS = r'''(function(){const D=__ID__;const $=id=>document.getElementById(id);
+const M=v=>'$'+(Math.abs(v-Math.round(v))<1e-9?Math.round(v).toLocaleString('en-US'):v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));
+const M3=v=>'$'+(v<0.1?v.toFixed(3):v.toFixed(2));const X=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cap=(c,r)=>Math.floor(c/r+1e-9);
+function cost(t,r,need,slow){let b=null;t.pl.forEach(p=>{const k0=cap(p.c,r);let c;if(need<=k0)c=[p.p,'fits',0];else if(slow&&p.sl)c=[p.p,'slow',0];else if(p.tp){const k=Math.ceil((need*r-p.c)/p.tp[0]-1e-9);c=[Math.round((p.p+k*p.tp[1])*100)/100,'top',k]}else return;
+if(!b||c[0]<b.usd-1e-9)b={p:p,usd:c[0],how:c[1],k:c[2],cap:k0}});return b}
+const q=new URLSearchParams(location.search);const sel={};D.forEach(t=>sel[t.s]=0);
+(q.get('m')||'').split(',').forEach(x=>{const [s,i]=x.split(':');const t=D.find(y=>y.s==s);if(t&&t.md[+i])sel[s]=+i});
+const qk=parseInt(q.get('n')),qt=parseInt(q.get('t'));if(qk>0&&qk<=100000)$('ic-keep').value=qk;if([1,2,4].includes(qt))$('ic-try').value=qt;if(q.get('slow')=='1')$('ic-slow1').checked=true;
+D.forEach(t=>{const s=$('im-'+t.s);s.value=sel[t.s];s.addEventListener('change',()=>{sel[t.s]=+s.value;go()})});
+function go(){const keep=Math.max(1,Math.min(100000,parseInt($('ic-keep').value)||0)),tries=parseInt($('ic-try').value),slow=$('ic-slow1').checked,need=keep*tries;const R=[];
+D.forEach(t=>{const m=t.md[sel[t.s]],c=cost(t,m.r,need,slow);R.push({t,m,c});let h;
+if(!c){const big=t.pl[t.pl.length-1];h='<p class="vc-big">More than the biggest plan</p><p class="small" style="margin:0">Needs '+need.toLocaleString()+' images of '+X(m.n)+'; the biggest plan covers about '+cap(big.c,m.r).toLocaleString()+'. Extra: '+X(t.tn)+'.</p>'}
+else{let how;if(c.how=='fits')how=c.p.p?X(c.p.n)+' plan ('+c.p.c.toLocaleString()+' '+t.un+')':X(c.p.n);else if(c.how=='slow')how=X(c.p.n)+' plan: about '+c.cap.toLocaleString()+' fast images, the rest in unlimited slow mode';
+else how=(c.p.p?X(c.p.n)+' plan '+M(c.p.p)+' + ':'Pay as you go: ')+(c.p.tp[0]>1?c.k.toLocaleString()+' × '+c.p.tp[0].toLocaleString()+' extra '+t.un+' at '+M(c.p.tp[1]):Math.round(need*m.r).toLocaleString()+' credits at '+M(c.p.tp[1]));
+h='<p class="vc-big">'+M(c.usd)+'/mo</p><p class="small" style="margin:0">'+how+' · <b>'+M3(c.usd/keep)+' per image you keep</b></p>'}
+$('io-'+t.s).innerHTML=h});
+const g={};R.forEach(r=>{if(r.m.k)(g[r.m.k]=g[r.m.k]||[]).push(r)});let v=[];
+Object.values(g).filter(a=>a.length>1).forEach(a=>{const ok=a.filter(r=>r.c).sort((x,y)=>x.c.usd-y.c.usd);if(ok.length<2)return;const w=ok[0],n=ok[1];
+const nm={'ideogram-4-turbo':'Ideogram 4.0 Turbo','recraft-v41-flash':'Recraft V4.1 Flash'}[w.m.k];v.push(w.c.usd==n.c.usd?'Same model ('+nm+'): '+X(w.t.n)+' and '+X(n.t.n)+' cost the same, '+M(w.c.usd)+'/mo.':'Same model ('+nm+'): <b>'+X(w.t.n)+' is cheaper</b> at '+M(w.c.usd)+'/mo vs '+X(n.t.n)+' at '+M(n.c.usd)+'/mo.')});
+const ok=R.filter(r=>r.c).sort((x,y)=>x.c.usd-y.c.usd);
+if(ok.length){const w=ok[0];v.unshift('For '+need.toLocaleString()+' images a month ('+keep.toLocaleString()+' kept × '+tries+' tr'+(tries==1?'y':'ies')+'), the lowest bill with the models picked is <b>'+X(w.t.n)+' ('+X(w.m.n)+') at '+M(w.c.usd)+'/mo</b>. Different models differ in quality and style, so that part isn\u2019t like for like.')}
+if(!v.length)v.push('Pick the same model in two cards to compare like for like.');
+else if(!Object.values(g).some(a=>a.length>1))v.push('<span class="small">Pick the same model in two cards (Ideogram 4.0 Turbo in Ideogram and Krea, or Recraft V4.1 Flash in Recraft and Krea) to compare like for like.</span>');
+$('ic-verdict').innerHTML=v.join('<br>');history.replaceState(null,'','?n='+keep+'&t='+tries+(slow?'&slow=1':'')+'&m='+D.map(t=>t.s+':'+sel[t.s]).join(','))}
+['ic-keep','ic-try'].forEach(i=>{$(i).addEventListener('input',go);$(i).addEventListener('change',go)});document.querySelectorAll('input[name=ic-slow]').forEach(x=>x.addEventListener('change',go));
+$('ic-copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(location.href);$('ic-st').textContent='Link copied.'}catch(e){$('ic-st').textContent='Copy this link: '+location.href}});
+document.querySelectorAll('[data-ip]').forEach(b=>b.addEventListener('click',()=>{const [n,t,s]=b.dataset.ip.split('|');$('ic-keep').value=n;$('ic-try').value=t;$(s=='1'?'ic-slow1':'ic-slow0').checked=true;go()}));
+go()})();'''
+_ipre = [("50 images, every one a keeper", "50|1|0"), ("100 keepers from 4 tries each", "100|4|0"), ("500 a month, can wait", "500|4|1"), ("2,000 a month, fast", "2000|1|0")]
+_i_qa = [("How much does one AI image cost?", f"On the entry plans we checked on {IMAGE_CHECKED}, from well under 1 cent (Krea 2 Turbo on Krea Basic: about 2,500 images for $9) to about 14 cents (Recraft V4.1 Pro Vector on Recraft Basic: 83 images for $12). The calculator works out your own cost from how many images you keep and how many tries each one takes."),
+         ("How many images do I get with Midjourney Basic?", "Midjourney Basic ($10/mo) gives 200 minutes of Fast GPU time. One standard (SD) prompt makes 4 images and uses about 0.8 minutes, so that's about 250 prompts or 1,000 images a month, or about 615 HD images. Midjourney says these are approximate."),
+         ("Which AI image plans are unlimited?", "Some plans let you keep generating in a slower queue after your fast credits run out: Ideogram Plus ($20/mo, unlimited slow credits), Midjourney Standard ($30/mo, unlimited Relax images), Leonardo Premium ($30/mo, unlimited relaxed images on selected models) and Krea Max ($105/mo, unlimited relaxed with supported in-house models). Choose “I can wait” in the calculator to count them."),
+         ("Is pay as you go cheaper than a subscription?", "For small amounts it can be. Ideogram's pay-as-you-go rate is 1¢ per credit, so 300 Ideogram 4.0 Turbo images (3 credits each) cost about $9, less than Plus at $20/mo. Above about 2,000 credits a month, Plus is cheaper, and it adds unlimited slow generation."),
+         ("Why do two tools charge differently for the same model?", f"Krea, Recraft and others resell models like Ideogram 4.0 and Recraft V4.1 Flash. Each sets its own credit price, so we compare them only when the same model is picked in both cards. Prices checked {IMAGE_CHECKED} on each official page.")]
+_i_body = f"""<style>.vc-big{{font-size:1.5rem;font-weight:800;margin:10px 0 2px}}.vc-in{{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));align-items:end}}.vc-in input[type=number],.vc-in select{{width:100%}}.i56pre{{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}}.i56pre button{{min-height:44px}}.i56tw table{{min-width:600px}}.i56tw td,.i56tw th{{font-size:.9rem;vertical-align:top}}.seg.i56s{{margin:0}}</style>
+<p class="small"><a href="/save-money.html">Save money</a> › Real cost of AI images</p><h1>What does an AI image really cost?</h1>
+<p class="tag">AI image plans are sold in credits, GPU minutes or units, and every model uses a different amount per image. Tell us how many images you need a month and see which plan of Midjourney, Ideogram, Recraft and Krea you'd actually need, and the real price per image, from each tool's official pricing page (checked {IMAGE_CHECKED}).</p>
+<div class="builder"><div class="i56pre" role="group" aria-label="Quick examples"><span class="small" style="align-self:center">Try:</span>{''.join(f'<button type="button" class="bbtn" data-ip="{v}">{e(l)}</button>' for l, v in _ipre)}</div>
+<div class="vc-in"><div><label for="ic-keep">Images you keep per month</label><input id="ic-keep" type="number" inputmode="numeric" min="1" max="100000" value="{I_DEF['keep']}"></div>
+<div><label for="ic-try">Images generated per keeper</label><select id="ic-try"><option value="1">1 (every image is a keeper)</option><option value="2">2</option><option value="4" selected>4 (one Midjourney grid)</option></select></div>
+<fieldset class="seg i56s"><legend>Speed</legend><input type="radio" name="ic-slow" id="ic-slow0" value="0" checked><label for="ic-slow0">I need them fast</label><input type="radio" name="ic-slow" id="ic-slow1" value="1"><label for="ic-slow1">I can wait (slow mode)</label></fieldset>
+<div><button type="button" class="bbtn" id="ic-copy">Copy link to this result</button> <span id="ic-st" class="small" role="status"></span></div></div>
+<p id="ic-verdict" class="pick" aria-live="polite" style="margin-top:12px">Pick the same model in two cards to compare like for like.</p></div>
+<h2>Your result by tool</h2><div class="grid">{_icards}</div>
+<p class="small">Monthly billing, before tax. The plan shown is the cheapest way to get your images: a plan, a plan plus top-ups (only where the top-up price is on the official page), or unlimited slow mode if you picked “I can wait”.</p>
+<h2>How many images each plan buys</h2><p class="small">Fast (priority) images per month, using all of a plan's monthly credits on one model. Credit costs and plan sizes copied from each official page on {IMAGE_CHECKED}. “$/image” is the plan price divided by the images it buys.</p>
+<div class="tw i56tw" role="region" aria-label="Images per plan" tabindex="0"><table><thead><tr><th scope="col">Tool</th><th scope="col">Model</th><th scope="col">Uses per image</th><th scope="col">Fast images per month, by plan (monthly billing)</th></tr></thead><tbody>{_irows}</tbody></table></div>
+<p class="small">Plans (monthly billing): {_iplans}.</p>
+<h2>If you can wait: plans with unlimited slow images</h2><p>After the fast credits run out, these plans keep generating images in a slower queue at no extra cost, so a heavy month costs the same as a light one:</p><ul>{_iflat}</ul>
+<h2>How we compare</h2><ul><li><b>Same unit.</b> Every plan is turned into images per month for the model you pick.</li><li><b>Same model for “cheaper”.</b> We only say one tool is cheaper when both run the same model (Ideogram 4.0 Turbo is on Ideogram and Krea; Recraft V4.1 Flash is on Recraft and Krea). Krea doesn't state the resolution for Ideogram 4.0; Ideogram's own rate is for 2K.</li><li><b>Monthly billing only.</b> Yearly plans are cheaper per month but paid up front; see <a href="/monthly-or-yearly.html">Monthly or yearly?</a></li><li><b>Only what the pages show.</b> Top-ups are added only where the price is on the official page (Midjourney $4 per GPU hour, Recraft $2 per 200 credits, Ideogram pay as you go at 1¢ per credit). Otherwise we say “More than the biggest plan” instead of guessing.</li><li><b>Approximate.</b> Midjourney's GPU minutes per prompt are its own averages; Krea's counts are rounded on its page. Editing, upscaling and reference images cost extra on most tools.</li></ul>
+<h2>Sources (checked {IMAGE_CHECKED})</h2><ul class="small">{_isrc}</ul>
+<h2>Tools left out</h2><ul>{_ileft}</ul>
+{_faq(_i_qa)}
+<p class="small">Related: <a href="/best-ai-images-tools.html">Best AI image tools</a> · <a href="/best-free-ai-images-tools.html">Free AI image tools</a> · <a href="/my-ai-costs.html#video">Real cost of AI video</a> · <a href="/my-ai-costs.html#voice">Real cost of AI voice</a> · <a href="/ai-budget-planner.html">AI budget planner</a> · <a href="/how-we-pick.html">How we pick</a></p>
+<script>{I_JS.replace("__ID__", _IJSON)}</script>"""
+page(I_PATH, f"AI Image Cost Calculator: Price per Image for Midjourney, Ideogram, Recraft, Krea ({IMAGE_CHECKED[:4]}) | ToolPick",
+     f"How many images each Midjourney, Ideogram, Recraft and Krea plan really buys, the real price per image, and which plans are unlimited in slow mode. From official pricing pages, checked {IMAGE_CHECKED}.",
+     _i_body, [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI image cost calculator", "url": BASE + I_PATH, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
+       "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": f"Works out which Midjourney, Ideogram, Recraft or Krea plan you need for a number of images a month and the real price per image, from official credit costs checked {IMAGE_CHECKED}."},
+      _ld_faq(_i_qa), crumbs([("ToolPick", "/"), ("Save money", "/save-money.html"), ("Real cost of AI images", I_PATH)])])
+V56_CHANGED = [I_PATH]
+def _v56ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v56"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V56_CHANGED.append(path); return True
+for _n in list(IMG) + ["Leonardo", "Magnific"]:
+    _v56ins(turl(_n), '<section class="card tbp"', f'<p class="pick v56"><b>How many images will you get?</b> See what each {e(_n)} plan really buys and the price per image, next to other image tools: <a href="{I_PATH}">Real cost of AI images →</a></p>')
+_v56ins("/best-ai-images-tools.html", "</h1>", f'<p class="pick v56">Image plans are sold in credits. <a href="{I_PATH}">See what an AI image really costs per plan →</a></p>', after=True)
+_v56ins("/best-free-ai-images-tools.html", "</h1>", f'<p class="pick v56">Outgrowing a free plan? <a href="{I_PATH}">See the real price per image on paid plans →</a></p>', after=True)
+for _js in ["ai-art", "logos-text-in-images", "social-media-graphics", "product-photos"]:
+    _v56ins(f"/best-ai-tool-for-{_js}.html", "<h2>Comparisons</h2>", f'<p class="pick small v56"><b>Need lots of images?</b> Compare the real price per image and plans with unlimited slow mode: <a href="{I_PATH}">Real cost of AI images →</a></p>')
+for _cs in ["midjourney-vs-leonardo", "midjourney-vs-ideogram", "midjourney-vs-krea", "leonardo-vs-ideogram", "ideogram-vs-recraft", "canva-vs-recraft"]:
+    _v56ins(f"/compare/{_cs}.html", "</h1>", f'<p class="small v56">How many images does each plan buy? <a href="{I_PATH}">Real cost of AI images →</a></p>', after=True)
+_v56ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v56\"><a href='{I_PATH}'>Real cost of AI images: price per image for Midjourney, Ideogram, Recraft and Krea</a></li>", after=True)
+V56_CHANGED.append("/save-money.html")
+open("public/llms.txt", "a").write(f"\n## Real cost of AI images (v56)\n- [AI image cost calculator]({BASE}{I_PATH}): images per month you keep x tries per keeper -> cheapest plan (plan, plan + top-ups where priced, or unlimited slow mode if ?slow=1) and $ per kept image for Midjourney, Ideogram, Recraft, Krea; same-model 'cheaper' verdicts only (Ideogram 4.0 Turbo, Recraft V4.1 Flash). Params: ?n=100&t=4&slow=1&m=midjourney:0,ideogram:0,recraft:1,krea:5. Official pages checked {IMAGE_CHECKED}:\n"
+    + "".join(f"  - {n} ({v['src']}): " + "; ".join(f"{a} ${b}/mo {c:,} {v['unit']}" + (" + unlimited slow" if d else "") for a, b, c, d, x in v["plans"]) + ". Per image: " + "; ".join(f"{a} {r:.3g} {v['unit']}" for a, r, k in v["models"]) + f". Extra: {v['top_note']}.\n" for n, v in IMG.items())
+    + "".join(f"  - Left out: {n} ({w})\n" for n, w in _tm0.IMAGE_LEFT_OUT))
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -3575,6 +3703,8 @@ if ' v52"' not in _hm and "</h1>" in _hm: open(_fpm, "w").write(_hm.replace("</h
 for _u in V52_CHANGED: _lm[_u] = REFUND_CHECKED
 for _u in V54_CHANGED: _lm[_u] = PRIVACY_CHECKED
 for _u in V55_CHANGED: _lm[_u] = PLANNER_CHECKED
+_v56ins("/my-ai-costs.html", "</h1>", f'<p class="small v56">Making images? <a href="{I_PATH}">Real cost of AI images: price per image and unlimited plans →</a></p>', after=True)
+for _u in V56_CHANGED: _lm[_u] = IMAGE_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
