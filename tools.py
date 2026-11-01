@@ -12,7 +12,7 @@ CATEGORIES = [
   {"name":"Synthesia","url":"https://www.synthesia.io","pricing":"https://www.synthesia.io/pricing","price":"Starter $19/mo ($14/mo yearly, $168/yr); Pro $89/mo ($59/mo yearly, $708/yr). Promotional: Starter $9 first month then $19/mo; Pro $49 first month then $89/mo (monthly billing)","free":"Basic free: 10 min video/mo + 500 credits, watermarked","about":"Business/training videos with AI presenters in 140+ languages."},
   {"name":"Descript","url":"https://www.descript.com","pricing":"https://www.descript.com/pricing","price":"Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50)","free":"Free: 1 media hour/mo, 720p export","about":"Edit video by editing the transcript; AI clean-up tools."},
   {"name":"CapCut","url":"https://www.capcut.com","pricing":"https://www.capcut.com/pricing","price":"Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo","free":"Free plan with basic editing and templates","about":"Easy editor for short-form social video, AI features built in."},
-  {"name":"InVideo","url":"https://invideo.io","pricing":"https://invideo.io/pricing","price":"Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150","free":"Free editor available","about":"Prompt-to-video for explainer and social videos."},
+  {"name":"InVideo","url":"https://invideo.io","pricing":"https://invideo.io/pricing","price":"Starter $20/mo ($10 yearly); Plus $60 ($30 yearly), more credits from $150; Max from $250/mo (checked 2026-11-01)","free":"Free editor available","about":"Prompt-to-video for explainer and social videos."},
  ]},
  {"id":"writing","name":"Writing","need":"Write, edit or brainstorm text","best":"Claude","free":["ChatGPT","Google Gemini","Grammarly"],"tools":[
   {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong long-form writing, editing and analysis assistant.","why":"Pro is $17-20/mo with a usable free tier, and is excellent at long, natural-sounding drafts."},
@@ -854,6 +854,7 @@ for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in ("Synthesia","GitHub Copilot","Suno"): _t["checked"] = "2026-10-27"
         if _t["name"] in ("v0","Bolt","Google Gemini","CapCut"): _t["checked"] = "2026-10-31"
+PRICE_NOTES["2026-11-01|InVideo"] = ("correction", "InVideo Starter ($20/mo, $10 billed yearly) and Plus ($60/mo, $30 billed yearly) are unchanged; Plus with more credits starts at $150/mo. We now also list Max, which starts at $250/seat/mo whether billed monthly or yearly.")
 PRICE_NOTES["2026-10-27|Synthesia"] = ("down", "Synthesia Starter is now $19/mo billed monthly, or $14/mo billed yearly ($168/yr). Before, it was $29/mo (yearly from $18/mo). Pro is still $89/mo, and billed yearly it is now $59/mo ($708/yr), down from $64. New: first-month offers, Starter $9 and Pro $49.")
 PRICE_NOTES["2026-10-27|ElevenLabs"] = ("changed", "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). New: a $1 first-month Starter offer, shown until Nov 1 (seen on the pricing page 2026-10-26).")
 for _n in ("GitHub Copilot", "Suno"):
