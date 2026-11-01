@@ -1383,3 +1383,26 @@ IMAGE_LEFT_OUT = [
 
 # Daily ops 2026-10-31: v0.app/pricing (paid plan renamed Team -> Plus, $30/user with $90 struck through; Free now 7 messages/day), bolt.new, gemini.google/subscriptions and capcut.com/pricing unchanged.
 PRICE_NOTES["2026-10-31|v0"] = ("changed", "v0's $30-per-user plan is now called Plus (it was Team), and the page shows $90 struck through next to the $30. Business is still $100 per user. The Free plan now lists a 7 messages/day limit, and new users get $5 in one-time credits.")
+
+# --- v57 (2026-11-01): extra facts for the "Beyond the price" compare tables, read today on official pages (only used where noted). ---
+V57_CHECKED = "2026-11-01"
+# ChatGPT Plus billing, https://help.openai.com/en/articles/6950777-what-is-chatgpt-plus : "Price: $20/month (billed monthly)."
+#   "Currently, we do not support annual billing or the option to pay for multiple months in advance for ChatGPT Plus subscriptions."
+V57_YEARLY = {"ChatGPT": ("Plus", 20, None, "Price: $20/month (billed monthly). Currently, we do not support annual billing ... for ChatGPT Plus subscriptions.", "https://help.openai.com/en/articles/6950777-what-is-chatgpt-plus")}
+# Windsurf (now Devin Desktop; windsurf.com/pricing shows "Devin Plans and Pricing"). Refunds, https://docs.devin.ai/desktop/accounts/usage :
+#   "Free trials of paid plans are not currently offered ... you can request a refund before using the subscription if you change your mind."
+#   Cancel: "cancel your plan at any time by browsing to the app.devin.ai/settings/plans page. Upon canceling, you'll still have access to your plan's features until the end of the current billing period."
+#   Terms 5.3 (https://cognition.com/legal/platform-terms-of-service): "Except as expressly provided in these Terms or where required by law, all payments are non-refundable."
+V57_REFUNDS = [{"t": "Windsurf", "k": "w", "wm": None, "wy": None, "cond": "you've not started using the subscription yet (no time limit stated)",
+  "how": "Ask Devin support.", "eu": "", "cancel": "app.devin.ai/settings/plans → cancel (on Teams, only the admin can)", "notice": "",
+  "after": "You keep paid features until the end of the billing period, then move to Free.", "app": 0,
+  "q": "You are welcome to subscribe directly to a paid plan, and you can request a refund before using the subscription if you change your mind.",
+  "sr": "https://docs.devin.ai/desktop/accounts/usage", "sc": "https://docs.devin.ai/desktop/accounts/usage"}]
+# Windsurf privacy, https://windsurf.com/security (redirects to Cognition's security page for Devin, which now includes Windsurf):
+#   "By default, we may use your data for model training purposes to improve and enhance the Services. If you're on a paid plan, you can opt out at any time on the Data Controls settings page."
+#   "On the Teams plan, only an administrator can exercise the opt-out." "If you are an Enterprise customer, we will never train on your data without your express prior written consent."
+# k "p" = trains by default, only paid plans can opt out.
+V57_PRIVACY = [{"t": "Windsurf", "k": "p", "ind": "By default it may use your data to train its models. Paid plans can opt out; the page doesn't offer the Free plan an opt-out.",
+  "steps": "Paid plans: Data Controls settings page → opt out (on Teams, only an admin can).", "bk": "a", "biz": "", "keep": "", "note": "",
+  "q": "By default, we may use your data for model training purposes to improve and enhance the Services. If you're on a paid plan, you can opt out at any time on the Data Controls settings page.",
+  "src": "https://windsurf.com/security", "sb": "https://windsurf.com/security", "more": []}]

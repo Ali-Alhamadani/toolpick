@@ -420,6 +420,9 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Left out: Canva (its pricing page describes AI as a shared allowance (“10x more AI than Canva Free”) with no image count)
   - Left out: Photoroom (it edits product photos (backgrounds, scenes) rather than selling image-generation credits)
 
+## Beyond the price on compare pages (v57)
+- Every /compare/ page with enough checked facts (60 pages, e.g. https://toolpick-ai.vercel.app/compare/chatgpt-vs-claude.html#beyond) now has a side-by-side table of free plan limits, yearly saving, student deal, team per-seat price, refund rule + how to cancel, and whether the tool trains on your data, each with its official source and checked date; an 'Ahead' mark per row by fixed rules (no call when a tool wasn't checked); 'Pick X if…' bullets; and a 'What matters to you?' tally (shareable: ?want=privacy,refund,free,yearly,student,team).
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.

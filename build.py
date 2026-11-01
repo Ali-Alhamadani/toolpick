@@ -3605,6 +3605,173 @@ open("public/llms.txt", "a").write(f"\n## Real cost of AI images (v56)\n- [AI im
     + "".join(f"  - {n} ({v['src']}): " + "; ".join(f"{a} ${b}/mo {c:,} {v['unit']}" + (" + unlimited slow" if d else "") for a, b, c, d, x in v["plans"]) + ". Per image: " + "; ".join(f"{a} {r:.3g} {v['unit']}" for a, r, k in v["models"]) + f". Extra: {v['top_note']}.\n" for n, v in IMG.items())
     + "".join(f"  - Left out: {n} ({w})\n" for n, w in _tm0.IMAGE_LEFT_OUT))
 
+# --- v57: "Beyond the price" on every compare page: free plan, yearly saving, student deal, team seats, refunds + cancelling, training on your data,
+# side by side with a winner per row, "Pick X if…" bullets and a "What matters to you?" tally. Reuses only facts already verified on official pages
+# (each cell shows its own source link and checked date: FREE_LIMITS 10-22, STUDENT 10-24, TEAM 10-26, REFUNDS 10-27, PRIVACY 10-29, PLANNER 10-30). ---
+V57_DATE = "2026-11-01"; V57_CHANGED = []
+_FL57 = {r[0]: r for r in _tm0.FREE_LIMITS}; _FLO57 = dict(_tm0.FREE_LEFT_OUT)
+_RF57 = {r["t"]: r for r in _tm0.REFUNDS + _tm0.V57_REFUNDS}; _RLO57 = dict(_tm0.REFUND_LEFT_OUT)
+_PV57 = {r["t"]: r for r in _tm0.PRIVACY + _tm0.V57_PRIVACY}; _PLO57 = dict(_tm0.PRIVACY_LEFT_OUT)
+_ST57 = {}
+for _o in _tm0.STUDENT_OFFERS:
+    if "s" in _o["who"]: _ST57.setdefault(_o["tool"], _o)
+_STN57 = {a: (b, c) for a, b, c in _tm0.STUDENT_NONE}
+_TM57 = {r["t"]: r for r in _tm0.TEAM_PLANS}; _TLO57 = dict(_tm0.TEAM_LEFT_OUT)
+_PP57 = _tm0.PLANNER_PRICES
+def _src57(u, n, d): return f'<span class="s57"><a href="{e(u)}" rel="noopener" target="_blank">source<span class="skip"> for {e(n)} (opens in a new tab)</span></a> · checked {d}</span>'
+def _na57(why=""): return dict(h=f'<span class="na57">{e(why) if why else "Not in our checks yet"}</span>', r=None)
+def _usd57(v): return "$" + (f"{v:,.2f}".rstrip("0").rstrip(".") if round(v, 2) != int(v) else f"{int(v):,}")
+_PVLAB = {"n": ("No", "doesn't train on your content"), "c": ("Only if you opt in", ""), "y": ("Yes, by default", "you can switch it off"), "x": ("Yes", "no opt-out found"), "u": ("Unclear", "the default isn't stated"), "p": ("Yes, by default", "only paid plans can switch it off")}
+_PVR = {"n": 4, "c": 3, "y": 2, "p": 1.5, "x": 1}
+def _row57(key, n):
+    t = find(n)
+    if key == "free":
+        if n in _FL57:
+            _, inc, lim, wm, com, step = _FL57[n]; NSv = _tm0.NS
+            b = [f"<b>Yes</b>: " + (e(lim) if lim != NSv else f"includes {e(inc[0].lower() + inc[1:])}")]
+            if wm not in (NSv,) and not wm.startswith("n/a"): b.append(f"Watermark: {e(wm)}")
+            if com != NSv: b.append(f"Commercial use: {e(com)}")
+            return dict(h="<br>".join(b) + _src57(_tm0.FREE_SRC.get(n, t["pricing"]), n, _tm0.FREE_CHECKED), r=1, why="you want to start on a free plan")
+        if n in _FLO57 and _FLO57[n].startswith("no free plan"):
+            return dict(h="<b>No free plan</b>" + _src57(t["pricing"], n, _tm0.FREE_CHECKED), r=0)
+        rf = realfree(t)
+        return dict(h=(f"<b>Yes</b>: {e(strip_checked(t['free']))}" if rf else f"<b>No real free plan</b>: {e(strip_checked(t['free']))}") + _src57(t["pricing"], n, t.get("checked", CHECKED)), r=1 if rf else 0, why="you want to start on a free plan")
+    if key == "yearly":
+        if n in _tm0.V57_YEARLY:
+            pl, m, y, q, u = _tm0.V57_YEARLY[n]
+            return dict(h=f"{e(pl)}: {_usd57(m)}/mo, <b>monthly only</b> (no yearly plan)" + _src57(u, n, _tm0.V57_CHECKED), r=0)
+        if n not in _PP57: return _na57()
+        pl, m, y, q = _PP57[n]
+        if m and y:
+            s = round((1 - y / m) * 100)
+            return dict(h=f"{e(pl)}: {_usd57(m)}/mo monthly, <b>{_usd57(y)}/mo billed yearly</b> (save {s}%)" + _src57(t["pricing"], n, _tm0.PLANNER_CHECKED), r=s, why=f"you'll pay for a year up front: {pl} drops from {_usd57(m)} to {_usd57(y)}/mo (save {s}%)")
+        pm, pa, _po = PRICE_TABLE.get(n, (None, None, None))
+        if m and not y and pa and pm == m:
+            s = round((1 - pa / m) * 100)
+            return dict(h=f"{e(pl)}: {_usd57(m)}/mo monthly, <b>{_usd57(pa)}/mo billed yearly</b> (save {s}%)" + _src57(t["pricing"], n, t.get("checked", CHECKED)), r=s, why=f"you'll pay for a year up front: {pl} drops from {_usd57(m)} to {_usd57(pa)}/mo (save {s}%)")
+        if y and not m and pm and pa == y:
+            s = round((1 - y / pm) * 100)
+            return dict(h=f"{e(pl)}: {_usd57(pm)}/mo monthly, <b>{_usd57(y)}/mo billed yearly</b> (save {s}%)" + _src57(t["pricing"], n, t.get("checked", CHECKED)), r=s, why=f"you'll pay for a year up front: {pl} drops from {_usd57(pm)} to {_usd57(y)}/mo (save {s}%)")
+        if m: return dict(h=f"{e(pl)}: {_usd57(m)}/mo monthly<br><span class=\"na57\">Yearly price not in our checks</span>" + _src57(t["pricing"], n, _tm0.PLANNER_CHECKED), r=None)
+        return dict(h=f"{e(pl)}: {_usd57(y)}/mo billed yearly<br><span class=\"na57\">Monthly price not in our checks</span>" + _src57(t["pricing"], n, _tm0.PLANNER_CHECKED), r=None)
+    if key == "student":
+        if n in _ST57:
+            o = _ST57[n]; rk = {"free": 3, "off": 2, "ask": 1}[o["kind"]]
+            return dict(h=f"<b>{e(o['badge'])}</b>: {e(o['offer'])}" + _src57(o["src"], n, _tm0.STUDENT_CHECKED), r=rk, why=f"you're a student: {o['badge'][0].lower() + o['badge'][1:]} ({o['offer']})")
+        if n in _STN57: return dict(h="<b>None</b> on its official page" + _src57(_STN57[n][1], n, _tm0.STUDENT_CHECKED), r=0)
+        return _na57()
+    if key == "team":
+        if n in _TM57:
+            p = _TM57[n]; pr = (f"<b>{_usd57(p['m'])}/seat/mo</b> monthly" + (f" ({_usd57(p['y'])} billed yearly)" if p.get("y") else "")) if p.get("m") else f"<b>{_usd57(p['y'])}/seat/mo</b>, billed yearly"
+            mn = f"; from {p['mn']} seats" if p.get("mn") else ""
+            if p.get('base'): pr += f" + {_usd57(p['base'])}/mo team fee"
+            if p.get('frm'): pr = pr.replace('/seat/mo</b>', '+/seat/mo</b>', 1)
+            if p.get('flat'): pr = f"<b>{_usd57(p['m'])}{'+' if p.get('frm') else ''}/mo</b> for the whole workspace"
+            nt = f'<br><span class="small">{e(p["note"])}</span>' if p.get('note') and (p.get('addon') or p.get('flat')) else ''
+            return dict(h=f"{e(p['plan'])}: {pr}{mn}{nt}" + _src57(p["src"], n, _tm0.TEAM_CHECKED), r=None, m=p.get("m"), y=p.get("y"), plan=p["plan"], odd=bool(p.get('flat')), soft=bool(p.get('base') or p.get('frm') or p.get('addon')))
+        if n in _TLO57: return _na57("No clean per-seat price on its page")
+        return _na57()
+    if key == "refund":
+        if n in _RF57:
+            r = _RF57[n]; rk = 0 if r["k"] == "n" else (1 if r["k"] == "c" else 2 + (r["wm"] or 0) / 100000)
+            lab = {"n": "<b>No refunds</b>", "c": "<b>Case by case</b>", "w": "<b>Refund window</b>" if r["wm"] else "<b>Refund in narrow cases</b>"}[r["k"]]
+            can = f'<br><span class="small">Cancel: {e(r["cancel"])}' + (f" ({e(r['notice'])})" if r["notice"] else "") + "</span>"
+            return dict(h=(f"{lab}: {e(_rshort(r))}" if not _rshort(r).startswith("Case by case") else f"<b>Case by case</b>: {e(_rshort(r)[14:])}") + can + _src57(r["sr"], n, _tm0.V57_CHECKED if r in _tm0.V57_REFUNDS else _tm0.REFUND_CHECKED), r=rk, why="you want a clearer way to get your money back: " + _rshort(r)[0].lower() + _rshort(r)[1:])
+        if n in _RLO57: return _na57("Refund rule unclear on its page")
+        return _na57()
+    if key == "privacy":
+        if n in _PV57:
+            p = _PV57[n]; a, b = _PVLAB[p["k"]]
+            biz = "<br><span class=\"small\">Team plans: not used for training by default</span>" if p["bk"] == "n" else ""
+            stp = f'<br><span class="small">Opt out: {e(p["steps"])}</span>' if p["k"] in ("y", "u", "p") and p["steps"] else ""
+            return dict(h=f"<b>{e(a)}</b>" + (f" ({e(b)})" if b else "") + f'<br><span class="small">{e(p["ind"])}</span>{stp}{biz}' + _src57(p["src"], n, _tm0.V57_CHECKED if p in _tm0.V57_PRIVACY else _tm0.PRIVACY_CHECKED), r=_PVR.get(p["k"]),
+                        why="you'd rather your chats and files weren't used for AI training by default" if p["k"] in ("n", "c") else "you want a setting to stop training on your data")
+        if n in _PLO57: return _na57("Not stated plainly on its pages")
+        return _na57()
+ROWS57 = [("free", "Free plan", "/free-plan-limits.html", "Free plan limits"), ("yearly", "Yearly billing", "/monthly-or-yearly.html", "Monthly or yearly?"),
+          ("student", "Student deal", "/ai-student-discounts.html", "Student discounts"), ("team", "Team plan", "/ai-team-plans.html", "Team plan costs"),
+          ("refund", "Refunds and cancelling", "/ai-refund-policies.html", "Refund rules"), ("privacy", "Trains on your data?", "/ai-data-privacy.html", "Data privacy")]
+WANT57 = {"free": "Free plan", "yearly": "Yearly savings", "student": "Student deal", "team": "Team seats", "refund": "Refunds", "privacy": "Privacy"}
+def _win57(key, cells):
+    if key == "team":
+        for f in ("m", "y"):
+            vs = {n: c[f] for n, c in cells.items() if c.get(f)}
+            if len(vs) >= 2 and len(vs) == len([c for c in cells.values() if c.get("plan")]):
+                lo = min(vs.values()); w = [n for n, v in vs.items() if v == lo]
+                if len(w) == 1 and len(vs) == len(cells) and not cells[w[0]].get('soft') and not any(c.get('odd') for c in cells.values()):
+                    oth = ", ".join(f"{n} {_usd57(v)}" for n, v in vs.items() if n != w[0])
+                    cells[w[0]]["why"] = f"you're buying seats: {cells[w[0]]['plan']} is {_usd57(lo)}/seat/mo on {'monthly' if f == 'm' else 'yearly'} billing (vs {oth})"
+                    return w[0], "same"
+                return None, ("tie" if len(vs) == len(cells) else None)
+        return None, None
+    rs = {n: c["r"] for n, c in cells.items() if c.get("r") is not None}
+    if len(rs) < 2 or len(rs) < len(cells): return None, None
+    hi = max(rs.values()); w = [n for n, v in rs.items() if v == hi]
+    if len(w) == 1 and hi > 0: return w[0], "same"
+    return None, "tie"
+_P57CSS = ('<style>.bp57{margin:var(--s6) 0}.bp57 h2{margin:0 0 var(--s2)}.w57{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s3) 0}.w57 .chip[aria-pressed=true]{background:var(--tx);color:var(--bg);border-color:var(--tx)}'
+           '.w57 .chip[aria-pressed=true]::before{content:"✓ "}#t57{min-height:1.6em}.bp57 table td,.bp57 table th{vertical-align:top;font-size:.93rem}.bp57 tbody th{width:170px}.bp57 tbody th a{font-weight:400;font-size:.85rem;display:inline-block;padding:0}'
+           '.s57{display:block;font-size:.8rem;color:var(--mu);margin-top:4px}.s57 a{display:inline;padding:0}.na57{color:var(--mu);font-size:.875rem}.a57{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--ok);color:var(--okt);margin:0 0 4px}'
+           '.bp57 tr.hl57 th,.bp57 tr.hl57 td{background:var(--acs)}.pk57{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--s4);margin:var(--s4) 0}.pk57 .card h3{margin:0 0 4px}.pk57 ul{margin:0;padding-left:1.2em}.pk57 li{margin:4px 0}'
+           '@media(max-width:640px){.bp57 .tw{overflow:visible;border:0;box-shadow:none;background:none}.bp57 table,.bp57 tbody,.bp57 tr,.bp57 td,.bp57 th{display:block;width:auto!important}.bp57 thead{position:absolute;left:-9999px}'
+           '.bp57 tr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);margin:0 0 var(--s3);box-shadow:var(--sh);overflow:hidden}.bp57 tbody th{font-size:1rem;border-bottom:1px solid var(--bd);background:var(--sf2)}.bp57 td::before{content:attr(data-t);display:block;font-weight:700;color:var(--tx)}}</style>')
+_W57JS = r'''(function(){const D=__D__;const $=id=>document.getElementById(id);const B=[...document.querySelectorAll('[data-w57]')];const q=new URLSearchParams(location.search);
+const on=new Set((q.get('want')||'').split(',').filter(k=>D.w[k]!==undefined));
+function go(push){B.forEach(b=>b.setAttribute('aria-pressed',on.has(b.dataset.w57)));document.querySelectorAll('tr[data-r57]').forEach(r=>r.classList.toggle('hl57',on.has(r.dataset.r57)));
+const L=D.lab,c={};let ties=[],none=[];on.forEach(k=>{const w=D.w[k];if(w&&w[0]){(c[w[0]]=c[w[0]]||[]).push(L[k])}else if(w&&w[1]=='tie')ties.push(L[k]);else none.push(L[k])});
+let h;if(!on.size)h='Tap what matters to you. We tally which tool is ahead using only the facts in the table below.';
+else{const r=Object.entries(c).sort((a,b)=>b[1].length-a[1].length);const s=[];
+if(r.length){const top=r[0];const tie=r.length>1&&r[1][1].length==top[1].length;
+s.push(tie?'<b>It\u2019s close.</b> ':'<b>'+top[0]+' is ahead on '+top[1].length+' of '+on.size+' things you picked.</b> ');
+r.forEach(x=>s.push(x[0]+': '+x[1].join(', ')+'.'))}else s.push('<b>No clear winner on what you picked.</b>');
+if(ties.length)s.push(' Same on: '+ties.join(', ')+'.');if(none.length)s.push(' Not enough checked facts to call: '+none.join(', ')+'.');h=s.join(' ')}
+$('t57').innerHTML=h;if(push){const p=new URLSearchParams(location.search);p.delete('want');let s=p.toString();if(on.size)s+=(s?'&':'')+'want='+[...on].join(',');history.replaceState(null,'',location.pathname+(s?'?'+s:'')+location.hash)}}
+B.forEach(b=>b.addEventListener('click',()=>{const k=b.dataset.w57;on.has(k)?on.delete(k):on.add(k);go(1)}));go(0)})();'''
+_v57_summary = {}
+def _bp57(x):
+    ns = cnames(x); rows = []; W = {}; why = {n: [] for n in ns}
+    for key, lab, href, hl in ROWS57:
+        cells = {n: _row57(key, n) for n in ns}
+        if all(c.get("r") is None and not c.get("plan") and "na57" in c["h"] for c in cells.values()): continue
+        w, st = _win57(key, cells); W[key] = [w, st]
+        if w and cells[w].get("why"): why[w].append(cells[w]["why"])
+        tds = "".join(f'<td data-t="{e(n)}">' + ('<span class="a57">Ahead</span><br>' if n == w else "") + cells[n]["h"] + "</td>" for n in ns)
+        rows.append(f'<tr data-r57="{key}"><th scope="row">{e(lab)}<br><a href="{href}">{e(hl)} →</a></th>{tds}</tr>')
+    if len(rows) < 2: return None
+    caps = {n: CAPS[n] for n in ns}
+    for n in ns:
+        only = [c for c in caps[n] if all(c not in caps[o] for o in ns if o != n)]
+        if only: why[n].append("you also need " + " and ".join(CAP_LABEL.get(c, c) for c in only[:2]) + " (from what its own site says it does)")
+    picks = "".join(f'<article class="card"><h3>Pick <a href="{turl(n)}">{e(n)}</a> if…</h3>' + (("<ul>" + "".join(f"<li>{e(w_[0].upper() + w_[1:].rstrip('.'))}.</li>" for w_ in why[n]) + "</ul>") if why[n] else '<p class="small">No clear edge in the facts we checked. Decide on price and features above.</p>') + "</article>" for n in ns)
+    wants = [k for k, lab, *_ in ROWS57 if k in W] if any(v[0] or v[1] == 'tie' for v in W.values()) else []
+    chips = "".join(f'<button type="button" class="chip" data-w57="{k}" aria-pressed="false">{e(WANT57[k])}</button>' for k in wants)
+    head = "".join(f'<th scope="col"><a href="{turl(n)}">{e(n)}</a></th>' for n in ns)
+    title = " vs ".join(ns)
+    _v57_summary[x[0]] = {k: v[0] for k, v in W.items()}
+    dj = json.dumps({"w": W, "lab": {k: WANT57[k] for k in wants}}, separators=(",", ":")).replace("</", "<\\/")
+    _pick_html = (f'<div class="builder" style="padding:var(--s4)"><p style="margin:0;font-weight:600" id="w57l">What matters to you?</p><div class="w57" role="group" aria-labelledby="w57l">{chips}</div><p id="t57" aria-live="polite" style="margin:0">Tap what matters to you. We tally which tool is ahead using only the facts in the table below.</p></div>') if wants else ''
+    _who_html = f'<h2 class="h3">Who should pick which</h2><div class="pk57">{picks}</div>' if any(why.values()) else ''
+    _js_html = f'<script>{_W57JS.replace("__D__", dj)}</script>' if wants else ''
+    return (f'{_P57CSS}<section class="bp57" id="beyond" aria-labelledby="bp57h"><h2 id="bp57h">Beyond the price: {e(title)}</h2>'
+            f'<p class="tag" style="font-size:1rem">Free plan limits, yearly savings, student and team deals, refunds and whether your data trains their AI, side by side. Every fact is from the tool\'s official page, with its source and the date we read it.</p>'
+            + _pick_html +
+            f'<div class="tw"><table><caption class="skip">{e(title)}: free plan, yearly billing, student deal, team plan, refunds and data training</caption><thead><tr><th scope="col">What you get</th>{head}</tr></thead><tbody>{"".join(rows)}</tbody></table></div>'
+            f'<p class="small">“Ahead” means better on that row only, by a fixed rule: a free plan beats none; the bigger yearly saving; free student plan, then discount; the lower per-seat price on the same billing; a stated refund window, then case by case, then none; not training on your data, then opt-in, then opt-out, then no opt-out. No row is called when a tool hasn\'t been checked. See <a href="/how-we-pick.html">how we pick</a>.</p>'
+            + _who_html + _js_html + '</section>')
+for _x in COMPARISONS:
+    _fp = f"public/compare/{_x[0]}.html"
+    if not os.path.exists(_fp): continue
+    _h = open(_fp).read()
+    if 'class="bp57"' in _h: continue
+    _sec = _bp57(_x)
+    if not _sec: continue
+    _h = _re.sub(r'<p class="small v5[02]">.*?</p>', '', _h, flags=_re.S)  # refund + team one-liners now live in the table
+    _h = _h.replace('<p class="small">More:', _sec + '<p class="small">More:', 1)
+    _h = _h.replace("</p><dl class=\"vgrid\">", '</p><p class="small v57" style="margin:0 0 6px"><a href="#beyond">Free plan, refunds, privacy and more: see what else differs ↓</a></p><dl class="vgrid">', 1)
+    _h = _re.sub(r'(<meta (?:name|property)="(?:og:)?description" content=")([^"]*?)(")', lambda m: m.group(1) + m.group(2).rstrip(".") + ". Also side by side: free plan limits, refunds, data privacy, student and team deals." + m.group(3), _h)
+    open(_fp, "w").write(_h); V57_CHANGED.append(f"/compare/{_x[0]}.html")
+open("public/llms.txt", "a").write(f"\n## Beyond the price on compare pages (v57)\n- Every /compare/ page with enough checked facts ({len(V57_CHANGED)} pages, e.g. {BASE}/compare/chatgpt-vs-claude.html#beyond) now has a side-by-side table of free plan limits, yearly saving, student deal, team per-seat price, refund rule + how to cancel, and whether the tool trains on your data, each with its official source and checked date; an 'Ahead' mark per row by fixed rules (no call when a tool wasn't checked); 'Pick X if…' bullets; and a 'What matters to you?' tally (shareable: ?want=privacy,refund,free,yearly,student,team).\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -3705,6 +3872,7 @@ for _u in V54_CHANGED: _lm[_u] = PRIVACY_CHECKED
 for _u in V55_CHANGED: _lm[_u] = PLANNER_CHECKED
 _v56ins("/my-ai-costs.html", "</h1>", f'<p class="small v56">Making images? <a href="{I_PATH}">Real cost of AI images: price per image and unlimited plans →</a></p>', after=True)
 for _u in V56_CHANGED: _lm[_u] = IMAGE_CHECKED
+for _u in V57_CHANGED: _lm[_u] = V57_DATE
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
