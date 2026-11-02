@@ -24,9 +24,9 @@
 - [Descript](https://toolpick-ai.vercel.app/tools/descript.html): Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50) | free: Free: 1 media hour/mo, 720p export
 - [CapCut](https://toolpick-ai.vercel.app/tools/capcut.html): Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo | free: Free plan with basic editing and templates
 - [InVideo](https://toolpick-ai.vercel.app/tools/invideo.html): Starter $20/mo ($10 yearly); Plus $60 ($30 yearly), more credits from $150; Max from $250/mo | free: Free editor available
-- [Opus Clip](https://toolpick-ai.vercel.app/tools/opus-clip.html): Paid from $15/mo billed monthly | free: Free forever plan ($0)
+- [Opus Clip](https://toolpick-ai.vercel.app/tools/opus-clip.html): Starter $15/mo; Pro $29/mo; Business custom | free: Free forever plan ($0)
 - [Captions](https://toolpick-ai.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
-- [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
+- [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max $100/mo; Ultra $200/mo | free: Free plan: $0
 - [ChatGPT](https://toolpick-ai.vercel.app/tools/chatgpt.html): Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); Business $25/seat/mo ($20 billed annually); monthly billing | free: Free: $0 (unlimited text chats on GPT-6, limits on tools)
 - [Google Gemini](https://toolpick-ai.vercel.app/tools/google-gemini.html): Google AI Plus $4.99/mo (Flash model, lighter tier); Google AI Pro $19.99/mo; Ultra from $99.99/mo (US prices) | free: Gemini app is free to use
 - [Grammarly](https://toolpick-ai.vercel.app/tools/grammarly.html): Pro $30/mo ($12/mo billed yearly, $144/yr; $60 quarterly) | free: Free: $0 spelling & grammar checks
@@ -167,6 +167,8 @@
 - [Replit vs Lovable](https://toolpick-ai.vercel.app/compare/replit-vs-lovable.html)
 - [Replit vs Bolt](https://toolpick-ai.vercel.app/compare/replit-vs-bolt.html)
 - [Replit vs Cursor](https://toolpick-ai.vercel.app/compare/replit-vs-cursor.html)
+- [Pika vs Luma Dream Machine](https://toolpick-ai.vercel.app/compare/pika-vs-luma.html)
+- [Runway vs HeyGen](https://toolpick-ai.vercel.app/compare/runway-vs-heygen.html)
 
 ## Best tool for a job
 - [making YouTube Shorts & TikToks](https://toolpick-ai.vercel.app/best-ai-tool-for-youtube-shorts.html)
@@ -256,7 +258,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## ChatGPT and Claude plans
 - [ChatGPT pricing](https://toolpick-ai.vercel.app/chatgpt-pricing.html): Free vs Go vs Plus vs Pro (and Business), each price with its confirmation date; feature differences from the official page (2026-10-24)
-- [Is Claude Pro worth it?](https://toolpick-ai.vercel.app/is-claude-pro-worth-it.html): what Pro adds over Free, when to skip it, similar plans; claude.com/pricing checked 2026-10-23
+- [Is Claude Pro worth it?](https://toolpick-ai.vercel.app/is-claude-pro-worth-it.html): what Pro adds over Free, when to skip it, similar plans; claude.com/pricing checked 2026-11-02
 
 ## AI student discounts (v48)
 - [AI student & teacher discounts](https://toolpick-ai.vercel.app/ai-student-discounts.html): 17 student offers (7 free) and 8 teacher offers, each with eligibility, how to claim, regular price and year-one saving where both prices are stated; read on official pages 2026-10-24. Also lists school-only plans (Claude, Grammarly, Canva Campus, Scite) and tools with no student discount (ChatGPT, Cursor, Warp). Filters: ?who=t, ?cat=coding, ?free=1, ?tool=lovable.
@@ -421,7 +423,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Left out: Photoroom (it edits product photos (backgrounds, scenes) rather than selling image-generation credits)
 
 ## Beyond the price on compare pages (v57)
-- Every /compare/ page with enough checked facts (60 pages, e.g. https://toolpick-ai.vercel.app/compare/chatgpt-vs-claude.html#beyond) now has a side-by-side table of free plan limits, yearly saving, student deal, team per-seat price, refund rule + how to cancel, and whether the tool trains on your data, each with its official source and checked date; an 'Ahead' mark per row by fixed rules (no call when a tool wasn't checked); 'Pick X if…' bullets; and a 'What matters to you?' tally (shareable: ?want=privacy,refund,free,yearly,student,team).
+- Every /compare/ page with enough checked facts (62 pages, e.g. https://toolpick-ai.vercel.app/compare/chatgpt-vs-claude.html#beyond) now has a side-by-side table of free plan limits, yearly saving, student deal, team per-seat price, refund rule + how to cancel, and whether the tool trains on your data, each with its official source and checked date; an 'Ahead' mark per row by fixed rules (no call when a tool wasn't checked); 'Pick X if…' bullets; and a 'What matters to you?' tally (shareable: ?want=privacy,refund,free,yearly,student,team).
 
 
 ## My AI costs
@@ -434,4 +436,4 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [Browse all AI tools](https://toolpick-ai.vercel.app/tools.html): search all 82 tools by name or job (e.g. /tools.html?q=voiceover), filter by what each tool does (?job=text-to-speech, from each tool's own site), category (?category=video), real free plan (?free=yes), verified starting price (?price=u10), billing (?billing=monthly), Best Value picks (?bv=1); card or table view (?view=table); compare up to 3. Prices from official pricing pages with checked dates.
 
 ## Search (v58)
-- [Search ToolPick](https://toolpick-ai.vercel.app/search.html): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of 294 pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: https://toolpick-ai.vercel.app/search-index.json
+- [Search ToolPick](https://toolpick-ai.vercel.app/search.html): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of 296 pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: https://toolpick-ai.vercel.app/search-index.json

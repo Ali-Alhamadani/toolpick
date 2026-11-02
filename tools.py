@@ -15,7 +15,7 @@ CATEGORIES = [
   {"name":"InVideo","url":"https://invideo.io","pricing":"https://invideo.io/pricing","price":"Starter $20/mo ($10 yearly); Plus $60 ($30 yearly), more credits from $150; Max from $250/mo (checked 2026-11-01)","free":"Free editor available","about":"Prompt-to-video for explainer and social videos."},
  ]},
  {"id":"writing","name":"Writing","need":"Write, edit or brainstorm text","best":"Claude","free":["ChatGPT","Google Gemini","Grammarly"],"tools":[
-  {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong long-form writing, editing and analysis assistant.","why":"Pro is $17-20/mo with a usable free tier, and is excellent at long, natural-sounding drafts."},
+  {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max $100/mo; Ultra $200/mo (checked 2026-11-02)","free":"Free plan: $0","about":"Strong long-form writing, editing and analysis assistant.","why":"Pro is $17-20/mo with a usable free tier, and is excellent at long, natural-sounding drafts."},
   {"name":"ChatGPT","url":"https://chatgpt.com","pricing":"https://chatgpt.com/pricing","price":"check site","free":"Free plan with unlimited text chats on GPT-6 (limits on tools)","about":"General-purpose AI assistant: writing, research, images, voice."},
   {"name":"Google Gemini","url":"https://gemini.google.com","pricing":"https://one.google.com/about/ai-premium","price":"Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo","free":"Gemini app is free to use","about":"Google's assistant, integrated with Gmail, Docs and Drive."},
   {"name":"Grammarly","url":"https://www.grammarly.com","pricing":"https://www.grammarly.com/plans","price":"Pro $30/mo ($12/mo billed yearly, $144/yr; $60 quarterly) (checked 2026-10-23)","free":"Free: $0 spelling & grammar checks","about":"Grammar, clarity and tone fixes everywhere you type."},
@@ -27,7 +27,7 @@ CATEGORIES = [
   {"name":"GitHub Copilot","url":"https://github.com/features/copilot","pricing":"https://github.com/features/copilot/plans","price":"Pro $10/mo; Pro+ $39/mo; Max $100/mo","free":"Free plan: $0","about":"AI pair programmer in VS Code, JetBrains and GitHub.","why":"Paid plan from $10/mo and a real free tier, and it works in the editor you already use."},
   {"name":"Cursor","url":"https://cursor.com","pricing":"https://cursor.com/pricing","price":"Plus $8/mo; Premium $30/mo; Super $100; Ultra $200; Teams $30/user","free":"Free: $0 with limited agent requests","about":"AI-first code editor with agents."},
   {"name":"Windsurf","url":"https://windsurf.com","pricing":"https://windsurf.com/pricing","price":"Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat","free":"Free: $0","about":"Agentic AI IDE."},
-  {"name":"Claude (Pro)","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17 yearly); Max from $100/mo","free":"Free plan: $0","about":"Strong coding model for chat-based and agentic coding."},
+  {"name":"Claude (Pro)","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17 yearly); Max $100/mo; Ultra $200/mo (checked 2026-11-02)","free":"Free plan: $0","about":"Strong coding model for chat-based and agentic coding."},
   {"name":"Bolt","url":"https://bolt.new","pricing":"https://bolt.new/pricing","price":"Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) (checked 2026-10-22)","free":"Free: 300K tokens/day, 1M/month","about":"Build full-stack web apps from a prompt in the browser."},
   {"name":"v0","url":"https://v0.app","pricing":"https://v0.app/pricing","price":"Plus $30/user/mo (page shows $90 struck through); Business $100/user/mo","free":"Free: $0/mo, 7 messages/day (new users also get $5 in starter credits)","about":"Vercel's AI app/UI builder, deploys to Vercel."},
   {"name":"Lovable","url":"https://lovable.dev","pricing":"https://lovable.dev/pricing","price":"check site","free":"Free: 5 build credits/day (up to 30/mo)","about":"Prompt-to-app builder for non-developers."},
@@ -63,7 +63,7 @@ CATEGORIES += [
  {"id":"assistants","name":"AI Assistants","need":"Chat with an AI assistant","best":"Le Chat (Mistral)","free":["ChatGPT","Claude","Google Gemini"],"tools":[
   {"name":"Le Chat (Mistral)","url":"https://chat.mistral.ai","pricing":"https://mistral.ai/pricing","price":"Pro $14.99/mo; Team $24.99/user/mo (excl. tax)","free":"Free plan with limited access","about":"Mistral's assistant with web search, image generation and the Vibe coding agent.","why":"Pro at $14.99/mo, plus a free plan."},
   {"name":"ChatGPT","url":"https://chatgpt.com","pricing":"https://chatgpt.com/pricing","price":"check site","free":"Free plan with unlimited text chats on GPT-6 (limits on tools)","about":"General-purpose AI assistant: writing, research, images, voice."},
-  {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max from $100/mo","free":"Free plan: $0","about":"Assistant known for long-form writing, analysis and coding."},
+  {"name":"Claude","url":"https://claude.ai","pricing":"https://claude.com/pricing","price":"Pro $20/mo ($17/mo billed yearly); Max $100/mo; Ultra $200/mo (checked 2026-11-02)","free":"Free plan: $0","about":"Assistant known for long-form writing, analysis and coding."},
   {"name":"Google Gemini","url":"https://gemini.google.com","pricing":"https://one.google.com/about/ai-premium","price":"Paid tiers $4.99/mo, $19.99/mo, Ultra from $99.99/mo","free":"Gemini app is free to use","about":"Google's assistant, integrated with Gmail, Docs and Drive."},
   {"name":"Perplexity","url":"https://www.perplexity.ai","pricing":"https://www.perplexity.ai/pricing","price":"check site","free":"check site","about":"Answer engine that cites web sources."},
   {"name":"Microsoft Copilot","url":"https://copilot.microsoft.com","pricing":"https://www.microsoft.com/en-us/microsoft-365/copilot/pricing","price":"check site","free":"check site","about":"Microsoft's assistant, built into Windows and Microsoft 365."},
@@ -86,7 +86,7 @@ def T(name,url,pricing,price,free,about,why=None,**kw):
     return d
 CK="check site"
 _extra = {
- "video":[T("Opus Clip","https://www.opus.pro","https://www.opus.pro/pricing","Paid from $15/mo billed monthly","Free forever plan ($0)","Turns long videos into short viral clips automatically."),
+ "video":[T("Opus Clip","https://www.opus.pro","https://www.opus.pro/pricing","Starter $15/mo; Pro $29/mo; Business custom (checked 2026-11-02)","Free forever plan ($0)","Turns long videos into short viral clips automatically."),
           T("Captions","https://www.captions.ai","https://www.captions.ai/pricing","From $24.99/mo; higher tiers $69.99, $139.99, $279.99/mo",CK,"AI video editing, captions and AI actors for creators.")],
  "writing":[T("Wordtune","https://www.wordtune.com","https://www.wordtune.com/plans","From $6.99/mo ($4.89/mo with yearly discount); next tier $9.99 ($6.99)","Basic $0 (limited)","Rewrites sentences for clarity and tone."),
             T("Rytr","https://rytr.me","https://rytr.me/pricing","$7.50/mo; $24.16/mo for multiple brands","Free forever, no card","Budget AI writer for short-form content.")],
@@ -718,7 +718,7 @@ CHATGPT_FEATURES = [  # row, Free, Go, Plus, Pro (from today's comparison table;
 # Max "From $100 Per month", "Choose 5x or 20x more usage than Pro"; FAQ "Pro gives you at least 5x more usage per 5-hour session than Free";
 # "Claude Code is included in all paid plans"; Free: Projects "Up to 5", Research "No", Opus "No"; Pro: Opus Yes, Research Yes, Claude in Chrome / Microsoft 365 Yes;
 # "Usage limits apply. Prices shown don't include applicable tax."
-CLAUDE_CHECKED = "2026-10-23"
+CLAUDE_CHECKED = "2026-11-02"
 
 # v48 (2026-10-24): Student & teacher discounts. Every offer read today on the tool's own official page (src); quote = exact text on that page.
 # kind: free | off | ask. who: s = students, t = teachers/educators. save = (formula, $ year-one saving) only when the page states the plan and both prices
@@ -1410,3 +1410,23 @@ V57_PRIVACY = [{"t": "Windsurf", "k": "p", "ind": "By default it may use your da
   "src": "https://windsurf.com/security", "sb": "https://windsurf.com/security", "more": []}]
 PRICE_NOTES["2026-11-02|ElevenLabs"] = ("changed", "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The pricing page still shows the $1 first-month Starter offer (83% off) after Nov 1, so the old end date was dropped (seen 2026-11-02).")
 PRICE_SKIP["2026-11-02|Otter"] = "Re-checked 2026-11-02; only the checked date changed, prices unchanged."
+
+# Weekly price pass 2026-11-02 (official pricing pages, WebFetch/curl). Re-read and unchanged: runwayml.com/pricing, pika.art/pricing, lumalabs.ai/pricing,
+# heygen.com/pricing, captions.ai/pricing ($24.99 / $69.99), rytr.me/pricing, warp.dev/pricing (Build $20/mo, $20 usage), midjourney.com (docs plans),
+# udio.com/pricing, krisp.ai/pricing, surferseo.com/pricing, writesonic.com/pricing, replit.com/pricing.
+# claude.com/pricing: "Max For all-day work $100 Per month ... 5x Pro usage every 5 hours and every week"; "Ultra For your longest tasks $200 Per month ...
+#   Everything in Max, plus: No 5-hour limit ... 10x Pro usage every week"; Pro "$17 Per month with annual subscription discount ($200 billed up front). $20 if billed monthly."
+# opus.pro/pricing: Free $0, Starter $15/mo, Pro $29/mo, Business custom.
+# Not verifiable today (left unchanged): Kling AI (JS-only), Lovable, Recraft, Magnific (no prices in fetched page), Qodo ($30 not shown), Wordtune, Photoroom, Murf (partial),
+#   Riverside (page showed a "staging environment" banner, so not trusted).
+_W1102 = {"Runway","Pika","Luma Dream Machine","HeyGen","Captions","Rytr","Warp","Midjourney","Udio","Krisp","Surfer","Writesonic","Replit","Claude","Claude (Pro)","Opus Clip"}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _W1102: _t["checked"] = "2026-11-02"
+PRICE_NOTES["2026-11-02|Claude"] = ("newplan", "Claude added an Ultra plan at $200/mo (10x Pro's weekly usage, no 5-hour limit). Max is now listed at $100/mo (5x Pro). Pro is unchanged at $20/mo, or $17/mo billed yearly.")
+PRICE_NOTES["2026-11-02|Claude (Pro)"] = PRICE_NOTES["2026-11-02|Claude"]
+PRICE_NOTES["2026-11-02|Opus Clip"] = ("changed", "Opus Clip's Starter plan is unchanged at $15/mo. We now also list Pro at $29/mo; Business is custom pricing.")
+COMPARISONS += [
+ ("pika-vs-luma", "Pika vs Luma Dream Machine", "Pika", "Luma Dream Machine", "video"),
+ ("runway-vs-heygen", "Runway vs HeyGen", "Runway", "HeyGen", "video"),
+]

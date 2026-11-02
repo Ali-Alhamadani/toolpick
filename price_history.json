@@ -3671,7 +3671,7 @@
    "free": "Free editor available"
   },
   "Opus Clip": {
-   "price": "Paid from $15/mo billed monthly",
+   "price": "Starter $15/mo; Pro $29/mo; Business custom (checked 2026-11-02)",
    "free": "Free forever plan ($0)"
   },
   "Captions": {
@@ -3679,7 +3679,7 @@
    "free": "Free plan available"
   },
   "Claude": {
-   "price": "Pro $20/mo ($17/mo billed yearly); Max from $100/mo",
+   "price": "Pro $20/mo ($17/mo billed yearly); Max $100/mo; Ultra $200/mo (checked 2026-11-02)",
    "free": "Free plan: $0"
   },
   "ChatGPT": {

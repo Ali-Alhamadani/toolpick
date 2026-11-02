@@ -2273,7 +2273,7 @@ _b_rows = "".join(f"<tr><th scope='row'>{a}</th><td>{b}</td><td>{c}</td></tr>" f
   ("Free plan", "Free $0 (limited AI usage)", "Free $0, but Claude Code isn't included"),
   ("Cheapest paid", "Plus $8/mo (only Grok models)", "Pro $20/mo (includes Claude Code)"),
   ("Main plan", "Premium $30/mo (most popular)", "Pro $20/mo"),
-  ("Higher tier", "Super $100/mo · Ultra $200/mo", "Max from $100/mo"),
+  ("Higher tier", "Super $100/mo · Ultra $200/mo", "Max $100/mo · Ultra $200/mo"),
   ("Yearly billing", "not shown on the pricing page", "Pro $17/mo ($200 billed up front)"),
   ("What it is", "An AI code editor", "A coding agent included with a Claude subscription, alongside the Claude chat app")])
 _qa_b = [("Is Claude Code cheaper than Cursor?", f"On monthly billing, Claude Pro (which includes Claude Code) is $20/mo and Cursor Premium is $30/mo. Cursor Plus is $8/mo but only includes Grok models (checked {CODING_CHECKED})."),
@@ -2285,7 +2285,7 @@ _b_body = f"""<p class="small"><a href="/best-ai-coding-tools.html">AI coding to
 <p class="small">Sources: <a href="{e(_cur['pr'])}" rel="noopener" target="_blank">cursor.com/pricing</a> · <a href="{e(_cc['pr'])}" rel="noopener" target="_blank">claude.com/pricing</a>. Usage limits are set differently on each plan and aren't published in the same unit, so we don't compare usage.</p>{_faq(_qa_b)}
 <p class="small">Related: <a href="/cursor-alternatives.html">Cursor alternatives</a> · <a href="/cheapest-ai-coding-assistant.html">Cheapest AI coding assistant</a> · <a href="/compare/github-copilot-vs-cursor.html">GitHub Copilot vs Cursor</a></p>"""
 page("/compare/cursor-vs-claude-code.html", f"Cursor vs Claude Code ({CODING_CHECKED[:4]}): Pricing Compared | ToolPick",
-     f"Cursor vs Claude Code prices checked {CODING_CHECKED}: Cursor Plus $8 (Grok models only), Premium $30; Claude Pro with Claude Code $20/mo or $17/mo yearly; Max from $100.",
+     f"Cursor vs Claude Code prices checked {CODING_CHECKED}: Cursor Plus $8 (Grok models only), Premium $30; Claude Pro with Claude Code $20/mo or $17/mo yearly; Max $100, Ultra $200.",
      _b_body, _ld_list("Cursor vs Claude Code", "/compare/cursor-vs-claude-code.html", ["Cursor", "Claude"]) + [_ld_faq(_qa_b), crumbs([("ToolPick", "/"), ("Compare", "/compare-builder.html"), ("Cursor vs Claude Code", "/compare/cursor-vs-claude-code.html")])])
 _V41_PAGES.append("/compare/cursor-vs-claude-code.html")
 # C) Cheapest AI coding assistant
@@ -2441,14 +2441,14 @@ _alt_li = "".join(f"<li><a href='{turl(n)}'>{e(n)}</a> {e(pl)}: {e(pr)} (checked
 _qa_cl = [("How much is Claude Pro?", f"$20/month billed monthly, or $17/month billed yearly ($200 up front), before tax (claude.com/pricing, {CLC})."),
           ("Does Claude Pro include Claude Code?", "Yes. Claude Code is included in all paid plans and shares the same usage limits as your chats."),
           ("How much more usage does Pro give than Free?", "Claude says Pro gives at least 5x more usage per 5-hour session than Free. There's no fixed message count."),
-          ("When is Claude Max better?", "Max starts at $100/month and gives 5x or 20x the usage of Pro, plus priority access at busy times.")]
+          ("When is Claude Max or Ultra better?", "Max is $100/month and gives 5x Pro's usage every 5 hours and every week, plus priority access at busy times. Ultra is $200/month with 10x Pro's weekly usage and no 5-hour limit for verified accounts.")]
 _cl_body = f"""<p class="small"><a href="{turl('Claude')}">Claude</a> › Is Claude Pro worth it?</p><h1>Is Claude Pro worth it?</h1>
 <p class="tag">What $20 a month gets you over the free plan, from <a href="https://claude.com/pricing" rel="noopener" target="_blank">claude.com/pricing</a> (checked {CLC}), and when to choose something else.</p>
 <p class="pick"><b>Short answer:</b> worth it if you hit Free's limits often, want Claude Code, Research or Opus, or need more than 5 projects. Skip it if Free covers your everyday questions. Pay yearly and it's $17/mo instead of $20.</p>
 <h2>What Pro adds over Free</h2><div class="tw"><table><caption class="small" style="text-align:left">From the plan comparison on claude.com/pricing, {CLC}.</caption><tr><th scope="col">Feature</th><th scope="col">Free ($0)</th><th scope="col">Pro ($20/mo, or $17/mo yearly)</th></tr>
 <tr><th scope="row">Usage</th><td>Everyday questions</td><td>At least 5x Free per 5-hour session</td></tr><tr><th scope="row">Claude Code</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Research</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Opus model</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Projects</th><td>Up to 5</td><td>Yes</td></tr><tr><th scope="row">Claude in Chrome, Microsoft 365, Outlook</th><td>No</td><td>Yes</td></tr><tr><th scope="row">Claude Dashboards (beta)</th><td>No</td><td>Yes</td></tr></table></div>
 <h2>Worth it if…</h2><ul><li>You run into Free's usage limits most weeks.</li><li>You code: Claude Code is included and shares your plan's usage.</li><li>You want Research, the Opus model, or more than 5 projects.</li></ul>
-<h2>Skip it if…</h2><ul><li>Free covers what you do: chat, web search, files and code, memory, Artifacts and connectors are all in Free.</li><li>You'd use it all day: Max (from $100/mo) gives 5x or 20x Pro's usage.</li></ul>
+<h2>Skip it if…</h2><ul><li>Free covers what you do: chat, web search, files and code, memory, Artifacts and connectors are all in Free.</li><li>You'd use it all day: Max ($100/mo) gives 5x Pro's usage; Ultra ($200/mo) gives 10x Pro's weekly usage with no 5-hour limit.</li></ul>
 <h2>Similar plans elsewhere (monthly billing)</h2><ul>{_alt_li}</ul>
 {_faq(_qa_cl)}
 <p class="small">Related: <a href="/chatgpt-pricing.html">ChatGPT pricing</a> · <a href="/compare/chatgpt-vs-claude.html">ChatGPT vs Claude</a> · <a href="/compare/cursor-vs-claude-code.html">Cursor vs Claude Code</a> · <a href="/ai-subscription-costs.html">AI subscription costs</a></p>"""
