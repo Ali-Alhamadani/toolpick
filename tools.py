@@ -228,7 +228,7 @@ FREE_ALT_FOR += ["Pika","InVideo","Writesonic","Surfer","Krea","Notion AI","Clau
 
 # Browser-verified 2026-10-15 (official pricing pages)
 _BV = {
- "Otter": dict(price="List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). Promotional (first-time subscribers): Pro $8.49/mo monthly or $4.17/mo yearly (save 50%); Business $24/user/mo for 3 months (20% off) (checked 2026-10-21)"),
+ "Otter": dict(price="List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). Promotional (first-time subscribers): Pro $8.49/mo monthly or $4.17/mo yearly (save 50%); Business $24/user/mo for 3 months (20% off) (checked 2026-11-02)"),
  "ChatGPT": dict(price="Go $8/mo; Plus $20/mo; Pro from $100/mo (3 tiers); Business $25/seat/mo ($20 billed annually); monthly billing (checked 2026-10-24)", free="Free: $0 (unlimited text chats on GPT-6, limits on tools)"),
  "Perplexity": dict(price="Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown (checked 2026-10-24)", free="Free tier available"),
  "Gamma": dict(price="Plus $12/mo ($9/mo yearly, $108/yr); Pro $25 ($18, $216/yr); Ultra $100 ($90, $1,080/yr); per seat (checked 2026-10-24)", free="Free plan available"),
@@ -348,7 +348,7 @@ COMPARISONS += [
 # Weekly price pass 2026-10-19 (official pricing pages; static HTML or rendered page text)
 CATEGORIES[2]["tools"].append(T("Replit","https://replit.com","https://replit.com/pricing","Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom",CK,"Build and deploy apps by describing them to Replit's AI agent, all in the browser."))
 _W1019 = {
- "ElevenLabs": dict(price="Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (until Nov 1), Creator $11 first month (50% off) (checked 2026-10-26)"),
+ "ElevenLabs": dict(price="Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (83% off), Creator $11 first month (50% off) (checked 2026-11-02)"),
  "Rytr": dict(price="Lite $9/mo; Personal $19/mo; Pro $49/mo (monthly prices; yearly billing saves 20%)", free="Free forever: 10,000 characters/mo", about="AI writing in your own voice, plus relationship and follow-up tools."),
  "Qodo": dict(price="Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits)", free="14-day free trial, no card; free for open source projects"),
  "Surfer": dict(price="Discovery $49/mo; AI Search Analytics $82/mo; Standard $99/mo; Pro $182/mo; Peace of Mind $299/mo (all billed yearly)"),
@@ -940,15 +940,16 @@ TEAM_LEFT_OUT = [  # tool, why (all read on TEAM_CHECKED)
 
 # v51 (2026-10-26): ElevenLabs, https://elevenlabs.io/pricing (WebFetch, "Monthly billing"). FAQ: "Free $0 (10,000 credits); Starter $6 (30,000 credits);
 # Creator $22 (121,000 credits, $11 for the first month); Pro $99 (600,000 credits); Scale $299 (1,800,000 credits, 3 seats); Business $990 (6,000,000 credits, 10 seats); Enterprise is custom."
-# Starter card: "Until Nov 1 $6 First month 83% off $1per month" (a stale banner on the same page says "Ends September 30"; we use the plan card).
+# 2026-11-02 re-check: Starter card still shows "$6 First month 83% off $1 per month" (its "Until" date is filled by JS; the Nov 1 date is no longer shown in our text).
+# Starter card (2026-10-26): "Until Nov 1 $6 First month 83% off $1per month" (a stale banner on the same page says "Ends September 30"; we use the plan card).
 # Annual: "annual price = monthly price x 10 ... $5 Starter, $18.33 Creator, $82.50 Pro, $249.17 Scale, $825 Business".
 # Compare table: TTS minutes included ~10/~30/~121/~600/~1,800/~6,000 (Free..Business). The "Extra minute" row is ambiguous in the fetched text (values shifted), so not used.
 # Credits: TTS 1 credit/character (V2 Multilingual); STT 330/min; Music 900/min; SFX 200/generation; Voice Changer & Isolator 1,000/min; Dubbing 2,000-10,000/min.
 # Rollover: unused credits roll over up to 2 months (max 3x quota) on active paid plans; not on Free. "Prices exclude all taxes, levies and duties."
-EL_CHECKED = "2026-10-26"
+EL_CHECKED = "2026-11-02"
 EL_PLANS = [  # plan, monthly $, yearly $/mo, credits, ~TTS minutes (UI), first-month promo, key adds
  ("Free", 0, None, "10,000", "~10", "", "Text to speech, speech to text, sound effects, music; 3 Studio projects; no commercial license"),
- ("Starter", 6, 5, "30,000", "~30", "$1 first month (until Nov 1)", "Commercial license, Instant Voice Cloning, Dubbing Studio, 20 Studio projects"),
+ ("Starter", 6, 5, "30,000", "~30", "$1 first month (83% off)", "Commercial license, Instant Voice Cloning, Dubbing Studio, 20 Studio projects"),
  ("Creator", 22, 18.33, "121,000", "~121", "$11 first month (50% off)", "Professional Voice Cloning, additional credits"),
  ("Pro", 99, 82.50, "600,000", "~600", "", "44.1kHz PCM output via API, 192kbps audio"),
  ("Scale", 299, 249.17, "1,800,000", "~1,800", "", "3 workspace seats, team collaboration, 3 Professional Voice Clones"),
@@ -1407,3 +1408,5 @@ V57_PRIVACY = [{"t": "Windsurf", "k": "p", "ind": "By default it may use your da
   "steps": "Paid plans: Data Controls settings page → opt out (on Teams, only an admin can).", "bk": "a", "biz": "", "keep": "", "note": "",
   "q": "By default, we may use your data for model training purposes to improve and enhance the Services. If you're on a paid plan, you can opt out at any time on the Data Controls settings page.",
   "src": "https://windsurf.com/security", "sb": "https://windsurf.com/security", "more": []}]
+PRICE_NOTES["2026-11-02|ElevenLabs"] = ("changed", "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The pricing page still shows the $1 first-month Starter offer (83% off) after Nov 1, so the old end date was dropped (seen 2026-11-02).")
+PRICE_SKIP["2026-11-02|Otter"] = "Re-checked 2026-11-02; only the checked date changed, prices unchanged."

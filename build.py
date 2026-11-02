@@ -2923,13 +2923,13 @@ def _ppm(p, mins):
 _el_rows = "".join(f"<tr><th scope='row'>{e(n)}</th><td>{_m(mo)}</td><td>{_m(yr) if yr is not None else ('—' if mo == 0 else 'Custom')}</td><td>{cr}</td><td>{mi}</td><td>{_ppm(mo, mi)}</td><td>{e(pr) or '—'}</td><td>{e(k)}</td></tr>" for n, mo, yr, cr, mi, pr, k in _tm0.EL_PLANS)
 _el_cr = "".join(f"<tr><th scope='row'>{e(a)}</th><td>{e(b)}</td></tr>" for a, b in _tm0.EL_CREDITS)
 _qa_el = [("How much is ElevenLabs per month?", f"Free $0, Starter $6, Creator $22, Pro $99, Scale $299, Business $990 on monthly billing; Enterprise is custom (elevenlabs.io/pricing, {ELC}). Prices exclude taxes."),
-          ("Is there an ElevenLabs discount right now?", f"On {ELC} the pricing page showed Starter at $1 for the first month (until Nov 1) and Creator at $11 for the first month (50% off). A separate banner on the same page said \"Ends September 30\", so check the page before you subscribe."),
+          ("Is there an ElevenLabs discount right now?", f"On {ELC} the pricing page showed Starter at $1 for the first month (83% off) and Creator at $11 for the first month (50% off). A separate banner on the same page said \"Ends September 30\", so check the page before you subscribe."),
           ("How many characters do ElevenLabs credits buy?", "For text to speech, 1 credit is 1 character on V2 Multilingual models (Flash/Turbo models cost 0.5–1 credit per character via the API). ElevenLabs estimates 10,000 credits at about 10 minutes of speech."),
           ("Is yearly billing cheaper?", "Yes. Yearly costs 10× the monthly price (two months free): Starter $5/mo, Creator $18.33/mo, Pro $82.50/mo."),
           ("Do unused credits roll over?", "On active paid plans, unused credits roll over for up to two months (a balance of up to 3× your monthly quota). They don't roll over on Free, and are forfeited if you downgrade or cancel.")]
 _el_body = f"""<p class="small"><a href="{turl('ElevenLabs')}">ElevenLabs</a> › Pricing</p><h1>ElevenLabs pricing: plans, credits and minutes</h1>
 <p class="tag">Every ElevenLabs plan from <a href="https://elevenlabs.io/pricing" rel="noopener" target="_blank">elevenlabs.io/pricing</a>, checked {ELC}. Monthly billing unless marked yearly.</p>
-<p class="pick"><b>In short:</b> Free gives 10,000 credits (~10 min of speech) with no commercial license. Starter is $6/mo for 30,000 credits and a commercial license, and is $1 for the first month until Nov 1. Creator is $22/mo for 121,000 credits and Professional Voice Cloning.</p>
+<p class="pick"><b>In short:</b> Free gives 10,000 credits (~10 min of speech) with no commercial license. Starter is $6/mo for 30,000 credits and a commercial license, and was $1 for the first month on the pricing page on {ELC}. Creator is $22/mo for 121,000 credits and Professional Voice Cloning.</p>
 <h2>Plans and prices</h2><div class="tw"><table><caption class="small" style="text-align:left">Checked {ELC}. Minutes are ElevenLabs' own text-to-speech estimate. “Per minute” is our calculation: monthly price ÷ included minutes.</caption><tr><th scope="col">Plan</th><th scope="col">Monthly</th><th scope="col">Yearly (per month)</th><th scope="col">Credits / month</th><th scope="col">~Minutes of speech</th><th scope="col">Per minute</th><th scope="col">First-month offer</th><th scope="col">Adds</th></tr>{_el_rows}</table></div>
 <h2>What credits buy</h2><p>All products share one monthly credit pool.</p><div class="tw"><table><caption class="small" style="text-align:left">Approximate credit costs, from the official FAQ ({ELC}).</caption><tr><th scope="col">Product</th><th scope="col">Credits</th></tr>{_el_cr}</table></div>
 {_faq(_qa_el)}
@@ -2939,7 +2939,7 @@ page("/elevenlabs-pricing.html", f"ElevenLabs Pricing ({ELC[:4]}): Plans, Credit
      _el_body, [{"@context": "https://schema.org", "@type": "Product", "name": "ElevenLabs", "url": BASE + "/elevenlabs-pricing.html", "brand": {"@type": "Brand", "name": "ElevenLabs"},
                  "offers": [{"@type": "Offer", "name": n, "price": mo, "priceCurrency": "USD"} for n, mo, *_ in _tm0.EL_PLANS if mo is not None]},
                 _ld_faq(_qa_el), crumbs([("ToolPick", "/"), ("ElevenLabs", turl("ElevenLabs")), ("ElevenLabs pricing", "/elevenlabs-pricing.html")])])
-_qa_ew = [("Is ElevenLabs Starter worth $6?", f"If you need a commercial license or voice cloning, yes: those start at Starter. You get 30,000 credits (~30 min of speech). On {ELC} the first month was $1 (until Nov 1)."),
+_qa_ew = [("Is ElevenLabs Starter worth $6?", f"If you need a commercial license or voice cloning, yes: those start at Starter. You get 30,000 credits (~30 min of speech). On {ELC} the first month was $1 (83% off)."),
           ("Can I use the free plan for YouTube or client work?", "Free has no commercial license, which starts at Starter. Free does include 10,000 credits a month for text to speech, speech to text, sound effects and music."),
           ("Starter or Creator?", "Creator ($22) adds Professional Voice Cloning and about 4× Starter's credits (121,000 vs 30,000). Pick it if you need a close clone of your own voice, or more than ~30 minutes a month."),
           ("Is there a cheaper way to pay?", "Yearly billing costs 10 months' price for 12, so Starter is $5/mo and Creator $18.33/mo. Unused credits also roll over for up to two months on active paid plans.")]
@@ -2947,7 +2947,7 @@ _ew_body = f"""<p class="small"><a href="{turl('ElevenLabs')}">ElevenLabs</a> �
 <p class="tag">Free vs Starter vs Creator: what each step up gets you, from <a href="https://elevenlabs.io/pricing" rel="noopener" target="_blank">elevenlabs.io/pricing</a> (checked {ELC}).</p>
 <p class="pick"><b>Short answer:</b> stay on Free for personal tests under ~10 minutes a month. Pay for Starter ($6) when you publish or sell the audio, because the commercial license starts there. Pay for Creator ($22) when you need Professional Voice Cloning or more than ~30 minutes a month.</p>
 <div class="tw"><table><caption class="small" style="text-align:left">Monthly billing, checked {ELC}.</caption><tr><th scope="col"></th><th scope="col">Free</th><th scope="col">Starter</th><th scope="col">Creator</th></tr>
-<tr><th scope="row">Price</th><td>$0</td><td>$6/mo ($1 first month, until Nov 1)</td><td>$22/mo ($11 first month)</td></tr>
+<tr><th scope="row">Price</th><td>$0</td><td>$6/mo ($1 first month)</td><td>$22/mo ($11 first month)</td></tr>
 <tr><th scope="row">Credits</th><td>10,000 (~10 min)</td><td>30,000 (~30 min)</td><td>121,000 (~121 min)</td></tr>
 <tr><th scope="row">Commercial license</th><td>No</td><td>Yes</td><td>Yes</td></tr>
 <tr><th scope="row">Voice cloning</th><td>No</td><td>Instant</td><td>Instant + Professional</td></tr>
