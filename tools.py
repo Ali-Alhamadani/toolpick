@@ -1430,3 +1430,45 @@ COMPARISONS += [
  ("pika-vs-luma", "Pika vs Luma Dream Machine", "Pika", "Luma Dream Machine", "video"),
  ("runway-vs-heygen", "Runway vs HeyGen", "Runway", "HeyGen", "video"),
 ]
+
+# --- v58 (2026-11-02): Kling, Runway, Pika, Luma re-checked in the browser on Nov 2, 2026 (values supplied from that check; nothing else assumed) ---
+# Kling https://kling.ai/app/membership/membership-plan (the old klingai.com URL redirects there; the plan page renders client-side after ~6 s, so browser checks must wait).
+#   Basic free $0, free credits not stated. Monthly regular: Standard $8.8 (660 credits), Pro $32.56 (3000), Premier $181.99 (18000; slider 8K-38K), Ultra+ $544.99 (57000).
+#   First month 30% off, one time: $6.99 / $25.99 / $144.99 / $432.99; end date not stated. Yearly per year: Standard $79.2, Pro $293.04, Premier $1639.99, Ultra+ $4902.99
+#   (per-month yearly figure not stated). Paid plans: up to 4 videos per generation; daily free credits for subscribers (amount not stated).
+# Runway https://runway.com/pricing; Pika https://pika.art/pricing; Luma https://lumalabs.ai/pricing: same values as the 2026-11-02 weekly check (see _W1102).
+V58_CHECKED = "2026-11-02"
+V58_LABEL = "checked Nov 2, 2026"
+KLING_URL = "https://kling.ai/app/membership/membership-plan"
+KLING_PLANS = [  # plan, monthly regular, first month (30% off), per year, credits/month, note
+ ("Basic", 0, None, None, "not stated", "Free plan"),
+ ("Standard", 8.8, 6.99, 79.2, "660", ""),
+ ("Pro", 32.56, 25.99, 293.04, "3,000", ""),
+ ("Premier", 181.99, 144.99, 1639.99, "18,000", "Credit slider from 8K to 38K"),
+ ("Ultra+", 544.99, 432.99, 4902.99, "57,000", ""),
+]
+VIDEO4 = {  # entry monthly, entry yearly per month (None = not stated), top monthly, free option, entry name, top name, pricing url
+ "Kling AI": dict(entry=8.8, entry_y=None, entry_yr=79.2, top=544.99, top_name="Ultra+", entry_name="Standard", free="Basic plan, $0 (free credits not stated)", url=KLING_URL,
+                  yearly="Per-year prices only: Standard $79.20/yr; per-month figure not stated", promo="30% off the first month, one time ($6.99 Standard); end date not stated"),
+ "Runway": dict(entry=15, entry_y=12, top=95, top_name="Max", entry_name="Standard", free="Free plan, 125 credits one time", url="https://runway.com/pricing",
+                yearly="$12/mo billed yearly (vs $15)", promo="25% off Kling 4.0 generations on Runway until Nov 30"),
+ "Pika": dict(entry=10, entry_y=8, top=95, top_name="Fancy (up to $880 with the slider)", entry_name="Starter", free="Free plan, $0: no monthly credits (packs only), no commercial license", url="https://pika.art/pricing",
+              yearly="$8/mo billed yearly (vs $10)", promo="not stated"),
+ "Luma Dream Machine": dict(entry=30, entry_y=25, top=300, top_name="Ultra", entry_name="Plus", free="No free plan listed", url="https://lumalabs.ai/pricing",
+                            yearly="$25/mo billed yearly ($300/yr, vs $30)", promo="not stated"),
+}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] == "Kling AI":
+            _t["pricing"] = KLING_URL; _t["checked"] = V58_CHECKED
+            _t["price"] = "List prices: Standard $8.8/mo ($79.20/yr); Pro $32.56/mo ($293.04/yr); Premier $181.99/mo ($1,639.99/yr); Ultra+ $544.99/mo ($4,902.99/yr). Promotional: 30% off the first month, one time: Standard $6.99; Pro $25.99; Premier $144.99; Ultra+ $432.99 (end date not stated)"
+            _t["free"] = "Basic: free ($0); free credits not stated"
+        if _t["name"] == "Runway":
+            _t["pricing"] = "https://runway.com/pricing"; _t["checked"] = V58_CHECKED
+        if _t["name"] in ("Pika", "Luma Dream Machine"): _t["checked"] = V58_CHECKED
+PRICE_TABLE["Kling AI"] = (8.8, None, None)
+PLANS_SHORT["Kling AI"] = "Standard $8.8/mo · Pro $32.56/mo · Premier $181.99/mo · Ultra+ $544.99/mo. Yearly: $79.20 / $293.04 / $1,639.99 / $4,902.99 per year. First month 30% off, one time ($6.99 / $25.99 / $144.99 / $432.99)."
+FREE_SRC["Runway"] = "https://runway.com/pricing"
+for _i, _r in enumerate(FREE_LIMITS):
+    if _r[0] == "Kling AI": FREE_LIMITS[_i] = ("Kling AI", "Basic plan at $0", NS, NS, NS, "Standard $8.8/mo ($6.99 first month, 30% off once)")
+PRICE_NOTES["2026-11-02|Kling AI"] = ("changed", "Kling now shows one regular monthly price per plan: Standard $8.8, Pro $32.56, Premier $181.99, Ultra+ $544.99 (we had listed $10 / $37 / $207 / $619 as list prices, with these as the after-first-month prices). The one-time 30% first-month offer is now $6.99 / $25.99 / $144.99 / $432.99 (Premier was $135, Ultra+ $402); end date not stated. Yearly Premier is $1,639.99/yr (was $1,490) and Ultra+ $4,902.99/yr (was $4,457); Standard $79.20 and Pro $293.04 are unchanged.")

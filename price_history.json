@@ -3647,8 +3647,8 @@
    "free": "No free plan listed on pricing page"
   },
   "Kling AI": {
-   "price": "List prices: Standard $10/mo ($79.20/yr); Pro $37/mo ($293.04/yr); Premier $207/mo ($1,490/yr); Ultra+ $619/mo ($4,457/yr). Promotional: Standard $6.99 first month then $8.8/mo; Pro $25.99 first month then $32.56/mo; Premier $135 first month then $181.99/mo; Ultra+ $402 first month then $544.99/mo (checked 2026-10-17)",
-   "free": "Basic: free"
+   "price": "List prices: Standard $8.8/mo ($79.20/yr); Pro $32.56/mo ($293.04/yr); Premier $181.99/mo ($1,639.99/yr); Ultra+ $544.99/mo ($4,902.99/yr). Promotional: 30% off the first month, one time: Standard $6.99; Pro $25.99; Premier $144.99; Ultra+ $432.99 (end date not stated)",
+   "free": "Basic: free ($0); free credits not stated"
   },
   "HeyGen": {
    "price": "Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat",

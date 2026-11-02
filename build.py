@@ -3772,6 +3772,95 @@ for _x in COMPARISONS:
     open(_fp, "w").write(_h); V57_CHANGED.append(f"/compare/{_x[0]}.html")
 open("public/llms.txt", "a").write(f"\n## Beyond the price on compare pages (v57)\n- Every /compare/ page with enough checked facts ({len(V57_CHANGED)} pages, e.g. {BASE}/compare/chatgpt-vs-claude.html#beyond) now has a side-by-side table of free plan limits, yearly saving, student deal, team per-seat price, refund rule + how to cancel, and whether the tool trains on your data, each with its official source and checked date; an 'Ahead' mark per row by fixed rules (no call when a tool wasn't checked); 'Pick X if…' bullets; and a 'What matters to you?' tally (shareable: ?want=privacy,refund,free,yearly,student,team).\n")
 
+# --- v58: Kling pricing, Kling vs Runway, Kling vs Pika vs Luma (prices checked Nov 2, 2026) ---
+KL = _tm0.V58_LABEL; KD = _tm0.V58_CHECKED; V4 = _tm0.VIDEO4
+def _d(v): return "$0" if v == 0 else f"${v:,.2f}".replace(".00", "")
+def _ysave(n):
+    x = V4[n]
+    if x.get("entry_y") is not None: return x["entry"] * 12 - x["entry_y"] * 12, x["entry_y"] * 12
+    return x["entry"] * 12 - x["entry_yr"], x["entry_yr"]
+_srcp = lambda n: f'<a href="{V4[n]["url"]}" rel="noopener" target="_blank">{e(V4[n]["url"].split("//")[1])}</a>'
+_CRED = '<p class="small"><b>Why we don\'t compare credits:</b> each tool spends credits differently (per second, per clip, per model), so 660 Kling credits and 625 Runway credits don\'t buy the same amount of video. We compare what you pay instead.</p>'
+# Page 1: Kling pricing
+_kp = "".join(f"<tr><th scope='row'>{e(n)}</th><td>{_d(m)}</td><td>{_d(f) if f is not None else '—'}</td><td>{(_d(y) + '/yr') if y is not None else '—'}</td><td>{e(c)}</td><td>{e(nt) or '—'}</td></tr>" for n, m, f, y, c, nt in _tm0.KLING_PLANS)
+_ks = "".join(f"<li>{e(n)}: {_d(m * 12)} paid monthly vs {_d(y)} yearly, so you save {_d(m * 12 - y)} ({round((m * 12 - y) / (m * 12) * 100)}%)</li>" for n, m, f, y, c, nt in _tm0.KLING_PLANS if y)
+_qa_k = [("How much does Kling AI cost?", f"Basic is free. Paid plans are Standard $8.8/mo, Pro $32.56/mo, Premier $181.99/mo and Ultra+ $544.99/mo on monthly billing ({KL})."),
+         ("Is there a Kling first-month discount?", f"Yes. Each paid plan is 30% off for the first month, one time: Standard $6.99, Pro $25.99, Premier $144.99, Ultra+ $432.99. The end date is not stated ({KL})."),
+         ("Does Kling have a free plan?", "Yes, Basic is $0. The pricing page doesn't state how many free credits it includes. Paid subscribers also get daily free credits; the amount is not stated."),
+         ("How much does Kling cost per year?", "Standard $79.20, Pro $293.04, Premier $1,639.99 and Ultra+ $4,902.99 per year. Kling doesn't state a per-month figure for yearly billing."),
+         ("How many credits does each Kling plan include?", "Standard 660 credits a month, Pro 3,000, Premier 18,000 (a slider goes from 8K to 38K) and Ultra+ 57,000. Basic's credits are not stated.")]
+_kbody = f"""<p class="small"><a href="{turl('Kling AI')}">Kling AI</a> › Pricing</p><h1>Kling AI pricing: plans, credits and first-month offer</h1>
+<p class="tag">Every Kling plan from {_srcp('Kling AI')}, {KL}. Prices in USD.</p>
+<p class="pick"><b>In short:</b> Basic is free. Standard is $8.8/mo for 660 credits, and $6.99 for your first month (30% off, once). Paying yearly saves about 25% on every plan.</p>
+<h2>Plans and prices</h2><div class="tw"><table><caption class="small" style="text-align:left">{KL}. “—” means the page doesn't show this for that plan.</caption><tr><th scope="col">Plan</th><th scope="col">Monthly</th><th scope="col">First month (30% off, once)</th><th scope="col">Yearly</th><th scope="col">Credits / month</th><th scope="col">Note</th></tr>{_kp}</table></div>
+<p class="small">All paid plans: up to 4 videos per generation, and daily free credits for subscribers (amount not stated). The first-month offer's end date is not stated.</p>
+<h2>Monthly or yearly?</h2><ul>{_ks}</ul><p class="small">Our maths: monthly price × 12 compared with the yearly price. Kling doesn't state a per-month price for yearly plans.</p>
+{_faq(_qa_k)}
+<p class="small">Compare: <a href="/kling-vs-runway.html">Kling vs Runway</a> · <a href="/kling-vs-pika-vs-luma.html">Kling vs Pika vs Luma</a> · <a href="/price-changes.html">AI price changes</a> · <a href="/best-ai-video-tools.html">Best AI video tools</a></p>"""
+page("/kling-pricing.html", "Kling AI Pricing (Nov 2026): Plans, Credits & 30% First-Month Offer | ToolPick",
+     f"Kling AI plans {KL}: Basic free, Standard $8.8/mo (660 credits), Pro $32.56, Premier $181.99, Ultra+ $544.99. 30% off the first month ($6.99 Standard) and yearly prices.",
+     _kbody, [{"@context": "https://schema.org", "@type": "Product", "name": "Kling AI", "url": BASE + "/kling-pricing.html", "brand": {"@type": "Brand", "name": "Kling AI"},
+               "offers": [{"@type": "Offer", "name": n, "price": m, "priceCurrency": "USD"} for n, m, *_ in _tm0.KLING_PLANS]},
+              _ld_faq(_qa_k), crumbs([("ToolPick", "/"), ("Kling AI", turl("Kling AI")), ("Kling AI pricing", "/kling-pricing.html")])])
+# Comparison table helper
+def _vcmp(names):
+    hd = "".join(f'<th scope="col"><a href="{turl(n)}">{e(n)}</a></th>' for n in names)
+    rows = [("Free option", [e(V4[n]["free"]) for n in names]),
+            ("Entry plan (monthly)", [f'{e(V4[n]["entry_name"])} {_d(V4[n]["entry"])}/mo' for n in names]),
+            ("Entry plan, paid yearly", [e(V4[n]["yearly"]) for n in names]),
+            ("Yearly saving on entry plan", [f"{_d(_ysave(n)[0])}/yr" for n in names]),
+            ("Top plan (monthly)", [f'{e(V4[n]["top_name"])} {_d(V4[n]["top"])}/mo' for n in names]),
+            ("Current offer", [e(V4[n]["promo"]) for n in names]),
+            ("Source", [_srcp(n) for n in names])]
+    return f'<div class="tw"><table><caption class="small" style="text-align:left">Monthly billing unless noted, {KL}.</caption><tr><th scope="col"></th>{hd}</tr>' + "".join(f'<tr><th scope="row">{a}</th>' + "".join(f"<td>{v}</td>" for v in vs) + "</tr>" for a, vs in rows) + "</table></div>"
+# Page 2: Kling vs Runway
+_qa_r = [("Is Kling cheaper than Runway?", f"On entry plans, yes: Kling Standard is $8.8/mo ($6.99 for the first month) and Runway Standard is $15/mo ($12/mo billed yearly), {KL}."),
+         ("Which has a better free plan?", "Runway's Free plan states 125 credits, one time. Kling's Basic plan is free but its credits are not stated, so we can't compare the two free allowances."),
+         ("Can I use Kling inside Runway?", "Runway's pricing page shows 25% off Kling 4.0 generations on Runway until Nov 30."),
+         ("Which is cheaper per year?", "Kling Standard is $79.20 a year. Runway Standard is $144 a year ($12/mo billed yearly).")]
+_rbody = f"""<p class="small"><a href="/compare-builder.html">Compare</a> › Kling vs Runway</p><h1>Kling vs Runway: price compared</h1>
+<p class="tag">Plans and offers from both official pricing pages, {KL}.</p>
+<p class="pick"><b>Our pick:</b> <b>Kling</b> if you want the lowest monthly bill: Standard is $8.8/mo, or $6.99 for the first month. <b>Runway</b> if you want to try free with a stated allowance (125 one-time credits), or you already use Runway and want Kling 4.0 there (25% off until Nov 30).</p>
+{_vcmp(["Kling AI", "Runway"])}
+{_CRED}
+<h2>Which to choose</h2><ul><li><b>Smallest budget:</b> Kling Standard, $8.8/mo or $79.20/yr.</li><li><b>Try before paying:</b> Runway Free (125 credits, one time).</li><li><b>Heavy use:</b> Runway's top plan is Max at $95/mo; Kling's goes up to Ultra+ at $544.99/mo. Price out the plan you'd actually need on each official page.</li></ul>
+{_faq(_qa_r)}
+<p class="small">Related: <a href="/kling-pricing.html">Kling pricing</a> · <a href="/kling-vs-pika-vs-luma.html">Kling vs Pika vs Luma</a> · <a href="/compare/runway-vs-kling.html">Runway vs Kling: full tool comparison</a> · <a href="/free-alternative-to-runway.html">Free alternatives to Runway</a></p>"""
+page("/kling-vs-runway.html", "Kling vs Runway (Nov 2026): Price, Free Plan & Offers Compared | ToolPick",
+     f"Kling vs Runway on price, {KL}: Kling Standard $8.8/mo ($6.99 first month) vs Runway Standard $15/mo ($12 yearly), free plans, top plans and current offers.",
+     _rbody, _ld_list("Kling vs Runway", "/kling-vs-runway.html", ["Kling AI", "Runway"]) + [_ld_faq(_qa_r), crumbs([("ToolPick", "/"), ("Compare", "/compare-builder.html"), ("Kling vs Runway", "/kling-vs-runway.html")])])
+# Page 3: Kling vs Pika vs Luma
+_qa_p = [("Which is cheapest: Kling, Pika or Luma?", f"Kling Standard at $8.8/mo, then Pika Starter at $10/mo, then Luma Plus at $30/mo, on monthly billing ({KL})."),
+         ("Which has a free plan?", "Kling has a free Basic plan (credits not stated). Pika has a $0 Free plan with no monthly credits (you buy packs) and no commercial license. Luma's pricing page lists no free plan."),
+         ("Can I pay as I go instead of subscribing?", "Pika sells credit packs, from 1,500 credits for $25 up to 30,000 credits for $500."),
+         ("Which saves most by paying yearly?", "On entry plans: Luma saves $60 a year ($300/yr vs $360), Pika $24 ($96 vs $120) and Kling $26.40 ($79.20 vs $105.60).")]
+_pbody = f"""<p class="small"><a href="/compare-builder.html">Compare</a> › Kling vs Pika vs Luma</p><h1>Kling vs Pika vs Luma: price compared</h1>
+<p class="tag">Plans and offers from the three official pricing pages, {KL}.</p>
+<p class="pick"><b>Our pick:</b> <b>Kling</b> for the lowest subscription ($8.8/mo, $79.20/yr). <b>Pika</b> if you'd rather not subscribe, since you can buy credit packs from $25. <b>Luma</b> has the highest entry price ($30/mo) and no free plan, so choose it only if you specifically want its tools.</p>
+{_vcmp(["Kling AI", "Pika", "Luma Dream Machine"])}
+{_CRED}
+<h2>Which to choose</h2><ul><li><b>Lowest monthly bill:</b> Kling Standard, $8.8/mo ($6.99 first month).</li><li><b>No subscription:</b> Pika credit packs, 1,500 for $25 up to 30,000 for $500.</li><li><b>Commercial use on the free plan:</b> Pika Free has no commercial license; Kling's and Luma's terms for this are not stated on these pages.</li></ul>
+{_faq(_qa_p)}
+<p class="small">Related: <a href="/kling-pricing.html">Kling pricing</a> · <a href="/kling-vs-runway.html">Kling vs Runway</a> · <a href="/compare/kling-vs-pika.html">Kling vs Pika</a> · <a href="/compare/pika-vs-luma.html">Pika vs Luma</a> · <a href="/free-alternative-to-luma-dream-machine.html">Free alternatives to Luma</a></p>"""
+page("/kling-vs-pika-vs-luma.html", "Kling vs Pika vs Luma (Nov 2026): AI Video Prices Compared | ToolPick",
+     f"Kling vs Pika vs Luma Dream Machine on price, {KL}: entry plans $8.8 vs $10 vs $30 a month, free options, yearly savings, top plans and credit packs.",
+     _pbody, _ld_list("Kling vs Pika vs Luma", "/kling-vs-pika-vs-luma.html", ["Kling AI", "Pika", "Luma Dream Machine"]) + [_ld_faq(_qa_p), crumbs([("ToolPick", "/"), ("Compare", "/compare-builder.html"), ("Kling vs Pika vs Luma", "/kling-vs-pika-vs-luma.html")])])
+V58_CHANGED = ["/kling-pricing.html", "/kling-vs-runway.html", "/kling-vs-pika-vs-luma.html"]
+def _v58ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not __import__("os").path.exists(_fp): return
+    _h = open(_fp).read()
+    if ' v58k"' in _h or marker not in _h: return
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V58_CHANGED.append(path)
+_K3 = '<a href="/kling-pricing.html">Kling pricing</a> · <a href="/kling-vs-runway.html">Kling vs Runway</a> · <a href="/kling-vs-pika-vs-luma.html">Kling vs Pika vs Luma</a>'
+_v58ins(turl("Kling AI"), '<section class="verdict', f'<p class="pick small v58k">Plans, credits and the 30% first-month offer ({KL}): {_K3}</p>')
+for _n in ["Runway", "Pika", "Luma Dream Machine"]:
+    _v58ins(turl(_n), '<section class="verdict', f'<p class="pick small v58k">Price check vs Kling ({KL}): {_K3}</p>')
+for _p in ["/compare/runway-vs-kling.html", "/compare/kling-vs-pika.html", "/compare/pika-vs-luma.html", "/compare/runway-vs-luma.html", "/compare/runway-vs-pika.html",
+           "/best-ai-video-tools.html", "/best-ai-tool-for-text-to-video.html", "/best-free-ai-video-tools.html", "/free-alternative-to-runway.html", "/free-alternative-to-pika.html", "/free-alternative-to-luma-dream-machine.html"]:
+    _v58ins(_p, "</h1>", f'<p class="small v58k">{_K3}</p>', after=True)
+open("public/llms.txt", "a").write(f"\n## Kling and AI video prices ({KL})\n- [Kling AI pricing]({BASE}/kling-pricing.html): Basic free; Standard $8.8, Pro $32.56, Premier $181.99, Ultra+ $544.99 a month; 30% off the first month; yearly prices; credits per plan\n- [Kling vs Runway]({BASE}/kling-vs-runway.html): entry, top and yearly prices, free plans and offers\n- [Kling vs Pika vs Luma]({BASE}/kling-vs-pika-vs-luma.html): entry, top and yearly prices, free options and credit packs\n")
+
 _lm = {}
 for _n in tool_pages: _lm[turl(_n)] = find(_n).get("checked", CHECKED)
 for _c in CATEGORIES:
@@ -3865,6 +3954,7 @@ for _u in V49_CHANGED: _lm[_u] = ALT49_DATE
 for _n, _s in _alt49_summ.items(): _lm[_s["p"]] = _s["lm"]
 _lm["/alternatives.html"] = ALT49_DATE
 for _u in V51_CHANGED + ["/my-ai-costs.html"]: _lm[_u] = ELC
+for _u in V58_CHANGED: _lm[_u] = KD
 _fpm = "public/my-ai-costs.html"; _hm = open(_fpm).read()
 if ' v52"' not in _hm and "</h1>" in _hm: open(_fpm, "w").write(_hm.replace("</h1>", f'</h1><p class="small v52">Want to stop paying for one? <a href="{R_PATH}">Refund and cancel rules for {_rn} AI tools →</a></p>', 1)); V52_CHANGED.append("/my-ai-costs.html")
 for _u in V52_CHANGED: _lm[_u] = REFUND_CHECKED

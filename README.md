@@ -22,3 +22,6 @@ Generated automatically by build.py from `price_history.json` snapshots — no m
    (tags: up, down, newplan, correction, currency, changed). Without a note the tag is guessed from the
    highest $ amount (up/down/changed) and a generic summary is used. Notes must only restate the
    documented old/new text. Snapshot artifacts go in `PRICE_SKIP` with a reason.
+
+## Daily-ops notes
+- **Kling AI pricing check (updated 2026-11-02):** `https://klingai.com/global/membership/membership-plan` redirects to `https://kling.ai/app/membership/membership-plan`. The plan page renders client-side about 6 seconds after load, so a plain fetch or an immediate browser read sees no prices. Browser checks must open the kling.ai URL and wait (~6-8 s, or until a plan price like "Standard" + "$" appears) before reading. Don't mark Kling "not verifiable" just because the first read was empty.
