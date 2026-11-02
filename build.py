@@ -3913,6 +3913,191 @@ _fpd = "public/tools.html"; _hd = open(_fpd).read()
 _hd = _re.sub(r'<p class="small v(48|49|50)">.*?</p>', '', _hd)
 open(_fpd, "w").write(_hd)
 open("public/llms.txt", "a").write(f"\n## Tools directory (v53)\n- [Browse all AI tools]({BASE}/tools.html): search all {total_tools} tools by name or job (e.g. /tools.html?q=voiceover), filter by what each tool does (?job=text-to-speech, from each tool's own site), category (?category=video), real free plan (?free=yes), verified starting price (?price=u10), billing (?billing=monthly), Best Value picks (?bv=1); card or table view (?view=table); compare up to 3. Prices from official pricing pages with checked dates.\n")
+# --- v58: Search everything — header search on every page (/ or Ctrl+K) + /search.html site index ---
+# Uses only page titles/descriptions already on the site and verified tools.py fields (price text, free plan,
+# checked date). No new prices. The index is lazy-loaded (fetched on first open), so page speed is unchanged.
+V58_DATE = "2026-11-02"
+S58_PATH = "/search.html"
+def _s58_norm(s): return _re.sub(r"\s+", " ", _re.sub(r"[^a-z0-9$+.]+", " ", html.unescape(s).lower().replace("&", " and "))).strip()
+def _s58_meta(fp):
+    h = open(fp).read()
+    if 'http-equiv="refresh"' in h or "<title>Moved" in h: return None
+    g = lambda pat: html.unescape(_re.sub(r"<[^>]+>", "", (_re.search(pat, h, _re.S) or [None, ""])[1])).strip()
+    return dict(t=g(r"<title>(.*?)</title>"), d=g(r'<meta name="description" content="([^"]*)"'), h1=g(r"<h1[^>]*>(.*?)</h1>"))
+_S58_TOOL = {}
+for _c in CATEGORIES:
+    for _t in _c["tools"]: _S58_TOOL.setdefault(_t["name"], (_t, []))[1].append(_c)
+_S58_SYN = {}
+for _cap, _a, _ph in QCAP: _S58_SYN.setdefault(_cap, set()).update(_ph)
+def _s58_type(u):
+    if u == "/": return "g"
+    if u.startswith("/tools/"): return "t"
+    if u.startswith("/compare/"): return "c"
+    if u.startswith("/best-ai-tool-for-"): return "j"
+    if u.startswith("/best-ai-tools-for-"): return "s"
+    if _re.match(r"^/best-(free-)?ai-[a-z-]+-tools\.html$", u) or u == SEO_VIDEO_PATH or u == "/best-ai-writing-tools.html": return "k"
+    if u.startswith(("/free-alternative-to-", "/alternatives", "/cursor-alternatives")): return "a"
+    if u.endswith("-pricing.html") or u.startswith("/is-") or u.startswith("/cheapest-"): return "p"
+    return "g"
+_S58_ROWS = []
+_s58_slug2name = {slug(n): n for n in _S58_TOOL}
+for _u in dict.fromkeys(URLS):
+    if _u.startswith(("/app/", "/embed/")) or _u == S58_PATH: continue
+    _fp = "public" + (_u + "index.html" if _u.endswith("/") else _u)
+    if not _os.path.exists(_fp): continue
+    _m = _s58_meta(_fp)
+    if not _m: continue
+    _y = _s58_type(_u); _row = dict(u=_u, y=_y)
+    _ti = _m["h1"] or _m["t"]
+    _ti = _re.sub(r"\s*[|·—-]\s*ToolPick\s*$", "", _ti)
+    _kw = [_m["t"]]
+    if _y == "t":
+        _n = _s58_slug2name.get(_u[7:-5])
+        if not _n: continue
+        _t, _cs = _S58_TOOL[_n]
+        _ti = _n
+        _row["p"] = _t["price"].split(";")[0].strip()[:70]
+        _row["f"] = 1 if realfree(_t) else 0
+        _row["ck"] = _t.get("checked", CHECKED)
+        _row["d"] = _t["about"]
+        _kw += [c["name"] for c in _cs] + [CAP_LABEL.get(x, x) for x in CAPS.get(_n, [])] + [w for x in CAPS.get(_n, [])[:2] for w in sorted(_S58_SYN.get(x, ()))]
+        if "(" in _n: _kw.append(_n.split("(")[1].strip(")"))
+    else:
+        _row["d"] = _m["d"][:150] + ("…" if len(_m["d"]) > 150 else "")
+    if _y == "c":
+        _x = next((x for x in COMPARISONS if f"/compare/{x[0]}.html" == _u), None)
+        if _x:
+            _row["n"] = [slug(n) for n in cnames(_x)]
+            _row["d"] = " · ".join(f'{n}: {_S58_TOOL[n][0]["price"].split(";")[0].strip()[:48]}' for n in cnames(_x) if n in _S58_TOOL)
+    if _y == "j": _kw.append(_u[18:-5].replace("-", " "))
+    if _u == "/": _ti = "Home: search by need (smart finder)"
+    _row["t"] = _ti
+    _row["k"] = _s58_norm(" ".join(_kw))
+    _S58_ROWS.append(_row)
+for _tab, _p, _nm in MERGED:
+    _S58_ROWS.append(dict(u=f"/my-ai-costs.html#{_tab}", y="g", t=f"{_nm} (My AI costs)", d=f"{_nm} tab on the My AI costs page.", k=_s58_norm(_nm + " my ai costs subscriptions spending")))
+# tool aliases for intent matching (vs / alternatives / free / pricing)
+_S58_AL = {}
+for _n in _S58_TOOL:
+    _als = {_s58_norm(_n), _s58_norm(_re.sub(r"\(.*?\)", "", _n)), _s58_norm(_n.replace(".", ""))}
+    if "(" in _n: _als.add(_s58_norm(_n.split("(")[1].strip(")")))
+    _w0 = _s58_norm(_n).split(" ")[0]
+    if len(_w0) >= 4 and sum(1 for m in _S58_TOOL if _s58_norm(m).split(" ")[0] == _w0) == 1: _als.add(_w0)
+    _S58_AL[slug(_n)] = sorted(a for a in _als if a)
+_S58_AL["google-gemini"] = sorted(set(_S58_AL["google-gemini"]) | {"gemini"})
+_S58_AL["microsoft-copilot"] = sorted(set(_S58_AL["microsoft-copilot"]) | {"copilot"} - {"microsoft"})
+_S58_AL["github-copilot"] = sorted(set(_S58_AL["github-copilot"]) | {"gh copilot"})
+_S58_AL["kling-ai"] = sorted(set(_S58_AL["kling-ai"]) | {"kling"})
+_S58_AL["luma-dream-machine"] = sorted(set(_S58_AL["luma-dream-machine"]) | {"luma"})
+_S58_AL["le-chat-mistral"] = sorted(set(_S58_AL["le-chat-mistral"]) | {"le chat"})
+_S58_IDX = dict(v=V58_DATE, r=_S58_ROWS, a=_S58_AL, nm={slug(n): n for n in _S58_TOOL})
+open("public/search-index.json", "w").write(json.dumps(_S58_IDX, separators=(",", ":"), ensure_ascii=False))
+_S58_TL = {"t": "Tool", "c": "Comparison", "j": "Best for a job", "k": "Category", "s": "Starter stack", "a": "Alternatives", "p": "Pricing", "g": "Guide"}
+_S58_GH = {"t": "Tools", "c": "Comparisons", "j": "Best tool for a job", "k": "Categories", "s": "Starter stacks by role", "a": "Alternatives", "p": "Pricing explainers", "g": "Guides & calculators"}
+_S58_ORDER = ["t", "c", "k", "j", "a", "s", "p", "g"]
+# ---- shared search script (served as /search.js, loaded with defer on every page) ----
+S58_JS = r'''(()=>{const D=document,TL=__TL__,ORD=__ORD__;let IX=null,P=null;const HUB=['/free.html','/free-plan-limits.html','/tools.html','/alternatives.html','/guides.html','/compare-builder.html','/help-me-choose.html','/stacks.html','/save-money.html','/my-ai-costs.html'];const X=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const N=s=>String(s).toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9$+.]+/g,' ').replace(/\s+/g,' ').trim();
+const STOP=new Set('a an the for to of in on and or with my me i is it best top ai tool tools app apps that which what good 2026 vs versus'.split(' '));
+const load=()=>P||(P=fetch('/search-index.json').then(r=>r.json()).then(j=>{IX=j;IX.r.forEach(r=>{r._t=N(r.t);r._d=N(r.d||'');r._a=r._t+' '+r.k+' '+r._d});return j}));
+function tools(q){const f=[];const s=' '+q+' ';for(const k in IX.a){for(const a of IX.a[k]){const i=s.indexOf(' '+a+' ');if(i>=0){f.push([i,k,a]);break}}}f.sort((x,y)=>x[0]-y[0]||y[2].length-x[2].length);const out=[];f.forEach(x=>{if(!out.includes(x[1])&&!f.some(y=>y!==x&&y[2].length>x[2].length&&y[2].includes(x[2])&&y[0]<=x[0]&&x[0]<y[0]+y[2].length))out.push(x[1])});return out}
+function search(raw,lim){const q=N(raw);if(!q)return{rows:[],acts:[]};const toks=q.split(' ').filter(t=>t&&!STOP.has(t)),T=tools(q);
+const vs=/\b(vs|versus|or|compare|compared|against)\b/.test(q)||T.length>1,alt=/\b(alternative|alternatives|instead|cheaper|like|similar|replace|replacement)\b/.test(q),free=/\bfree\b/.test(q),price=/\b(price|prices|pricing|cost|costs|plans?|worth)\b/.test(q);
+const sc=[];for(const r of IX.r){let s=0,hit=0;for(let i=0;i<toks.length;i++){const t=toks[i],last=i==toks.length-1;const st=t.length>=8?t.slice(0,7):t,wre=new RegExp('(^| )'+st.replace(/[.$+]/g,'\\$&')+(last||st!==t?'':'( |$)'));
+if(wre.test(r._t)){s+=12;hit++}else if(r._t.includes(t)){s+=6;hit++}else if(wre.test(r.k)){s+=5;hit++}else if(r._a.includes(t)){s+=2;hit++}}
+if(toks.length&&hit<Math.ceil(toks.length/2)&&!T.length)continue;if(hit&&HUB.includes(r.u))s+=10;if(!toks.length&&!T.length)continue;
+if(r._t==q)s+=40;else if(r._t.startsWith(q))s+=8;
+if(T.length){const tu=T.map(k=>'/tools/'+k+'.html');
+if(r.y=='t'&&tu.includes(r.u))s+=(vs||alt?20:45)+(T[0]==r.u.slice(7,-5)?5:0);
+if(r.y=='c'&&r.n){const m=T.filter(k=>r.n.includes(k)).length;s+=m*(vs?30:8)+(m>=2?60:0)}
+if(alt&&r.y=='a'&&T.some(k=>r.u.includes('-to-'+k+'.')||r.u.includes('/'+k+'.')||r.u.includes('/'+k+'-')))s+=free?(r.u.includes('free-alternative')?75:55):(r.u.includes('free-alternative')?50:70);
+if(T.length==1&&!vs&&!alt&&!free&&(r.y=='p'||r.y=='a')&&r.u.includes(T[0]))s+=r.y=='p'?22:16;
+if(free&&!alt&&r.y=='a'&&T.some(k=>r.u.includes('-to-'+k+'.')))s+=40;
+if(price&&(r.y=='p'||r.y=='t')&&T.some(k=>r.u.includes(k)))s+=35;
+const rel=(r.y=='t'&&tu.includes(r.u))||(r.n&&T.some(k=>r.n.includes(k)))||((r.y=='a'||r.y=='p')&&T.some(k=>r.u.includes(k)));if(vs&&T.length>1&&!rel)continue;if(!rel&&(r.y=='a'||r.y=='t'||r.y=='c'))continue;
+if(!hit&&!(r.y=='t'&&tu.includes(r.u))&&!(r.n&&T.some(k=>r.n.includes(k)))&&!(r.y=='a'&&T.some(k=>r.u.includes(k)))&&!(r.y=='p'&&T.some(k=>r.u.includes(k))))continue}
+if(free&&(r.f||r.u.includes('free')))s+=6;if(price&&r.y=='p')s+=6;
+if(s>0)sc.push([s,r])}
+sc.sort((a,b)=>b[0]-a[0]||ORD.indexOf(a[1].y)-ORD.indexOf(b[1].y)||a[1].t.length-b[1].t.length);
+const acts=[];if(T.length>=2&&!sc.some(x=>x[1].n&&T.slice(0,2).every(k=>x[1].n.includes(k))))acts.push({u:'/compare-builder.html?tools='+T.slice(0,3).join(','),t:'Compare '+T.slice(0,3).map(k=>IX.nm[k]).join(' vs ')+' side by side',y:'c'});
+acts.push({u:'/?q='+encodeURIComponent(raw.trim()),t:'Ask the finder: \u201c'+raw.trim()+'\u201d',y:'f'});
+return{rows:sc.slice(0,lim).map(x=>x[1]),acts,total:sc.length,all:sc.map(x=>x[1])}}
+function rowH(r,id,act){const sub=r.y=='t'?`${r.p?X(r.p):''}${r.f?' · <span class="s58f">Free plan</span>':''}${r.ck?' · checked '+X(r.ck):''}`:X(r.d||'');
+return `<li role="option" id="${id}" aria-selected="false"><a href="${X(r.u)}" tabindex="-1"><span class="s58y s58y-${r.y}">${r.y=='f'?'Finder':X(TL[r.y]||'')}</span><span class="s58m"><b>${X(r.t)}</b>${sub?`<span class="s58s">${sub}</span>`:''}</span></a></li>`}
+const POP=[['/help-me-choose.html','Help me choose (5 quick questions)','g'],['/compare/chatgpt-vs-claude.html','ChatGPT vs Claude','c'],['/free.html','Can I do it for free?','g'],['/ai-budget-planner.html','Build my AI stack under $X/mo','g'],['/tools.html','Browse all tools with filters','g'],['/alternatives.html','Alternatives to popular AI tools','a']];
+const RK='tp_recent_v1';const rec=()=>{try{return JSON.parse(localStorage.getItem(RK)||'[]')}catch(e){return[]}};const remember=(u,t,y)=>{try{const l=rec().filter(x=>x.u!==u);l.unshift({u,t,y});localStorage.setItem(RK,JSON.stringify(l.slice(0,5)))}catch(e){}};
+function bind(inp,list,status,lim,onPick){let act=-1;const opts=()=>[...list.querySelectorAll('[role=option]')];
+const setAct=i=>{const o=opts();if(!o.length){act=-1;inp.removeAttribute('aria-activedescendant');return}act=(i+o.length)%o.length;o.forEach((x,j)=>x.setAttribute('aria-selected',j==act?'true':'false'));inp.setAttribute('aria-activedescendant',o[act].id);o[act].scrollIntoView({block:'nearest'})};
+const render=()=>{const v=inp.value;act=-1;inp.removeAttribute('aria-activedescendant');
+if(!v.trim()){const R=rec();let h='';if(R.length)h+=`<li class="s58h" role="presentation">Recent</li>`+R.map((r,i)=>rowH(r,list.id+'-r'+i)).join('');h+=`<li class="s58h" role="presentation">Popular</li>`+POP.map((p,i)=>rowH({u:p[0],t:p[1],y:p[2]},list.id+'-p'+i)).join('');list.innerHTML=h;status.textContent='Type a tool, a job (e.g. voiceover) or two tools to compare.';return}
+if(!IX){status.textContent='Loading…';load().then(render);return}
+const res=search(v,lim);list.innerHTML=res.rows.map((r,i)=>rowH(r,list.id+'-'+i)).join('')+(res.acts.length?`<li class="s58h" role="presentation">${res.rows.length?'Or':'No page matches. Try'}</li>`:'')+res.acts.map((r,i)=>rowH(r,list.id+'-a'+i)).join('');
+status.textContent=res.rows.length?`${res.total} page${res.total==1?'':'s'} match${res.total==1?'es':''}. Use up and down arrows, Enter to open.`:'No pages match. Try a tool name or a job, or ask the finder.';if(onPick)onPick(v,res);if(res.rows.length)setAct(0)};
+inp.addEventListener('input',render);inp.addEventListener('keydown',ev=>{if(ev.key=='ArrowDown'){ev.preventDefault();setAct(act+1)}else if(ev.key=='ArrowUp'){ev.preventDefault();setAct(act-1)}else if(ev.key=='Enter'){const o=opts()[act>=0?act:0];if(o){ev.preventDefault();const a=o.querySelector('a');remember(a.getAttribute('href'),a.querySelector('b').textContent,(o.querySelector('.s58y').className.match(/s58y-(\w)/)||[])[1]);location.href=a.href}}});
+list.addEventListener('click',ev=>{const a=ev.target.closest('a');if(a){const o=a.closest('li');remember(a.getAttribute('href'),a.querySelector('b').textContent,(o.querySelector('.s58y').className.match(/s58y-(\w)/)||[])[1])}});
+list.addEventListener('mousemove',ev=>{const o=ev.target.closest('[role=option]');if(o){const i=opts().indexOf(o);if(i!==act)setAct(i)}});return render}
+let dlg=null,drender=null;
+function open(){load();if(!dlg){dlg=D.createElement('dialog');dlg.className='s58d';dlg.setAttribute('aria-label','Search ToolPick');
+dlg.innerHTML=`<div class="s58bar"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><label for="s58q" class="skip">Search tools, comparisons and guides</label><input id="s58q" type="search" role="combobox" aria-expanded="true" aria-controls="s58l" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search tools, comparisons, jobs…"><button type="button" class="s58x" aria-label="Close search">Esc</button></div><p id="s58st" class="s58st" role="status" aria-live="polite"></p><ul id="s58l" role="listbox" aria-label="Search results" class="s58l"></ul><p class="s58ft"><a href="/search.html">Full search &amp; every page A–Z</a><span class="s58k"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>/</kbd> search</span></p>`;
+D.body.appendChild(dlg);const inp=dlg.querySelector('input');drender=bind(inp,dlg.querySelector('ul'),dlg.querySelector('#s58st'),8);dlg.querySelector('.s58x').onclick=()=>dlg.close();dlg.addEventListener('click',ev=>{if(ev.target===dlg)dlg.close()});
+dlg.querySelector('.s58ft a').addEventListener('click',ev=>{const v=inp.value.trim();if(v)ev.currentTarget.href='/search.html?q='+encodeURIComponent(v)})}
+if(!dlg.open)dlg.showModal();drender();dlg.querySelector('input').focus()}
+D.addEventListener('click',ev=>{const b=ev.target.closest('.sbtn');if(b&&typeof HTMLDialogElement=='function'&&!ev.ctrlKey&&!ev.metaKey&&!ev.shiftKey){ev.preventDefault();open()}});
+D.addEventListener('keydown',ev=>{const t=ev.target,typing=t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));if(((ev.key=='/'&&!typing)||((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()=='k'))){const pq=D.getElementById('s58pq');if(pq){ev.preventDefault();pq.focus();pq.select();return}if(typeof HTMLDialogElement=='function'){ev.preventDefault();open()}}});
+const pq=D.getElementById('s58pq');if(pq){const list=D.getElementById('s58pl'),st=D.getElementById('s58pst'),all=D.getElementById('s58all'),cnt=D.getElementById('s58cnt');
+const r=bind(pq,list,st,30,(v,res)=>{const u=new URL(location);if(v.trim())u.searchParams.set('q',v.trim());else u.searchParams.delete('q');history.replaceState(null,'',u)});
+pq.addEventListener('input',()=>{if(all)all.hidden=!!pq.value.trim()});const q0=new URLSearchParams(location.search).get('q');if(q0){pq.value=q0;if(all)all.hidden=true;load().then(r)}else r();
+D.querySelectorAll('.s58chip').forEach(b=>b.addEventListener('click',()=>{pq.value=b.dataset.q;if(all)all.hidden=true;load().then(r);pq.focus()}))}})();'''
+S58_JS = S58_JS.replace("__TL__", json.dumps(_S58_TL)).replace("__ORD__", json.dumps(_S58_ORDER))
+open("public/search.js", "w").write(S58_JS)
+S58_CSS = ('<style>.sbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;padding:0 12px;margin-left:auto;border:1px solid var(--bd);border-radius:999px;background:var(--sf2);color:var(--mu);text-decoration:none;font-weight:500;font-size:.95rem;box-sizing:border-box}.sbtn:hover{border-color:var(--ac);color:var(--tx)}.sbtn svg{flex:none;color:var(--tx)}.sbtn kbd{font:600 .75rem/1 ui-monospace,monospace;border:1px solid var(--bd);border-radius:5px;padding:3px 6px;background:var(--sf);color:var(--mu)}'
+           'header.site .sbtn+nav.top{margin-left:4px!important}@media(min-width:761px){.sbtn{width:250px}.sbtn .sbl{flex:1}}@media(max-width:760px){.sbtn kbd,.sbtn .sbl{display:none}.sbtn{justify-content:center;padding:0;width:44px}}'
+           '.s58d{border:1px solid var(--bd);border-radius:16px;padding:0;width:min(640px,calc(100vw - 24px));max-height:min(78vh,640px);margin:8vh auto auto;background:var(--sf);color:var(--tx);box-shadow:0 20px 60px rgba(0,0,0,.3);overflow:hidden;flex-direction:column}.s58d[open]{display:flex}.s58d::backdrop{background:rgba(15,23,42,.5)}'
+           '.s58bar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 16px;border-bottom:1px solid var(--bd)}.s58bar input,.s58pbar input{flex:1;min-width:0;min-height:48px;border:0;background:transparent;color:var(--tx);font:inherit;font-size:1.1rem;outline:none}.s58bar input:focus-visible{outline:none!important}.s58bar:focus-within{box-shadow:inset 0 -2px 0 var(--ac)}'
+           '.s58x{min-height:44px;min-width:44px;border:1px solid var(--bd);border-radius:8px;background:var(--sf2);color:var(--mu);font:600 .8rem ui-monospace,monospace;cursor:pointer}.s58st{margin:0;padding:8px 16px 0;font-size:.85rem;color:var(--mu)}'
+           '.s58l{list-style:none;margin:0;padding:6px 8px 8px;overflow:auto;flex:1}.s58l li{margin:0}.s58l a{display:flex!important;align-items:flex-start!important;gap:12px;padding:10px;border-radius:10px;color:var(--tx);text-decoration:none;min-height:44px}.s58l [aria-selected=true] a{background:var(--acs);box-shadow:inset 3px 0 0 var(--ac)}'
+           '.s58h{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--mu);padding:10px 10px 4px}.s58m{display:flex;flex-direction:column;min-width:0;gap:2px}.s58m b{font-weight:700;line-height:1.35}.s58s{font-size:.85rem;color:var(--mu);line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}'
+           '.s58y{flex:none;width:104px;font-size:.72rem;font-weight:700;line-height:1.2;padding:4px 6px;border-radius:6px;background:var(--sf2);color:var(--mu);text-align:center;margin-top:1px}.s58y-t{background:var(--acs);color:var(--tx)}.s58y-c{background:#ede9fe;color:#4c1d95}.s58y-a{background:#dcfce7;color:#14532d}.s58y-j{background:#fef3c7;color:#78350f}.s58y-f{background:var(--ac);color:var(--sf)}'
+           '@media(prefers-color-scheme:dark){.s58y-c{background:#2e1f5e;color:#ddd6fe}.s58y-a{background:#123522;color:#bbf7d0}.s58y-j{background:#4a3a0c;color:#fde68a}}.s58f{color:var(--ok);font-weight:600}@media(prefers-color-scheme:dark){.s58f{color:#4ade80}}'
+           '.s58ft{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;margin:0;padding:8px 16px;border-top:1px solid var(--bd);font-size:.85rem;color:var(--mu)}.s58ft a{display:inline-flex;align-items:center;min-height:44px}.s58k{display:inline-flex;align-items:center;gap:4px}.s58k kbd{font:600 .72rem ui-monospace,monospace;border:1px solid var(--bd);border-radius:4px;padding:2px 5px}'
+           '@media(max-width:560px){.s58d{margin:0;width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;border-radius:0;border:0}.s58k{display:none}.s58y{width:84px;font-size:.68rem}}</style>')
+S58_BTN = '<a class="sbtn" href="/search.html" aria-label="Search ToolPick" aria-keyshortcuts="/ Control+K" title="Search (press /)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sbl">Search</span><kbd aria-hidden="true">/</kbd></a>'
+# ---- /search.html: full search + every page A–Z (pre-rendered, works without JS) ----
+_s58_groups = {y: sorted([r for r in _S58_ROWS if r["y"] == y and "#" not in r["u"]], key=lambda r: r["t"].lower()) for y in _S58_ORDER}
+_s58_n = sum(len(v) for v in _s58_groups.values())
+_s58_sec = "".join(f'<section class="s58g" aria-labelledby="g58{y}"><h3 id="g58{y}">{e(_S58_GH[y])} <span class="small">({len(_s58_groups[y])})</span></h3><ul>'
+                   + "".join(f'<li><a href="{e(r["u"])}">{e(r["t"])}</a>' + (f' <span class="small">{e(r["p"])}{" · free plan" if r.get("f") else ""}</span>' if r["y"] == "t" else "") + "</li>" for r in _s58_groups[y]) + "</ul></section>" for y in _S58_ORDER if _s58_groups[y])
+_s58_jump = " · ".join(f'<a href="#g58{y}">{e(_S58_GH[y])}</a>' for y in _S58_ORDER if _s58_groups[y])
+_S58_CHIPS = ["ChatGPT vs Claude", "free alternative to Midjourney", "voiceover", "cheaper than Cursor", "meeting notes", "ElevenLabs pricing", "Runway or Kling", "pitch deck"]
+_s58_body = (S58_CSS + '<style>.s58pbar{display:flex;align-items:center;gap:10px;background:var(--sf);border:2px solid var(--bd);border-radius:14px;padding:4px 14px;box-shadow:var(--sh);margin:var(--s4) 0 var(--s2)}.s58pbar:focus-within{border-color:var(--ac)}.s58pbar input:focus-visible{outline:none!important}.s58pwrap .s58l{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:6px;margin:var(--s2) 0 var(--s5)}.s58pwrap .s58l:empty{display:none}.s58pwrap .s58st{padding:4px 2px}.s58chips{display:flex;flex-wrap:wrap;gap:8px;margin:var(--s3) 0}.s58chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-size:.92rem;cursor:pointer}.s58chip:hover{border-color:var(--ac)}.s58g{margin:var(--s5) 0}.s58g ul{columns:2 300px;column-gap:var(--s6);padding-left:1.1em;margin:var(--s2) 0}.s58g li{break-inside:avoid;margin:0 0 2px}.s58jump{background:var(--sf2);border-radius:10px;padding:var(--s3) var(--s4);line-height:2.2}</style>'
+    + '<h1>Search ToolPick</h1><p class="tag">Find any tool, comparison, best-tool-for-a-job page, alternative or calculator on ToolPick in a few keystrokes. Type a tool name, a job like <i>voiceover</i>, or two tools like <i>Runway or Kling</i>.</p>'
+    + '<div class="s58pwrap" role="search"><div class="s58pbar"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><label for="s58pq" class="skip">Search tools, comparisons and guides</label><input id="s58pq" type="search" role="combobox" aria-expanded="true" aria-controls="s58pl" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="e.g. free alternative to Midjourney"></div>'
+    + '<div class="s58chips" aria-label="Example searches">' + "".join(f'<button type="button" class="s58chip" data-q="{e(q)}">{e(q)}</button>' for q in _S58_CHIPS) + '</div>'
+    + '<p id="s58pst" class="s58st" role="status" aria-live="polite"></p><ul id="s58pl" role="listbox" aria-label="Search results" class="s58l"></ul></div>'
+    + '<noscript><p class="pick">Search needs JavaScript. Every page is listed below; use your browser’s find (Ctrl+F / ⌘F).</p></noscript>'
+    + f'<p class="small">Tip: press <kbd>/</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd> on any ToolPick page to search from anywhere. Can’t find it? <a href="/">Describe what you need</a> and the finder suggests tools, or <a href="/help-me-choose.html">answer 5 quick questions</a>.</p>'
+    + f'<div id="s58all"><h2>Every page on ToolPick, A–Z <span class="small">({_s58_n} pages)</span></h2><p class="s58jump">Jump to: {_s58_jump}</p>{_s58_sec}'
+    + f'<p class="small">Tool prices shown are each tool’s first listed plan, copied from its official pricing page on the date shown on its tool page. "check site" means we could not verify it. Index built {V58_DATE}.</p></div>')
+page(S58_PATH, "Search ToolPick: every AI tool, comparison & guide", f"Search all {_s58_n} ToolPick pages: {len(_S58_TOOL)} AI tools with checked prices, {len(_s58_groups['c'])} comparisons, best-tool-for-a-job pages, alternatives and cost calculators. Full A–Z index.", _s58_body,
+     ld=[{"@context": "https://schema.org", "@type": "WebSite", "name": "ToolPick", "url": BASE + "/", "potentialAction": {"@type": "SearchAction", "target": BASE + S58_PATH + "?q={search_term_string}", "query-input": "required name=search_term_string"}}, crumbs([("ToolPick", "/"), ("Search", S58_PATH)])])
+_lm[S58_PATH] = V58_DATE
+# apply the site nav (the v39 pass already ran) to the new page
+_h58 = open("public" + S58_PATH).read()
+_h58 = _re.sub(r'<nav class="top" aria-label="Main">.*?</nav>', _NAV, _h58, count=1, flags=_re.S).replace("</head>", _NCSS + '<link rel="icon" href="/favicon.svg" type="image/svg+xml"></head>', 1)
+open("public" + S58_PATH, "w").write(_h58)
+# header search button + script on every page
+V58_CHANGED = []
+for _fp in _glob.glob("public/**/*.html", recursive=True):
+    if _fp.startswith(("public/app/", "public/embed/")): continue
+    _h = open(_fp).read()
+    if 'class="sbtn"' in _h or '<header class="site">' not in _h: continue
+    _h2 = _re.sub(r'(<header class="site"><div class="wrap"><a class="brand"[^>]*>.*?</a>)', lambda m: m.group(1) + S58_BTN, _h, count=1, flags=_re.S)
+    if _h2 == _h: continue
+    _h2 = _h2.replace("</head>", S58_CSS + '<script defer src="/search.js"></script></head>', 1)
+    open(_fp, "w").write(_h2); V58_CHANGED.append(_fp[6:])
+print("v58 search:", len(_S58_ROWS), "index rows;", len(V58_CHANGED), "pages got header search")
+open("public/llms.txt", "a").write(f"\n## Search (v58)\n- [Search ToolPick]({BASE}{S58_PATH}): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of {_s58_n} pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: {BASE}/search-index.json\n")
+
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))
 print("pages:", len(URLS), "unique tools:", total_tools, {c["id"]:len(c["tools"]) for c in CATEGORIES})

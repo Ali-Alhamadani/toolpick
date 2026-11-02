@@ -1,0 +1,52 @@
+(()=>{const D=document,TL={"t": "Tool", "c": "Comparison", "j": "Best for a job", "k": "Category", "s": "Starter stack", "a": "Alternatives", "p": "Pricing", "g": "Guide"},ORD=["t", "c", "k", "j", "a", "s", "p", "g"];let IX=null,P=null;const HUB=['/free.html','/free-plan-limits.html','/tools.html','/alternatives.html','/guides.html','/compare-builder.html','/help-me-choose.html','/stacks.html','/save-money.html','/my-ai-costs.html'];const X=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const N=s=>String(s).toLowerCase().replace(/&/g,' and ').replace(/[^a-z0-9$+.]+/g,' ').replace(/\s+/g,' ').trim();
+const STOP=new Set('a an the for to of in on and or with my me i is it best top ai tool tools app apps that which what good 2026 vs versus'.split(' '));
+const load=()=>P||(P=fetch('/search-index.json').then(r=>r.json()).then(j=>{IX=j;IX.r.forEach(r=>{r._t=N(r.t);r._d=N(r.d||'');r._a=r._t+' '+r.k+' '+r._d});return j}));
+function tools(q){const f=[];const s=' '+q+' ';for(const k in IX.a){for(const a of IX.a[k]){const i=s.indexOf(' '+a+' ');if(i>=0){f.push([i,k,a]);break}}}f.sort((x,y)=>x[0]-y[0]||y[2].length-x[2].length);const out=[];f.forEach(x=>{if(!out.includes(x[1])&&!f.some(y=>y!==x&&y[2].length>x[2].length&&y[2].includes(x[2])&&y[0]<=x[0]&&x[0]<y[0]+y[2].length))out.push(x[1])});return out}
+function search(raw,lim){const q=N(raw);if(!q)return{rows:[],acts:[]};const toks=q.split(' ').filter(t=>t&&!STOP.has(t)),T=tools(q);
+const vs=/\b(vs|versus|or|compare|compared|against)\b/.test(q)||T.length>1,alt=/\b(alternative|alternatives|instead|cheaper|like|similar|replace|replacement)\b/.test(q),free=/\bfree\b/.test(q),price=/\b(price|prices|pricing|cost|costs|plans?|worth)\b/.test(q);
+const sc=[];for(const r of IX.r){let s=0,hit=0;for(let i=0;i<toks.length;i++){const t=toks[i],last=i==toks.length-1;const st=t.length>=8?t.slice(0,7):t,wre=new RegExp('(^| )'+st.replace(/[.$+]/g,'\\$&')+(last||st!==t?'':'( |$)'));
+if(wre.test(r._t)){s+=12;hit++}else if(r._t.includes(t)){s+=6;hit++}else if(wre.test(r.k)){s+=5;hit++}else if(r._a.includes(t)){s+=2;hit++}}
+if(toks.length&&hit<Math.ceil(toks.length/2)&&!T.length)continue;if(hit&&HUB.includes(r.u))s+=10;if(!toks.length&&!T.length)continue;
+if(r._t==q)s+=40;else if(r._t.startsWith(q))s+=8;
+if(T.length){const tu=T.map(k=>'/tools/'+k+'.html');
+if(r.y=='t'&&tu.includes(r.u))s+=(vs||alt?20:45)+(T[0]==r.u.slice(7,-5)?5:0);
+if(r.y=='c'&&r.n){const m=T.filter(k=>r.n.includes(k)).length;s+=m*(vs?30:8)+(m>=2?60:0)}
+if(alt&&r.y=='a'&&T.some(k=>r.u.includes('-to-'+k+'.')||r.u.includes('/'+k+'.')||r.u.includes('/'+k+'-')))s+=free?(r.u.includes('free-alternative')?75:55):(r.u.includes('free-alternative')?50:70);
+if(T.length==1&&!vs&&!alt&&!free&&(r.y=='p'||r.y=='a')&&r.u.includes(T[0]))s+=r.y=='p'?22:16;
+if(free&&!alt&&r.y=='a'&&T.some(k=>r.u.includes('-to-'+k+'.')))s+=40;
+if(price&&(r.y=='p'||r.y=='t')&&T.some(k=>r.u.includes(k)))s+=35;
+const rel=(r.y=='t'&&tu.includes(r.u))||(r.n&&T.some(k=>r.n.includes(k)))||((r.y=='a'||r.y=='p')&&T.some(k=>r.u.includes(k)));if(vs&&T.length>1&&!rel)continue;if(!rel&&(r.y=='a'||r.y=='t'||r.y=='c'))continue;
+if(!hit&&!(r.y=='t'&&tu.includes(r.u))&&!(r.n&&T.some(k=>r.n.includes(k)))&&!(r.y=='a'&&T.some(k=>r.u.includes(k)))&&!(r.y=='p'&&T.some(k=>r.u.includes(k))))continue}
+if(free&&(r.f||r.u.includes('free')))s+=6;if(price&&r.y=='p')s+=6;
+if(s>0)sc.push([s,r])}
+sc.sort((a,b)=>b[0]-a[0]||ORD.indexOf(a[1].y)-ORD.indexOf(b[1].y)||a[1].t.length-b[1].t.length);
+const acts=[];if(T.length>=2&&!sc.some(x=>x[1].n&&T.slice(0,2).every(k=>x[1].n.includes(k))))acts.push({u:'/compare-builder.html?tools='+T.slice(0,3).join(','),t:'Compare '+T.slice(0,3).map(k=>IX.nm[k]).join(' vs ')+' side by side',y:'c'});
+acts.push({u:'/?q='+encodeURIComponent(raw.trim()),t:'Ask the finder: \u201c'+raw.trim()+'\u201d',y:'f'});
+return{rows:sc.slice(0,lim).map(x=>x[1]),acts,total:sc.length,all:sc.map(x=>x[1])}}
+function rowH(r,id,act){const sub=r.y=='t'?`${r.p?X(r.p):''}${r.f?' · <span class="s58f">Free plan</span>':''}${r.ck?' · checked '+X(r.ck):''}`:X(r.d||'');
+return `<li role="option" id="${id}" aria-selected="false"><a href="${X(r.u)}" tabindex="-1"><span class="s58y s58y-${r.y}">${r.y=='f'?'Finder':X(TL[r.y]||'')}</span><span class="s58m"><b>${X(r.t)}</b>${sub?`<span class="s58s">${sub}</span>`:''}</span></a></li>`}
+const POP=[['/help-me-choose.html','Help me choose (5 quick questions)','g'],['/compare/chatgpt-vs-claude.html','ChatGPT vs Claude','c'],['/free.html','Can I do it for free?','g'],['/ai-budget-planner.html','Build my AI stack under $X/mo','g'],['/tools.html','Browse all tools with filters','g'],['/alternatives.html','Alternatives to popular AI tools','a']];
+const RK='tp_recent_v1';const rec=()=>{try{return JSON.parse(localStorage.getItem(RK)||'[]')}catch(e){return[]}};const remember=(u,t,y)=>{try{const l=rec().filter(x=>x.u!==u);l.unshift({u,t,y});localStorage.setItem(RK,JSON.stringify(l.slice(0,5)))}catch(e){}};
+function bind(inp,list,status,lim,onPick){let act=-1;const opts=()=>[...list.querySelectorAll('[role=option]')];
+const setAct=i=>{const o=opts();if(!o.length){act=-1;inp.removeAttribute('aria-activedescendant');return}act=(i+o.length)%o.length;o.forEach((x,j)=>x.setAttribute('aria-selected',j==act?'true':'false'));inp.setAttribute('aria-activedescendant',o[act].id);o[act].scrollIntoView({block:'nearest'})};
+const render=()=>{const v=inp.value;act=-1;inp.removeAttribute('aria-activedescendant');
+if(!v.trim()){const R=rec();let h='';if(R.length)h+=`<li class="s58h" role="presentation">Recent</li>`+R.map((r,i)=>rowH(r,list.id+'-r'+i)).join('');h+=`<li class="s58h" role="presentation">Popular</li>`+POP.map((p,i)=>rowH({u:p[0],t:p[1],y:p[2]},list.id+'-p'+i)).join('');list.innerHTML=h;status.textContent='Type a tool, a job (e.g. voiceover) or two tools to compare.';return}
+if(!IX){status.textContent='Loading…';load().then(render);return}
+const res=search(v,lim);list.innerHTML=res.rows.map((r,i)=>rowH(r,list.id+'-'+i)).join('')+(res.acts.length?`<li class="s58h" role="presentation">${res.rows.length?'Or':'No page matches. Try'}</li>`:'')+res.acts.map((r,i)=>rowH(r,list.id+'-a'+i)).join('');
+status.textContent=res.rows.length?`${res.total} page${res.total==1?'':'s'} match${res.total==1?'es':''}. Use up and down arrows, Enter to open.`:'No pages match. Try a tool name or a job, or ask the finder.';if(onPick)onPick(v,res);if(res.rows.length)setAct(0)};
+inp.addEventListener('input',render);inp.addEventListener('keydown',ev=>{if(ev.key=='ArrowDown'){ev.preventDefault();setAct(act+1)}else if(ev.key=='ArrowUp'){ev.preventDefault();setAct(act-1)}else if(ev.key=='Enter'){const o=opts()[act>=0?act:0];if(o){ev.preventDefault();const a=o.querySelector('a');remember(a.getAttribute('href'),a.querySelector('b').textContent,(o.querySelector('.s58y').className.match(/s58y-(\w)/)||[])[1]);location.href=a.href}}});
+list.addEventListener('click',ev=>{const a=ev.target.closest('a');if(a){const o=a.closest('li');remember(a.getAttribute('href'),a.querySelector('b').textContent,(o.querySelector('.s58y').className.match(/s58y-(\w)/)||[])[1])}});
+list.addEventListener('mousemove',ev=>{const o=ev.target.closest('[role=option]');if(o){const i=opts().indexOf(o);if(i!==act)setAct(i)}});return render}
+let dlg=null,drender=null;
+function open(){load();if(!dlg){dlg=D.createElement('dialog');dlg.className='s58d';dlg.setAttribute('aria-label','Search ToolPick');
+dlg.innerHTML=`<div class="s58bar"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><label for="s58q" class="skip">Search tools, comparisons and guides</label><input id="s58q" type="search" role="combobox" aria-expanded="true" aria-controls="s58l" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search tools, comparisons, jobs…"><button type="button" class="s58x" aria-label="Close search">Esc</button></div><p id="s58st" class="s58st" role="status" aria-live="polite"></p><ul id="s58l" role="listbox" aria-label="Search results" class="s58l"></ul><p class="s58ft"><a href="/search.html">Full search &amp; every page A–Z</a><span class="s58k"><kbd>↑</kbd><kbd>↓</kbd> move · <kbd>Enter</kbd> open · <kbd>/</kbd> search</span></p>`;
+D.body.appendChild(dlg);const inp=dlg.querySelector('input');drender=bind(inp,dlg.querySelector('ul'),dlg.querySelector('#s58st'),8);dlg.querySelector('.s58x').onclick=()=>dlg.close();dlg.addEventListener('click',ev=>{if(ev.target===dlg)dlg.close()});
+dlg.querySelector('.s58ft a').addEventListener('click',ev=>{const v=inp.value.trim();if(v)ev.currentTarget.href='/search.html?q='+encodeURIComponent(v)})}
+if(!dlg.open)dlg.showModal();drender();dlg.querySelector('input').focus()}
+D.addEventListener('click',ev=>{const b=ev.target.closest('.sbtn');if(b&&typeof HTMLDialogElement=='function'&&!ev.ctrlKey&&!ev.metaKey&&!ev.shiftKey){ev.preventDefault();open()}});
+D.addEventListener('keydown',ev=>{const t=ev.target,typing=t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));if(((ev.key=='/'&&!typing)||((ev.ctrlKey||ev.metaKey)&&ev.key.toLowerCase()=='k'))){const pq=D.getElementById('s58pq');if(pq){ev.preventDefault();pq.focus();pq.select();return}if(typeof HTMLDialogElement=='function'){ev.preventDefault();open()}}});
+const pq=D.getElementById('s58pq');if(pq){const list=D.getElementById('s58pl'),st=D.getElementById('s58pst'),all=D.getElementById('s58all'),cnt=D.getElementById('s58cnt');
+const r=bind(pq,list,st,30,(v,res)=>{const u=new URL(location);if(v.trim())u.searchParams.set('q',v.trim());else u.searchParams.delete('q');history.replaceState(null,'',u)});
+pq.addEventListener('input',()=>{if(all)all.hidden=!!pq.value.trim()});const q0=new URLSearchParams(location.search).get('q');if(q0){pq.value=q0;if(all)all.hidden=true;load().then(r)}else r();
+D.querySelectorAll('.s58chip').forEach(b=>b.addEventListener('click',()=>{pq.value=b.dataset.q;if(all)all.hidden=true;load().then(r);pq.focus()}))}})();

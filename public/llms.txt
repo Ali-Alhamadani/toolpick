@@ -23,7 +23,7 @@
 - [Synthesia](https://toolpick-ai.vercel.app/tools/synthesia.html): Starter $19/mo ($14/mo yearly, $168/yr); Pro $89/mo ($59/mo yearly, $708/yr). Promotional: Starter $9 first month then $19/mo; Pro $49 first month then $89/mo (monthly billing) | free: Basic free: 10 min video/mo + 500 credits, watermarked
 - [Descript](https://toolpick-ai.vercel.app/tools/descript.html): Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50) | free: Free: 1 media hour/mo, 720p export
 - [CapCut](https://toolpick-ai.vercel.app/tools/capcut.html): Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo | free: Free plan with basic editing and templates
-- [InVideo](https://toolpick-ai.vercel.app/tools/invideo.html): Starter $20/mo ($10 yearly); Plus $60 ($30); higher tiers from $150 | free: Free editor available
+- [InVideo](https://toolpick-ai.vercel.app/tools/invideo.html): Starter $20/mo ($10 yearly); Plus $60 ($30 yearly), more credits from $150; Max from $250/mo | free: Free editor available
 - [Opus Clip](https://toolpick-ai.vercel.app/tools/opus-clip.html): Paid from $15/mo billed monthly | free: Free forever plan ($0)
 - [Captions](https://toolpick-ai.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
 - [Claude](https://toolpick-ai.vercel.app/tools/claude.html): Pro $20/mo ($17/mo billed yearly); Max from $100/mo | free: Free plan: $0
@@ -432,3 +432,6 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## Tools directory (v53)
 - [Browse all AI tools](https://toolpick-ai.vercel.app/tools.html): search all 82 tools by name or job (e.g. /tools.html?q=voiceover), filter by what each tool does (?job=text-to-speech, from each tool's own site), category (?category=video), real free plan (?free=yes), verified starting price (?price=u10), billing (?billing=monthly), Best Value picks (?bv=1); card or table view (?view=table); compare up to 3. Prices from official pricing pages with checked dates.
+
+## Search (v58)
+- [Search ToolPick](https://toolpick-ai.vercel.app/search.html): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of 294 pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: https://toolpick-ai.vercel.app/search-index.json
