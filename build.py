@@ -3897,6 +3897,114 @@ _lm["/price-changes.html"] = max(_pc_latest, PC_BUILD_DATE)
 for _n in CHANGES_BY_TOOL: _lm[turl(_n)] = max(_lm.get(turl(_n), CHECKED), PC_BUILD_DATE)
 for _r in ROLES:
     _lm[role_path(_r[0])] = max(x.get("checked", CHECKED) for b in ROLE_DATA[_r[0]] for c, t, al in ROLE_DATA[_r[0]][b] for x in [t] + al)
+# --- v59: AI usage limits by plan + "Which plan should I pick?" on tool pages ---
+from tools import USAGE, USAGE_CHECKED, USAGE_LEFT_OUT
+U_PATH = "/ai-usage-limits.html"
+_ULV = [("light", "A few times a week"), ("daily", "Every day for work"), ("heavy", "All day or with agents")]
+_UKEY = {u["t"]: slug(u["t"]) for u in USAGE}
+def _hj(xs):
+    return "; ".join(x if i == 0 or x.split()[0] in ("ChatGPT", "Microsoft", "Gemini", "Claude", "Cursor", "Windsurf", "GitHub") else x[0].lower() + x[1:] for i, x in enumerate(xs))
+def _uprice(u, p):
+    pc = u["pc"].get(p[0])
+    return p[1] + (f" (price checked {pc})" if pc else "")
+def _upick(u, i):
+    p = u["plans"][u["pick"][i]]; a = u["alt"][i]
+    return p, (u["plans"][a] if a is not None else None)
+def _uresult(u, i):
+    p, a = _upick(u, i)
+    nx = u["pick"][i] + 1
+    up = u["plans"][nx] if nx < len(u["plans"]) and (a is None or u["plans"][nx][0] != a[0]) else None
+    h = (f'<p class="small" style="margin:0">{e(u["t"])} · {e(_ULV[i][1].lower())}</p>'
+         f'<p class="vc-big" style="margin:4px 0 2px">{e(p[0])} · {e(p[1])}</p>'
+         f'<p style="margin:0 0 8px">{e(u["why"][i])}</p><ul class="u59r">'
+         f'<li><b>What you get:</b> {e(p[3])}</li>'
+         f'<li><b>Limit resets:</b> {e(u["reset"])}</li>'
+         f'<li><b>If you hit the limit:</b> {e(_hj(u["hit"]))}.</li>')
+    if a: h += f'<li><b>Also worth a look:</b> {e(a[0])} ({e(_uprice(u, a))}): {e(a[3])}</li>'
+    if up: h += f'<li><b>Next step up:</b> {e(up[0])} ({e(_uprice(u, up))})</li>'
+    h += (f'</ul><p class="small" style="margin:8px 0 0">From {e(u["t"])}\'s own pages, checked {USAGE_CHECKED}: '
+          + " · ".join(f'<a href="{s}" rel="nofollow noopener" target="_blank">{e(l)}<span class="skip"> (opens in a new tab)</span></a>' for l, s in u["src"])
+          + f' · <a href="{turl(u["t"])}">{e(u["t"])} review</a></p>')
+    return h
+_UJS_DATA = {_UKEY[u["t"]]: {"h": [_uresult(u, i) for i in range(3)], "t": u["t"]} for u in USAGE}
+_uopts = "".join(f'<option value="{_UKEY[u["t"]]}"{" selected" if u["t"] == "Claude" else ""}>{e(u["t"])}</option>' for u in USAGE)
+_useg = "".join(f'<input type="radio" name="ul-use" id="ul-{k}" value="{k}"{" checked" if k == "daily" else ""}><label for="ul-{k}">{e(l)}</label>' for k, l in _ULV)
+_uclaude = next(u for u in USAGE if u["t"] == "Claude")
+_urows = "".join(f'<tr><th scope="row"><a href="#{_UKEY[u["t"]]}">{e(u["t"])}</a></th><td>{e(u["unit"])}</td><td>{e(u["reset"])}</td><td>{e(u["hard"])}</td><td>{e(u["extra"])}</td></tr>' for u in USAGE)
+def _uladder(u):
+    rows = "".join(f'<tr><th scope="row">{e(p[0])}</th><td>{e(_uprice(u, p))}</td><td>{e(p[3])}</td><td>{("“" + e(p[4]) + "”") if p[4] else "—"}</td></tr>' for p in u["plans"])
+    picks = " · ".join(f'{e(l)}: <b>{e(u["plans"][u["pick"][i]][0])}</b>' for i, (k, l) in enumerate(_ULV))
+    return (f'<details class="card u59d" id="{_UKEY[u["t"]]}"><summary><h3>{e(u["t"])} plans and limits</h3></summary>'
+            f'<p class="small" style="margin:6px 0">Our pick by use: {picks} · <a href="{U_PATH}?tool={_UKEY[u["t"]]}&amp;use=daily#picker">Open in the picker</a></p>'
+            f'<div class="tw u59tw" role="region" aria-label="{e(u["t"])} plans" tabindex="0"><table><thead><tr><th scope="col">Plan</th><th scope="col">Price</th><th scope="col">What the plan includes</th><th scope="col">{e(u["t"])} says it\'s for</th></tr></thead><tbody>{rows}</tbody></table></div>'
+            f'<p class="small"><b>How it\'s counted:</b> {e(u["unit"])} <b>Resets:</b> {e(u["reset"])} <b>At the limit:</b> {e(_hj(u["hit"]))}. {e(u["note"])}</p>'
+            f'<p class="small">Sources (checked {USAGE_CHECKED}): ' + " · ".join(f'<a href="{s}" rel="nofollow noopener" target="_blank">{e(l)}<span class="skip"> (opens in a new tab)</span></a>' for l, s in u["src"]) + f' · <a href="{turl(u["t"])}">ToolPick review</a></p></details>')
+_uladders = "".join(_uladder(u) for u in USAGE)
+_u_qa = [
+ ("Does ChatGPT, Claude or Gemini have a fixed number of messages?", "Mostly no. Claude and Gemini count usage by how much work a request takes (chat length, files, model), so there's no fixed message count. ChatGPT says everyday text chats are unlimited on every plan, with separate limits for uploads, images, deep research, Thinking and Codex. GitHub Copilot is the clearest: a set number of AI credits a month (1,500 on Pro)."),
+ ("Which AI limits reset every 5 hours?", f"Claude (a rolling 5-hour session plus a weekly limit), Google Gemini (every 5 hours until a weekly limit) and ChatGPT's Codex and Work on Plus (5 hours plus weekly). Cursor resets weekly, Windsurf daily and weekly, and GitHub Copilot monthly on the 1st (00:00 UTC). Checked {USAGE_CHECKED}."),
+ ("What happens when I hit my Claude limit?", "Claude says you can wait for it to reset, move to a higher plan, or on paid plans turn on usage credits to keep working at standard API rates. Claude Code uses the same limit as chat."),
+ ("Is Claude Max or ChatGPT Pro worth it for heavy use?", "Both start at $100 a month. Claude Max gives 5x Pro usage every 5 hours and every week. ChatGPT Pro 100 adds Pro reasoning and removes the 5-hour limit in Codex and Work. If you mostly code with agents, compare them with Cursor Super ($100, 15x Plus) and GitHub Copilot Max ($100, 20,000 AI credits)."),
+ ("Can I pay for extra usage instead of upgrading?", "Claude (usage credits at API rates on paid plans), GitHub Copilot ($0.01 per AI credit with a budget you set), Cursor (top-offs), Windsurf (extra usage at API pricing) and ChatGPT (credits for Codex, Work and Office add-ins) all say yes. Gemini's limits page doesn't mention a top-up. Mistral and Microsoft don't say."),
+ ("How did you pick the plan for each use level?", "From each company's own wording where it gives one (Claude: Pro “for everyday work”, Max “for all-day work”; Cursor recommends Premium for new AI users and Super for daily agent users; GitHub calls Pro+ ideal for AI power users), otherwise from the allowances each plan states. We don't guess message counts the companies don't publish."),
+]
+_u_body = f"""<style>.vc-big{{font-size:1.5rem;font-weight:800;margin:10px 0 2px}}.u59r{{margin:0;padding-left:1.1em}}.u59r li{{margin:4px 0}}.u59tw table{{min-width:640px}}.u59tw td,.u59tw th{{font-size:.9rem;vertical-align:top}}.u59d{{margin:10px 0}}.u59d>summary{{cursor:pointer;min-height:44px;display:flex;align-items:center}}.u59d>summary h3{{display:inline;margin:0;font-size:1.05rem}}.u59in{{display:grid;gap:12px;grid-template-columns:minmax(180px,260px) 1fr;align-items:end}}.u59in select{{width:100%}}@media(max-width:640px){{.u59in{{grid-template-columns:1fr}}.u59in .seg{{display:flex;flex-wrap:wrap;border-radius:18px}}.u59in .seg label{{flex:1 1 auto;justify-content:center}}}}#ul-out{{min-height:300px}}</style>
+<p class="small"><a href="/save-money.html">Save money</a> › AI usage limits</p><h1>AI usage limits: which plan do you actually need?</h1>
+<p class="tag">Message caps, 5-hour windows and weekly limits, explained for {len(USAGE)} AI tools. Pick a tool and how much you use it to see the plan to buy, when the limit resets and what to do when you hit it. From each tool's own pricing and help pages, checked {USAGE_CHECKED}.</p>
+<div class="builder" id="picker"><div class="u59in"><div><label for="ul-tool">AI tool</label><select id="ul-tool">{_uopts}</select></div>
+<fieldset class="seg"><legend>How much do you use it?</legend>{_useg}</fieldset></div>
+<div id="ul-out" class="pick" aria-live="polite" style="margin-top:12px">{_uresult(_uclaude, 1)}</div>
+<p style="margin:8px 0 0"><button type="button" class="bbtn" id="ul-copy">Copy link to this answer</button> <span id="ul-st" class="small" role="status"></span></p></div>
+<h2>How each tool's limits work, side by side</h2>
+<p class="small">“Published numbers” means the company states a count; most only state multipliers (“5x Pro”) or labels (“extensive”).</p>
+<div class="tw u59tw" role="region" aria-label="Usage limits compared" tabindex="0"><table><thead><tr><th scope="col">Tool</th><th scope="col">How usage is counted</th><th scope="col">When it resets</th><th scope="col">Published numbers</th><th scope="col">Pay for extra?</th></tr></thead><tbody>{_urows}</tbody></table></div>
+<h2>Every plan's limit, tool by tool</h2><p class="small">Open a tool to see each plan's price, what it includes and who the company says it's for.</p>
+{_uladders}
+<h2>Tips to make a limit last longer</h2><ul><li><b>Start a new chat for a new topic.</b> Claude and Gemini both count long chats as more usage.</li><li><b>Use the lighter model for simple jobs.</b> Gemini, Windsurf and Cursor all say the model you pick changes how fast you use your allowance; ChatGPT's Fast mode uses it 2.5x faster.</li><li><b>Check the meter.</b> Claude: Settings › Usage. Gemini: Settings › Usage Limits. Microsoft: Services &amp; subscriptions.</li><li><b>Paying for two?</b> If you only hit limits on one tool, upgrade that one and drop the other. <a href="/my-ai-costs.html">Audit what you pay →</a></li></ul>
+<h2>Left out</h2><ul>{"".join(f"<li><b>{e(n)}</b>: {e(r)}.</li>" for n, r in USAGE_LEFT_OUT)}</ul>
+{_faq(_u_qa)}
+<p class="small">Related: <a href="/free-plan-limits.html">Free plan limits</a> · <a href="/chatgpt-pricing.html">ChatGPT pricing</a> · <a href="/cursor-pricing.html">Cursor pricing</a> · <a href="/compare/chatgpt-vs-claude.html">ChatGPT vs Claude</a> · <a href="/compare/cursor-vs-github-copilot-vs-windsurf.html">Cursor vs GitHub Copilot vs Windsurf</a> · <a href="/monthly-or-yearly.html">Monthly or yearly?</a> · <a href="/how-we-pick.html">How we pick</a></p>
+<script>(()=>{{const D={json.dumps(_UJS_DATA)};const L=["light","daily","heavy"];const s=document.getElementById('ul-tool'),o=document.getElementById('ul-out'),st=document.getElementById('ul-st');
+const q=new URLSearchParams(location.search);if(D[q.get('tool')])s.value=q.get('tool');if(L.includes(q.get('use')))document.getElementById('ul-'+q.get('use')).checked=true;
+const use=()=>document.querySelector('input[name=ul-use]:checked').value;
+function r(push){{const t=s.value,u=use();o.innerHTML=D[t].h[L.indexOf(u)];if(push){{const p=new URLSearchParams(location.search);p.set('tool',t);p.set('use',u);history.replaceState(null,'','?'+p+location.hash)}}}}
+s.addEventListener('change',()=>r(1));document.querySelectorAll('input[name=ul-use]').forEach(x=>x.addEventListener('change',()=>r(1)));
+if(q.get('tool')||q.get('use'))r(0);
+document.getElementById('ul-copy').addEventListener('click',()=>{{const p=new URLSearchParams();p.set('tool',s.value);p.set('use',use());const u=location.origin+location.pathname+'?'+p;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>st.textContent='Link copied',()=>st.textContent=u)}});}})();</script>"""
+page(U_PATH, f"AI Usage Limits {USAGE_CHECKED[:4]}: ChatGPT, Claude, Gemini, Cursor, Copilot Plans Compared | ToolPick",
+     f"Message caps, 5-hour and weekly limits for ChatGPT, Claude, Gemini, Microsoft Copilot, Le Chat, Cursor, GitHub Copilot and Windsurf, and which plan to buy for light, daily or all-day use. Official pages, checked {USAGE_CHECKED}.",
+     _u_body, [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI usage limits plan picker", "url": BASE + U_PATH, "applicationCategory": "UtilitiesApplication", "operatingSystem": "Any",
+       "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": f"Pick an AI tool and how much you use it to get the plan to buy, how its usage limit resets and what to do at the limit, from official pages checked {USAGE_CHECKED}."},
+      {"@context": "https://schema.org", "@type": "ItemList", "name": "AI tools compared by usage limits", "itemListElement": [{"@type": "ListItem", "position": i + 1, "name": u["t"], "url": BASE + U_PATH + "#" + _UKEY[u["t"]]} for i, u in enumerate(USAGE)]},
+      _ld_faq(_u_qa), crumbs([("ToolPick", "/"), ("Save money", "/save-money.html"), ("AI usage limits", U_PATH)])])
+V59_CHANGED = [U_PATH]
+def _v59ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v59"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V59_CHANGED.append(path); return True
+for u in USAGE:
+    _k = _UKEY[u["t"]]
+    _li = "".join(f'<li><b>{e(l)}:</b> {e(_upick(u, i)[0][0])}, {e(_upick(u, i)[0][1])}. {e(u["why"][i])}</li>' for i, (k, l) in enumerate(_ULV))
+    _v59ins(turl(u["t"]), '<section class="card tbp"',
+        f'<section class="card v59" aria-labelledby="u59h" style="margin:12px 0"><h2 id="u59h" style="margin:0 0 6px;font-size:1.1rem">Which {e(u["t"])} plan should I pick?</h2>'
+        f'<ul class="u59l" style="margin:0;padding-left:1.1em">{_li}</ul>'
+        f'<p class="small" style="margin:8px 0 0"><b>Limit resets:</b> {e(u["reset"])} <b>At the limit:</b> {e(u["hit"][0])}. Checked {USAGE_CHECKED}. '
+        f'<a href="{U_PATH}?tool={_k}&amp;use=daily#picker">Compare usage limits across {len(USAGE)} AI tools →</a></p></section>')
+_ULINK = f'<a href="{U_PATH}">AI usage limits: which plan do you need?</a>'
+for _p in ["/free-plan-limits.html", "/chatgpt-pricing.html", "/cursor-pricing.html", "/save-money.html", "/best-ai-assistants-tools.html", "/best-ai-coding-tools.html"]:
+    _v59ins(_p, "</h1>", f'<p class="pick small v59">Hitting message caps or weekly limits? See every plan\'s limit and which one you need: {_ULINK} →</p>', after=True)
+_uslugs = set(_UKEY.values())
+for _x in COMPARISONS:
+    _cn = cnames(_x)
+    _in = [n for n in _cn if n in _UKEY]
+    if len(_in) >= 2:
+        _v59ins(f"/compare/{_x[0]}.html", "</h1>", f'<p class="small v59">Usage limits compared ({", ".join(e(n) for n in _in)}): message caps, reset windows and which plan you need → {_ULINK}</p>', after=True)
+_v59ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v59\"><a href='{U_PATH}'>AI usage limits: message caps, 5-hour and weekly limits, and which plan you need</a></li>", after=True)
+print("v59 usage limits:", len(USAGE), "tools;", len(V59_CHANGED), "pages changed")
+open("public/llms.txt", "a").write(f"\n## AI usage limits (v59, checked {USAGE_CHECKED})\n- [AI usage limits: which plan do you need?]({BASE}{U_PATH}): {len(USAGE)} tools ({', '.join(u['t'] for u in USAGE)}): how usage is counted, when limits reset (5-hour, daily, weekly, monthly), published numbers, paying for extra, and the plan to buy for light / daily / all-day use, from official pages. Deep link: {U_PATH}?tool=claude&use=heavy\n- Each of those tool pages has a 'Which plan should I pick?' box.\n")
+
 # --- v39: simplification pass (one nav, one costs page, collapsed details, fewer boxes) ---
 import re as _re, os as _os, glob as _glob
 V39_DATE = "2026-10-20"
@@ -3963,6 +4071,7 @@ for _u in V55_CHANGED: _lm[_u] = PLANNER_CHECKED
 _v56ins("/my-ai-costs.html", "</h1>", f'<p class="small v56">Making images? <a href="{I_PATH}">Real cost of AI images: price per image and unlimited plans →</a></p>', after=True)
 for _u in V56_CHANGED: _lm[_u] = IMAGE_CHECKED
 for _u in V57_CHANGED: _lm[_u] = V57_DATE
+for _u in V59_CHANGED: _lm[_u] = USAGE_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
