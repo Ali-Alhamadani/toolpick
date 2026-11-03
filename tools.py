@@ -36,7 +36,7 @@ CATEGORIES = [
   {"name":"Leonardo","url":"https://leonardo.ai","pricing":"https://leonardo.ai/pricing","price":"Essential $12/mo; Premium $30; Ultimate $60","free":"Free: 150 fast tokens/day","about":"Image and video generation with presets and custom model training.","why":"Generous daily free tokens and a $12 entry plan; Premium adds unlimited relaxed image generation."},
   {"name":"Midjourney","url":"https://www.midjourney.com","pricing":"https://docs.midjourney.com/hc/en-us/articles/27870484040333-Comparing-Midjourney-Plans","price":"Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96)","free":"No free plan (subscription only)","about":"Top-tier artistic image quality, plus video."},
   {"name":"Ideogram","url":"https://ideogram.ai","pricing":"https://ideogram.ai/pricing","price":"Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20)","free":"Free weekly credits for eligible accounts","about":"Best-in-class text rendering in images (logos, posters)."},
-  {"name":"Krea","url":"https://www.krea.ai","pricing":"https://www.krea.ai/pricing","price":"Basic $9/mo; Pro $35/mo ($21 yearly); Max $105 ($63); $200 ($160) (checked 2026-10-22)","free":"Free: 100 units/day","about":"Real-time generation, many models, upscaling."},
+  {"name":"Krea","url":"https://www.krea.ai","pricing":"https://www.krea.ai/pricing","price":"Basic $9/mo ($5 yearly); Pro $35/mo ($21 yearly); Max $105 ($63 yearly); Business $200 ($160 yearly) (checked 2026-11-03)","free":"Free: 100 units/day","about":"Real-time generation, many models, upscaling."},
   {"name":"Canva","url":"https://www.canva.com","pricing":"https://www.canva.com/pricing/","price":"check site","free":"Free plan available","about":"Design tool with built-in AI image generation."},
   {"name":"Recraft","url":"https://www.recraft.ai","pricing":"https://www.recraft.ai/pricing","price":"check site","free":"Free plan (images not licensed for commercial use)","about":"Vector and brand-style image generation."},
  ]},
@@ -1591,3 +1591,7 @@ USAGE = [
 ]
 USAGE_LEFT_OUT = [("Perplexity", "its pricing page showed a security check today, so we couldn't read its plan limits"),
                   ("Microsoft 365 Pro", "the plan is named on Microsoft's limits page, but its price isn't on the plan comparison page we read")]
+
+# Daily ops 2026-11-03: krea.ai/pricing re-read (WebFetch): Basic $9 ($5/mo yearly), Pro $35 ($21), Max $105 ($63), Business $200 ($160); labels added, prices unchanged.
+# notion.com/pricing re-read: Plus $10, Business $20 per member/mo shown (yearly view), consistent with listing; left dated 2026-10-23 since monthly not shown.
+PRICE_SKIP["2026-11-03|Krea"] = "Re-checked 2026-11-03; added plan labels and Basic yearly price, prices unchanged."

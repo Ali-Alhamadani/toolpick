@@ -489,7 +489,7 @@
      "name": "Krea",
      "url": "https://www.krea.ai",
      "pricing": "https://www.krea.ai/pricing",
-     "price": "Basic $9/mo; Pro $35/mo ($21 yearly); Max $105 ($63); $200 ($160)",
+     "price": "Basic $9/mo ($5 yearly); Pro $35/mo ($21 yearly); Max $105 ($63 yearly); Business $200 ($160 yearly)",
      "free": "Free: 100 units/day",
      "about": "Real-time generation, many models, upscaling.",
      "checked": "2026-10-19",

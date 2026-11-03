@@ -47,7 +47,7 @@
 - [Leonardo](https://toolpick-ai.vercel.app/tools/leonardo.html): Essential $12/mo; Premium $30; Ultimate $60 | free: Free: 150 fast tokens/day
 - [Midjourney](https://toolpick-ai.vercel.app/tools/midjourney.html): Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96) | free: No free plan (subscription only)
 - [Ideogram](https://toolpick-ai.vercel.app/tools/ideogram.html): Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20) | free: Free weekly credits for eligible accounts
-- [Krea](https://toolpick-ai.vercel.app/tools/krea.html): Basic $9/mo; Pro $35/mo ($21 yearly); Max $105 ($63); $200 ($160) | free: Free: 100 units/day
+- [Krea](https://toolpick-ai.vercel.app/tools/krea.html): Basic $9/mo ($5 yearly); Pro $35/mo ($21 yearly); Max $105 ($63 yearly); Business $200 ($160 yearly) | free: Free: 100 units/day
 - [Canva](https://toolpick-ai.vercel.app/tools/canva.html): Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person | free: Free plan available
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
