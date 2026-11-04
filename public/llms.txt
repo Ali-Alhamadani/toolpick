@@ -434,6 +434,9 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [AI usage limits: which plan do you need?](https://toolpick-ai.vercel.app/ai-usage-limits.html): 8 tools (ChatGPT, Claude, Google Gemini, Microsoft Copilot, Le Chat (Mistral), Cursor, GitHub Copilot, Windsurf): how usage is counted, when limits reset (5-hour, daily, weekly, monthly), published numbers, paying for extra, and the plan to buy for light / daily / all-day use, from official pages. Deep link: /ai-usage-limits.html?tool=claude&use=heavy
 - Each of those tool pages has a 'Which plan should I pick?' box.
 
+## AI coding tool cost calculator (v60, checked 2026-11-04)
+- [AI coding tool cost calculator](https://toolpick-ai.vercel.app/ai-coding-cost.html): monthly and yearly cost of Cursor, GitHub Copilot, Claude Code, Windsurf, Warp for 1-500 people, by usage (light / daily / heavy) and billing, using individual or team plans (seat limits and flat team fees applied), every price from the official pricing page. Deep link: /ai-coding-cost.html?seats=5&use=heavy&bill=y (also &type=solo, &plan=cursor:2).
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.
@@ -445,4 +448,4 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [Browse all AI tools](https://toolpick-ai.vercel.app/tools.html): search all 82 tools by name or job (e.g. /tools.html?q=voiceover), filter by what each tool does (?job=text-to-speech, from each tool's own site), category (?category=video), real free plan (?free=yes), verified starting price (?price=u10), billing (?billing=monthly), Best Value picks (?bv=1); card or table view (?view=table); compare up to 3. Prices from official pricing pages with checked dates.
 
 ## Search (v58)
-- [Search ToolPick](https://toolpick-ai.vercel.app/search.html): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of 300 pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: https://toolpick-ai.vercel.app/search-index.json
+- [Search ToolPick](https://toolpick-ai.vercel.app/search.html): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of 301 pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: https://toolpick-ai.vercel.app/search-index.json

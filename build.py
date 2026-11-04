@@ -4005,6 +4005,161 @@ _v59ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v59\"><a href='
 print("v59 usage limits:", len(USAGE), "tools;", len(V59_CHANGED), "pages changed")
 open("public/llms.txt", "a").write(f"\n## AI usage limits (v59, checked {USAGE_CHECKED})\n- [AI usage limits: which plan do you need?]({BASE}{U_PATH}): {len(USAGE)} tools ({', '.join(u['t'] for u in USAGE)}): how usage is counted, when limits reset (5-hour, daily, weekly, monthly), published numbers, paying for extra, and the plan to buy for light / daily / all-day use, from official pages. Deep link: {U_PATH}?tool=claude&use=heavy\n- Each of those tool pages has a 'Which plan should I pick?' box.\n")
 
+# --- v60: AI coding tool cost calculator (/ai-coding-cost.html) ---
+# Prices: CODECOST in tools.py, each read on the official pricing page on CODECOST_CHECKED. No other prices used.
+from tools import CODECOST, CODECOST_CHECKED, CODECOST_LEFT_OUT
+CC_PATH = "/ai-coding-cost.html"
+_CCLV = [("light", "Light", "Autocomplete and a few questions"), ("daily", "Daily", "Agent help most days"), ("heavy", "Heavy", "Agents for hours every day")]
+def _ccm(v):
+    r = round(v, 2); return "$" + (f"{int(r):,}" if r == int(r) else f"{r:,.2f}")
+def _ccname(c): return c.get("label", c["t"])
+_CCD = []
+for c in CODECOST:
+    _t0 = find(c["t"])
+    _CCD.append(dict(k=slug(c["t"]), n=_ccname(c), u=turl(c["t"]), src=c["src"], free=c["free"], extra=c["extra"], twhy=c["twhy"],
+        solo=[dict(p=p[0], m=p[1], y=p[2], inc=p[3], says=p[4]) for p in c["solo"]], sp=list(c["spick"]), sw=list(c["swhy"]),
+        team=[dict(p=p[0], m=p[1], y=p[2], b=p[3], lim=p[4], frm=p[5], inc=p[6], says=p[7]) for p in c["team"]], tp=list(c["tpick"])))
+    # guard: every solo/team monthly price must match the verified tools.py / TEAM_PLANS text where it exists
+    for p in c["solo"]:
+        assert f"${p[1]}" in _t0["price"] or (c["t"], p[0]) == ("Warp", "Max"), (c["t"], p)
+def _cccalc(d, n, i, bill, typ, ov=None):
+    plans = d["team"] if typ == "team" else d["solo"]
+    idx = ov if ov is not None and 0 <= ov < len(plans) else (d["tp"] if typ == "team" else d["sp"])[i]
+    p = plans[idx]
+    per = p["y"] if bill == "y" and p.get("y") is not None else p["m"]
+    lim = p.get("lim"); out = bool(lim and (n < lim[0] or n > lim[1]))
+    tot = (p.get("b") or 0) + per * n
+    return dict(idx=idx, p=p, per=per, tot=tot, out=out, noy=(bill == "y" and p.get("y") is None))
+def _ccprice(r, typ):
+    p = r["p"]; f = "from " if p.get("frm") else ""
+    s = f"{f}{_ccm(r['per'])}" + ("/seat/mo" if typ == "team" else "/mo")
+    if p.get("b"): s = f"{_ccm(p['b'])}/mo + {_ccm(r['per'])}/seat"
+    return s
+def _cccard(d, r, n, i, bill, typ, best):
+    p = r["p"]; plans = d["team"] if typ == "team" else d["solo"]
+    why = d["twhy"] if typ == "team" else d["sw"][i]
+    opts = "".join(f'<option value="{j}"{" selected" if j == r["idx"] else ""}>{e(q["p"])} · {_ccm(q["m"])}{"+" if q.get("frm") else ""}{"/seat" if typ == "team" else ""}</option>' for j, q in enumerate(plans))
+    tot = ("from " if p.get("frm") else "") + _ccm(r["tot"])
+    if r["out"]:
+        totl = f'<p class="cc-tot">Not available for {n} seats</p><p class="small" style="margin:0">{e(p["p"])} allows {p["lim"][0]}–{p["lim"][1]} seats. Ask {e(d["n"])} about Enterprise.</p>'
+    else:
+        totl = (f'<p class="cc-tot">{tot}<span class="small">/mo</span></p><p class="small" style="margin:0">{("from " if p.get("frm") else "") + _ccm(r["tot"] * 12)} a year · {e(_ccprice(r, typ))}'
+                + (" × " + str(n) if n > 1 and not p.get("b") else (f" × {n} seats" if p.get("b") else "")) + "</p>")
+    note = '<p class="small cc-note">No yearly price on the official page, so the monthly price is used.</p>' if r["noy"] else ""
+    return (f'<article class="cc-card{" cc-best" if best else ""}" data-k="{d["k"]}">' + ('<p class="cc-badge">Lowest cost for you</p>' if best else "")
+            + f'<h3><a href="{d["u"]}">{e(d["n"])}</a></h3><label class="small" for="cc-p-{d["k"]}">Plan</label><select id="cc-p-{d["k"]}" class="cc-sel" data-k="{d["k"]}">{opts}</select>'
+            + totl + note + f'<p class="small cc-inc"><b>Includes:</b> {e(p["inc"])}</p><p class="small cc-why">{e(why)}</p>'
+            + f'<p class="small" style="margin:6px 0 0">Checked {CODECOST_CHECKED} · <a href="{e(d["src"])}" rel="nofollow noopener" target="_blank">Official pricing<span class="skip"> for {e(d["n"])} (opens in a new tab)</span></a></p></article>')
+def _ccrender(n=1, i=1, bill="m", typ="solo"):
+    rows = [(d, _cccalc(d, n, i, bill, typ)) for d in _CCD]
+    rows.sort(key=lambda x: (x[1]["out"], x[1]["tot"], x[0]["n"]))
+    ok = [x for x in rows if not x[1]["out"]]
+    b = ok[0] if ok else None
+    ppl = "you" if n == 1 else f"{n} people"
+    if b:
+        nx = ok[1] if len(ok) > 1 else None
+        diff = (f", {'at least ' if nx[1]['p'].get('frm') else ''}{_ccm(nx[1]['tot'] - b[1]['tot'])} a month less than {nx[0]['n']} {nx[1]['p']['p']}" if nx and nx[1]["tot"] > b[1]["tot"] else (f", the same as {nx[0]['n']} {nx[1]['p']['p']}" if nx else ""))
+        head = (f'<p class="small" style="margin:0">Lowest cost for {ppl}, {_CCLV[i][1].lower()} use, billed {"yearly" if bill == "y" else "monthly"}</p>'
+                f'<p class="vc-big" style="margin:4px 0">{e(b[0]["n"])} {e(b[1]["p"]["p"])}: {"from " if b[1]["p"].get("frm") else ""}{_ccm(b[1]["tot"])}/mo</p>'
+                f'<p style="margin:0">{"From " if b[1]["p"].get("frm") else ""}{_ccm(b[1]["tot"] * 12)} a year{e(diff)}. Plans include different amounts of AI usage, so check what each one includes below.</p>')
+    else:
+        head = '<p>None of these plans fits that many seats. Try fewer seats or individual plans.</p>'
+    return head, "".join(_cccard(d, r, n, i, bill, typ, b is not None and d is b[0]) for d, r in rows)
+_cc_head, _cc_cards = _ccrender()
+def _ccseg(name, opts, sel):
+    return "".join(f'<input type="radio" name="{name}" id="{name}-{k}" value="{k}"{" checked" if k == sel else ""}><label for="{name}-{k}">{e(l)}</label>' for k, l in opts)
+_cc_free = "".join(f'<li><b>{e(d["n"])}:</b> {e(d["free"])}</li>' for d in _CCD)
+def _ccladder(d):
+    r1 = "".join(f'<tr><th scope="row">{e(p["p"])}</th><td>{_ccm(p["m"])}/mo</td><td>{(_ccm(p["y"]) + "/mo") if p["y"] is not None else "not stated"}</td><td>{e(p["inc"])}</td><td>{("“" + e(p["says"]) + "”") if p["says"] else "—"}</td></tr>' for p in d["solo"])
+    r2 = "".join(f'<tr><th scope="row">{e(p["p"])}</th><td>{("$" + str(p["b"]) + "/mo + ") if p["b"] else ""}{"from " if p["frm"] else ""}{_ccm(p["m"])}/seat/mo</td><td>{(_ccm(p["y"]) + "/seat/mo") if p["y"] is not None else "not stated"}</td><td>{e(p["inc"])}{(" Seats: " + str(p["lim"][0]) + "–" + str(p["lim"][1]) + ".") if p["lim"] else ""}</td><td>{("“" + e(p["says"]) + "”") if p["says"] else "—"}</td></tr>' for p in d["team"])
+    return (f'<details class="card cc-d"><summary><h3>{e(d["n"])}: every plan and price</h3></summary>'
+            f'<div class="tw" role="region" aria-label="{e(d["n"])} plans" tabindex="0"><table><thead><tr><th scope="col">Plan</th><th scope="col">Monthly billing</th><th scope="col">Billed yearly</th><th scope="col">What the page says it includes</th><th scope="col">{e(d["n"])} says</th></tr></thead><tbody>'
+            f'<tr><th scope="row">Free</th><td colspan="4">{e(d["free"])}</td></tr>{r1}<tr><td colspan="5" class="small"><b>Team plans</b></td></tr>{r2}</tbody></table></div>'
+            f'<p class="small"><b>Extra usage:</b> {e(d["extra"])} Checked {CODECOST_CHECKED} on <a href="{e(d["src"])}" rel="nofollow noopener" target="_blank">{e(dom(d["src"]))}<span class="skip"> (opens in a new tab)</span></a> · <a href="{d["u"]}">{e(d["n"])} review</a></p></details>')
+_cc_ladders = "".join(_ccladder(d) for d in _CCD)
+_cc_qa = [
+ ("What's the cheapest AI coding tool for one developer?", f"For light use, Cursor Plus at $8 a month is the cheapest paid plan, but it only has Grok models. GitHub Copilot Pro is $10 a month with unlimited completions and $15 of AI credits. GitHub Copilot, Cursor, Windsurf and Warp also have $0 plans with limited usage. Checked {CODECOST_CHECKED}."),
+ ("How much does Claude Code cost?", "Claude Code comes with Claude Pro ($20 a month, or $17 a month billed yearly at $200 up front), Max ($100) and Ultra ($200). The free Claude plan doesn't include Claude Code. Teams pay $25 per standard seat a month ($20 billed yearly) or $125 per premium seat ($100 billed yearly)."),
+ ("What does GitHub Copilot cost for a team?", "Copilot Business is $19 per user a month and Enterprise is $39 per user a month, from GitHub's plans page. For a team of 10 on Business that's $190 a month, or $2,280 a year."),
+ ("How is Windsurf's team price worked out?", "Windsurf Teams is a flat $80 a month for the team plan plus $40 a month for each full dev seat, up to 200 users. So 5 developers cost $80 + 5 × $40 = $280 a month. windsurf.com/pricing now opens Devin's pricing page, which lists these plans."),
+ ("Is yearly billing cheaper?", "Where the official page shows a yearly price, yes: Claude Pro is $17 instead of $20, Claude Team $20 instead of $25 per seat, Warp Build $18 instead of $20, Warp Max $180 instead of $200 and Warp Business $45 instead of $50. Cursor, GitHub Copilot and Windsurf don't show a yearly price on their pricing pages, so the calculator uses their monthly price."),
+ ("Why don't you compare how much usage each plan gives?", "Each company counts usage differently: Cursor in multiples of its Plus plan, GitHub in AI credits, Claude in multiples of Pro per 5 hours and week, Warp in dollars of agent usage, Windsurf in quotas it doesn't number. We show what each page says is included rather than guess an exchange rate."),
+]
+_cc_body = f"""<style>.vc-big{{font-size:1.5rem;font-weight:800;margin:10px 0 2px}}.cc-in{{display:flex;flex-wrap:wrap;gap:16px 36px;align-items:flex-start}}.cc-f>span.cc-l{{display:block;font-weight:600;margin-bottom:6px}}.cc-step{{display:inline-flex;align-items:center;gap:6px}}.cc-step button{{min-width:48px;min-height:48px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font-size:1.3rem;font-weight:700;cursor:pointer}}.cc-step input{{width:84px;min-height:48px;text-align:center;font-size:1.1rem;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)}}.cc-f .seg{{flex-wrap:wrap}}.cc-hint{{margin:6px 0 0}}#cc-head{{margin:16px 0 8px;min-height:120px}}.cc-grid{{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}}.cc-card{{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px}}.cc-card h3{{margin:0;font-size:1.1rem}}.cc-card select{{width:100%;min-height:44px;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);padding:0 8px}}.cc-tot{{font-size:1.6rem;font-weight:800;margin:6px 0 0;line-height:1.2}}.cc-best{{border:2px solid var(--ok);box-shadow:var(--sh)}}.cc-badge{{margin:0;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ok)}}.cc-note{{margin:0;color:var(--mu)}}.cc-inc,.cc-why{{margin:4px 0 0}}.cc-d{{margin:10px 0}}.cc-d>summary{{cursor:pointer;min-height:44px;display:flex;align-items:center}}.cc-d>summary h3{{display:inline;margin:0;font-size:1.05rem}}.cc-d table{{min-width:640px}}.cc-d td,.cc-d th{{font-size:.9rem;vertical-align:top}}#cc-typew[hidden]{{display:none}}@media(max-width:640px){{.cc-in{{flex-direction:column;align-items:stretch}}.cc-f .seg{{display:flex;border-radius:18px}}.cc-f .seg label{{flex:1 1 auto;justify-content:center;padding:0 10px}}}}@media(prefers-color-scheme:dark){{.cc-badge{{color:#4ade80}}.cc-best{{border-color:#4ade80}}}}</style>
+<p class="small"><a href="/save-money.html">Save money</a> › AI coding cost</p><h1>AI coding tool cost calculator</h1>
+<p class="tag">What will Cursor, GitHub Copilot, Claude Code, Windsurf and Warp cost you or your team each month? Pick how many people and how much they'll use it. Every price comes from the official pricing page, checked {CODECOST_CHECKED}.</p>
+<div class="builder" id="calc"><div class="cc-in">
+<div class="cc-f"><label class="cc-l" for="cc-seats" style="display:block;font-weight:600;margin-bottom:6px">How many people?</label><div class="cc-step"><button type="button" id="cc-minus" aria-label="One person fewer">−</button><input type="number" id="cc-seats" min="1" max="500" value="1" inputmode="numeric"><button type="button" id="cc-plus" aria-label="One person more">+</button></div></div>
+<div class="cc-f"><span class="cc-l" aria-hidden="true">How much will each person use it?</span><fieldset class="seg"><legend>How much will each person use it?</legend>{_ccseg("cc-use", [(k, l) for k, l, d in _CCLV], "daily")}</fieldset><p class="small cc-hint">{" · ".join(f"<b>{l}:</b> {d.lower()}" for k, l, d in _CCLV)}</p></div>
+<div class="cc-f"><span class="cc-l" aria-hidden="true">Billing</span><fieldset class="seg"><legend>Billing</legend>{_ccseg("cc-bill", [("m", "Monthly"), ("y", "Yearly")], "m")}</fieldset></div>
+<div class="cc-f" id="cc-typew" hidden><span class="cc-l" aria-hidden="true">Plan type</span><fieldset class="seg"><legend>Plan type</legend>{_ccseg("cc-type", [("team", "Team plans (admin, central billing)"), ("solo", "Individual plan for each person")], "team")}</fieldset></div>
+</div>
+<div id="cc-head" class="pick" aria-live="polite" aria-atomic="true">{_cc_head}</div>
+<h2 class="skip">Prices for each tool</h2><div class="cc-grid" id="cc-cards">{_cc_cards}</div>
+<p style="margin:12px 0 0"><button type="button" class="bbtn" id="cc-copy">Copy link to these results</button> <button type="button" class="bbtn" id="cc-reset">Start again</button> <span id="cc-st" class="small" role="status"></span></p></div>
+<div class="bnote"><h2 style="margin-top:0;font-size:1.05rem">Could it be $0?</h2><p class="small" style="margin:0 0 6px">If your use is light, try the free plan first:</p><ul class="small" style="margin:0">{_cc_free}</ul></div>
+<h2>How we work it out</h2><ul><li><b>Prices:</b> copied from each official pricing page on {CODECOST_CHECKED}, before tax. Nothing is estimated.</li><li><b>Which plan:</b> Light = the cheapest paid plan. Daily and Heavy follow each company's own wording about who a plan is for (the same picks as our <a href="/ai-usage-limits.html">AI usage limits guide</a>). You can change the plan on any card.</li><li><b>Teams:</b> 2 or more people use each company's team plan unless you choose individual plans. Seat limits and flat team fees are applied.</li><li><b>Yearly:</b> used only where the page shows a yearly price; otherwise the monthly price is used and the card says so.</li><li><b>Not included:</b> extra usage you buy on top (API-rate top-ups, credits) and tax.</li></ul>
+<h2>Every plan we priced</h2><p class="small">Open a tool to see all its plans, team prices and what each includes.</p>{_cc_ladders}
+<h2>Left out</h2><ul>{"".join(f"<li><b>{e(n)}</b>: {e(r)}.</li>" for n, r in CODECOST_LEFT_OUT)}</ul>
+{_faq(_cc_qa)}
+<p class="small">Related: <a href="/cheapest-ai-coding-assistant.html">Cheapest AI coding assistant</a> · <a href="/cursor-pricing.html">Cursor pricing</a> · <a href="/ai-usage-limits.html">AI usage limits</a> · <a href="/ai-team-plans.html">AI team plan costs</a> · <a href="/compare/cursor-vs-github-copilot-vs-windsurf.html">Cursor vs GitHub Copilot vs Windsurf</a> · <a href="/best-ai-coding-tools.html">Best AI coding tools</a> · <a href="/how-we-pick.html">How we pick</a></p>
+<script>(()=>{{const D={json.dumps(_CCD, separators=(",", ":"))},LV={json.dumps([[k, l] for k, l, d in _CCLV])},CK="{CODECOST_CHECKED}";
+const $=s=>document.querySelector(s),X=s=>String(s).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}})[c]);
+const M=v=>{{const r=Math.round(v*100)/100;return '$'+(r==Math.floor(r)?r.toLocaleString('en-US'):r.toLocaleString('en-US',{{minimumFractionDigits:2,maximumFractionDigits:2}}))}};
+let OV={{}};const seatsEl=$('#cc-seats');
+const val=n=>(document.querySelector('input[name='+n+']:checked')||{{}}).value;
+function st(){{let n=parseInt(seatsEl.value,10);if(!(n>=1))n=1;if(n>500)n=500;return {{n,i:Math.max(0,LV.findIndex(x=>x[0]==val('cc-use'))),b:val('cc-bill')||'m',t:n>1?(val('cc-type')||'team'):'solo'}}}}
+function calc(d,s){{const pl=s.t=='team'?d.team:d.solo;let ix=OV[s.t+d.k];if(!(ix>=0&&ix<pl.length))ix=(s.t=='team'?d.tp:d.sp)[s.i];const p=pl[ix];const per=s.b=='y'&&p.y!=null?p.y:p.m;const out=!!(p.lim&&(s.n<p.lim[0]||s.n>p.lim[1]));return {{ix,p,per,tot:(p.b||0)+per*s.n,out,noy:s.b=='y'&&p.y==null}}}}
+function card(d,r,s,best){{const p=r.p,pl=s.t=='team'?d.team:d.solo,why=s.t=='team'?d.twhy:d.sw[s.i],f=p.frm?'from ':'';
+const opts=pl.map((q,j)=>`<option value="${{j}}"${{j==r.ix?' selected':''}}>${{X(q.p)}} · ${{M(q.m)}}${{q.frm?'+':''}}${{s.t=='team'?'/seat':''}}</option>`).join('');
+const price=p.b?`${{M(p.b)}}/mo + ${{M(r.per)}}/seat`:`${{f}}${{M(r.per)}}${{s.t=='team'?'/seat/mo':'/mo'}}`;
+const tot=r.out?`<p class="cc-tot">Not available for ${{s.n}} seats</p><p class="small" style="margin:0">${{X(p.p)}} allows ${{p.lim[0]}}–${{p.lim[1]}} seats. Ask ${{X(d.n)}} about Enterprise.</p>`:`<p class="cc-tot">${{f}}${{M(r.tot)}}<span class="small">/mo</span></p><p class="small" style="margin:0">${{f}}${{M(r.tot*12)}} a year · ${{X(price)}}${{s.n>1&&!p.b?' × '+s.n:(p.b?' × '+s.n+' seats':'')}}</p>`;
+return `<article class="cc-card${{best?' cc-best':''}}" data-k="${{d.k}}">${{best?'<p class="cc-badge">Lowest cost for you</p>':''}}<h3><a href="${{d.u}}">${{X(d.n)}}</a></h3><label class="small" for="cc-p-${{d.k}}">Plan</label><select id="cc-p-${{d.k}}" class="cc-sel" data-k="${{d.k}}">${{opts}}</select>${{tot}}${{r.noy?'<p class="small cc-note">No yearly price on the official page, so the monthly price is used.</p>':''}}<p class="small cc-inc"><b>Includes:</b> ${{X(p.inc)}}</p><p class="small cc-why">${{X(why)}}</p><p class="small" style="margin:6px 0 0">Checked ${{CK}} · <a href="${{X(d.src)}}" rel="nofollow noopener" target="_blank">Official pricing<span class="skip"> for ${{X(d.n)}} (opens in a new tab)</span></a></p></article>`}}
+function qs(s){{const p=new URLSearchParams();if(s.n!=1)p.set('seats',s.n);if(LV[s.i][0]!='daily')p.set('use',LV[s.i][0]);if(s.b!='m')p.set('bill',s.b);if(s.n>1&&s.t=='solo')p.set('type','solo');const o=Object.keys(OV).filter(k=>k.startsWith(s.t)).map(k=>k.slice(s.t.length)+':'+OV[k]);if(o.length)p.set('plan',o.join(','));const q=p.toString();return location.pathname+(q?'?'+q:'')}}
+function render(push){{const s=st();$('#cc-typew').hidden=s.n<2;const rows=D.map(d=>[d,calc(d,s)]).sort((a,b)=>(a[1].out-b[1].out)||(a[1].tot-b[1].tot)||a[0].n.localeCompare(b[0].n));const ok=rows.filter(x=>!x[1].out),b=ok[0],ppl=s.n==1?'you':s.n+' people';
+let h;if(b){{const nx=ok[1];let diff='';if(nx)diff=nx[1].tot>b[1].tot?`, ${{nx[1].p.frm?'at least ':''}}${{M(nx[1].tot-b[1].tot)}} a month less than ${{nx[0].n}} ${{nx[1].p.p}}`:`, the same as ${{nx[0].n}} ${{nx[1].p.p}}`;const f=b[1].p.frm;
+h=`<p class="small" style="margin:0">Lowest cost for ${{ppl}}, ${{LV[s.i][1].toLowerCase()}} use, billed ${{s.b=='y'?'yearly':'monthly'}}</p><p class="vc-big" style="margin:4px 0">${{X(b[0].n)}} ${{X(b[1].p.p)}}: ${{f?'from ':''}}${{M(b[1].tot)}}/mo</p><p style="margin:0">${{f?'From ':''}}${{M(b[1].tot*12)}} a year${{X(diff)}}. Plans include different amounts of AI usage, so check what each one includes below.</p>`}}else h='<p>None of these plans fits that many seats. Try fewer seats or individual plans.</p>';
+$('#cc-head').innerHTML=h;const fk=document.activeElement&&document.activeElement.classList.contains('cc-sel')?document.activeElement.dataset.k:null;
+$('#cc-cards').innerHTML=rows.map(([d,r])=>card(d,r,s,b&&d===b[0])).join('');if(fk){{const el=document.getElementById('cc-p-'+fk);if(el)el.focus()}}
+if(push!==false)history.replaceState(null,'',qs(s))}}
+const P=new URLSearchParams(location.search);if(P.get('seats'))seatsEl.value=Math.min(500,Math.max(1,parseInt(P.get('seats'),10)||1));
+const setR=(n,v)=>{{const el=document.getElementById(n+'-'+v);if(el)el.checked=true}};if(P.get('use'))setR('cc-use',P.get('use'));if(P.get('bill'))setR('cc-bill',P.get('bill'));if(P.get('type'))setR('cc-type',P.get('type'));
+if(P.get('plan')){{const t=st().t;P.get('plan').split(',').forEach(x=>{{const [k,v]=x.split(':');if(D.some(d=>d.k==k)&&/^\\d+$/.test(v||''))OV[t+k]=+v}})}}
+if(location.search)render(false);
+document.querySelectorAll('#calc input[type=radio]').forEach(el=>el.addEventListener('change',()=>render()));
+seatsEl.addEventListener('input',()=>render());seatsEl.addEventListener('change',()=>{{seatsEl.value=st().n;render()}});
+const bump=d=>{{seatsEl.value=Math.min(500,Math.max(1,st().n+d));render()}};$('#cc-minus').addEventListener('click',()=>bump(-1));$('#cc-plus').addEventListener('click',()=>bump(1));
+$('#cc-cards').addEventListener('change',ev=>{{const el=ev.target;if(!el.classList.contains('cc-sel'))return;const s=st();OV[s.t+el.dataset.k]=+el.value;render()}});
+$('#cc-reset').addEventListener('click',()=>{{OV={{}};seatsEl.value=1;setR('cc-use','daily');setR('cc-bill','m');setR('cc-type','team');render();$('#cc-st').textContent='Back to the defaults.';seatsEl.focus()}});
+$('#cc-copy').addEventListener('click',async()=>{{const u=location.origin+qs(st());try{{await navigator.clipboard.writeText(u);$('#cc-st').textContent='Link copied: '+u}}catch(err){{$('#cc-st').textContent='Copy this link: '+u}}}});
+}})();</script>"""
+page(CC_PATH, "AI Coding Tool Cost Calculator (2026): Cursor, Copilot, Claude Code, Windsurf | ToolPick",
+     f"What Cursor, GitHub Copilot, Claude Code, Windsurf and Warp really cost per month for you or your team, by usage level and seats. Official prices checked {CODECOST_CHECKED}.",
+     _cc_body, [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI coding tool cost calculator", "url": BASE + CC_PATH, "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "dateModified": CODECOST_CHECKED,
+                 "description": "Monthly and yearly cost of AI coding tools by team size and usage level, from official pricing pages."},
+                faq(_cc_qa)[1], crumbs([("ToolPick", "/"), ("Save money", "/save-money.html"), ("AI coding cost", CC_PATH)])])
+_lm[CC_PATH] = CODECOST_CHECKED
+V60_CHANGED = [CC_PATH]
+def _v60ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v60"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V60_CHANGED.append(path); return True
+for d in _CCD:
+    _v60ins(d["u"], '<section class="card tbp"', f'<p class="pick v60"><b>What will {e(d["n"])} cost you or your team?</b> Compare it with {", ".join(e(x["n"]) for x in _CCD if x is not d)} by seats and usage: <a href="{CC_PATH}">AI coding cost calculator →</a></p>')
+_CCL = f'<a href="{CC_PATH}">AI coding tool cost calculator</a>'
+for _p in ["/cheapest-ai-coding-assistant.html", "/cursor-pricing.html", "/best-ai-coding-tools.html", "/best-free-ai-coding-tools.html", "/cursor-alternatives.html", "/best-ai-tools-for-developers.html", "/best-ai-tool-for-code-autocomplete.html", "/best-ai-tool-for-code-review.html", "/free-alternative-to-cursor.html", "/save-money.html", "/ai-team-plans.html"]:
+    _v60ins(_p, "</h1>", f'<p class="pick small v60">Paying for an AI coding tool? See what Cursor, Copilot, Claude Code, Windsurf and Warp cost per month for you or your team: {_CCL} →</p>', after=True)
+_ccn = {c["t"] for c in CODECOST}
+for _x in COMPARISONS:
+    _in = [n for n in cnames(_x) if n in _ccn]
+    if len(_in) >= 2:
+        _v60ins(f"/compare/{_x[0]}.html", "</h1>", f'<p class="small v60">Monthly cost for you or your team ({", ".join(e(_ccname(next(c for c in CODECOST if c["t"] == n))) for n in _in)}) → <a href="{CC_PATH}">AI coding cost calculator</a></p>', after=True)
+_v60ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v60\"><a href='{CC_PATH}'>AI coding tool cost calculator: Cursor, Copilot, Claude Code, Windsurf and Warp by seats and usage</a></li>", after=True)
+print("v60 coding cost:", len(_CCD), "tools;", len(V60_CHANGED), "pages changed")
+open("public/llms.txt", "a").write(f"\n## AI coding tool cost calculator (v60, checked {CODECOST_CHECKED})\n- [AI coding tool cost calculator]({BASE}{CC_PATH}): monthly and yearly cost of {', '.join(d['n'] for d in _CCD)} for 1-500 people, by usage (light / daily / heavy) and billing, using individual or team plans (seat limits and flat team fees applied), every price from the official pricing page. Deep link: {CC_PATH}?seats=5&use=heavy&bill=y (also &type=solo, &plan=cursor:2).\n")
+
 # --- v39: simplification pass (one nav, one costs page, collapsed details, fewer boxes) ---
 import re as _re, os as _os, glob as _glob
 V39_DATE = "2026-10-20"
@@ -4072,6 +4227,7 @@ _v56ins("/my-ai-costs.html", "</h1>", f'<p class="small v56">Making images? <a h
 for _u in V56_CHANGED: _lm[_u] = IMAGE_CHECKED
 for _u in V57_CHANGED: _lm[_u] = V57_DATE
 for _u in V59_CHANGED: _lm[_u] = USAGE_CHECKED
+for _u in V60_CHANGED: _lm[_u] = CODECOST_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))

@@ -1595,3 +1595,63 @@ USAGE_LEFT_OUT = [("Perplexity", "its pricing page showed a security check today
 # Daily ops 2026-11-03: krea.ai/pricing re-read (WebFetch): Basic $9 ($5/mo yearly), Pro $35 ($21), Max $105 ($63), Business $200 ($160); labels added, prices unchanged.
 # notion.com/pricing re-read: Plus $10, Business $20 per member/mo shown (yearly view), consistent with listing; left dated 2026-10-23 since monthly not shown.
 PRICE_SKIP["2026-11-03|Krea"] = "Re-checked 2026-11-03; added plan labels and Basic yearly price, prices unchanged."
+
+# --- v60 (2026-11-04): AI coding tool cost calculator (/ai-coding-cost.html) ---
+# Every price below was read today on the official pricing page in "src" (headless-Chrome render + curl, raw text in
+# /workspace/v60/raw). m = $/seat/month billed monthly; y = $/seat/month billed yearly (None = the page states no yearly
+# price; Claude Max/Ultra: "Both plans are billed monthly"); base = flat team fee per month; mx = seat limit; frm = page shows
+# "from" ($30+). "inc" = what the page says the plan includes; "says" = the vendor's own wording for who it's for.
+# pick = plan index for (light, daily, heavy) use: daily/heavy follow the v59 usage-limits picks (vendor wording);
+# light = the cheapest paid plan (free plans are shown separately as "could be $0").
+CODECOST_CHECKED = "2026-11-04"
+CODECOST = [
+ dict(t="Cursor", src="https://cursor.com/pricing", free="Free $0: limited AI usage, agent and chat requests",
+      extra="Third-party models are billed separately at API list price; top-offs when you run out. Usage refreshes weekly.",
+      solo=[("Plus", 8, None, "Shared AI usage pool; only Grok models", "Our introductory plan"),
+            ("Premium", 30, None, "4x Plus usage; cloud agents, AI code reviews (Bugbot), third-party models at API list price", "Most popular"),
+            ("Super", 100, None, "15x Plus usage; priority model access at peak times", "Recommended for daily agent users"),
+            ("Ultra", 200, None, "50x Plus usage; earliest access to products and models", "Recommended for power users")],
+      spick=(0, 1, 2),
+      swhy=("Plus is Cursor's cheapest paid plan, but it only has Grok models.", "Cursor recommends Premium for new AI users: 4x the Plus pool.", "Cursor recommends Super for daily agent users (15x Plus). Ultra ($200) gives 50x."),
+      team=[("Teams", 30, None, 0, None, True, "4-50x Plus usage, pooled across the team; central billing, SSO, usage analytics; mix seat types", "Recommended for professionals collaborating with others")],
+      tpick=(0, 0, 0), twhy="Teams is shown as “$30+” per user: higher-usage seat tiers cost more, and those prices aren't published."),
+ dict(t="GitHub Copilot", src="https://github.com/features/copilot/plans", free="Free $0: 2,000 code completions a month, limited chat and agent usage",
+      extra="Chat and agents use GitHub AI Credits (1 credit = $0.01); set a budget to keep going past your allowance. Completions are unlimited on paid plans.",
+      solo=[("Pro", 10, None, "Unlimited completions; $15 of AI credits a month; Copilot in the cloud and code review; Claude Code and Codex agents", "For everyday coding with agents"),
+            ("Pro+", 39, None, "4x+ Pro usage; $70 of AI credits a month; premium models including Opus", "For more complex development with premium models"),
+            ("Max", 100, None, "2.9x+ Pro+ usage; $200 of AI credits a month; priority access to new models", "For sustained, high-volume agent workflows")],
+      spick=(0, 0, 1),
+      swhy=("Pro is the cheapest paid plan: unlimited completions plus $15 of AI credits.", "Pro: unlimited completions plus $15 of AI credits a month for chat and agents.", "Pro+ gives 4x+ Pro usage ($70 of credits). Max ($100) is for sustained, high-volume agent work."),
+      team=[("Business", 19, None, 0, None, False, "Copilot for organizations; credits pooled across the org with admin spend controls", ""),
+            ("Enterprise", 39, None, 0, None, False, "GitHub's enterprise Copilot plan", "")],
+      tpick=(0, 0, 0), twhy="Business is GitHub's organization plan at $19 per user. Enterprise is $39 per user."),
+ dict(t="Claude", label="Claude Code", src="https://claude.com/pricing", free="Free $0, but Claude Code isn't included",
+      extra="One usage pool shared with Claude chat, with 5-hour and weekly limits; paid plans can turn on usage credits at API rates.",
+      solo=[("Pro", 20, 17, "Claude Code included; more usage than Free every 5 hours and every week", "For everyday work"),
+            ("Max", 100, None, "5x Pro usage every 5 hours and every week; $100 a month of API credits", "For all-day work"),
+            ("Ultra", 200, None, "No 5-hour limit; 10x Pro usage every week; $200 a month of API credits", "For your longest tasks")],
+      spick=(0, 0, 1),
+      swhy=("Pro is the cheapest plan with Claude Code.", "Claude calls Pro the plan “for everyday work”.", "Claude calls Max the plan “for all-day work” (5x Pro). Ultra ($200) drops the 5-hour limit."),
+      team=[("Standard seat", 25, 20, 0, (2, 150), False, "All Claude features including Claude Code; more usage than Pro", "For teams of 2 to 150"),
+            ("Premium seat", 125, 100, 0, (2, 150), False, "5x more usage than standard seats; Claude Code included", "")],
+      tpick=(0, 0, 1), twhy="Team needs 2 to 150 seats. Premium seats give 5x the usage of standard seats; you can mix both."),
+ dict(t="Windsurf", src="https://windsurf.com/pricing", free="Free $0: light agent quota, unlimited Tab completions",
+      extra="windsurf.com/pricing now opens Devin's pricing page (devin.ai/pricing), which lists these plans. Extra usage is charged at API pricing; quotas refresh daily and weekly.",
+      solo=[("Pro", 20, None, "Higher quotas; all frontier models; cloud agents; extra usage at API pricing", "Popular"),
+            ("Max", 200, None, "Everything in Pro with significantly higher quotas", "For power users")],
+      spick=(0, 0, 1),
+      swhy=("Pro is the only paid plan below $200.", "Pro raises the quotas and unlocks every model.", "Max is for power users who need significantly higher quotas."),
+      team=[("Teams", 40, None, 80, (1, 200), False, "$80/mo team plan plus $40/mo per full dev seat; central billing, admin analytics, priority support", "Up to 200 users")],
+      tpick=(0, 0, 0), twhy="Teams costs a flat $80 a month plus $40 per full dev seat, up to 200 users."),
+ dict(t="Warp", src="https://www.warp.dev/pricing", free="Free $0: modern terminal; buy agent usage or bring your own AI",
+      extra="Plans include agent usage in dollars at API rates; add-on usage costs extra when you run out.",
+      solo=[("Build", 20, 18, "$20 of agent usage a month at API rates; full Warp Agent access", "Recommended"),
+            ("Max", 200, 180, "$200 of agent usage a month (10x Build); add-on usage and auto-reload", "For heavy AI users who consistently need more capacity")],
+      spick=(0, 0, 1),
+      swhy=("Build is the cheapest paid plan and includes $20 of agent usage.", "Warp's recommended plan: $20 of agent usage a month included.", "Warp says Max is best for heavy AI users: $200 of usage a month."),
+      team=[("Business", 50, 45, 0, (1, 25), False, "$20 of agent usage per seat a month; SSO, team usage metrics, admin data controls", "For teams scaling AI-powered development (up to 25 seats)")],
+      tpick=(0, 0, 0), twhy="Business is Warp's team plan, up to 25 seats; each seat includes $20 of agent usage."),
+]
+CODECOST_LEFT_OUT = [("OpenAI Codex", "it comes inside ChatGPT plans rather than as its own coding subscription; see ChatGPT pricing"),
+                     ("Replit", "it builds and hosts whole apps rather than assisting in your own editor, a different job"),
+                     ("Qodo", "it's a team code-review product billed in credits, a different job and billing")]
