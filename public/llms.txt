@@ -22,7 +22,7 @@
 - [HeyGen](https://toolpick-ai.vercel.app/tools/heygen.html): Creator $29/mo ($24 yearly); Pro from $49; Business $149 + $20/seat | free: Free: 3 videos/mo, up to 1 min each
 - [Synthesia](https://toolpick-ai.vercel.app/tools/synthesia.html): Starter $19/mo ($14/mo yearly, $168/yr); Pro $89/mo ($59/mo yearly, $708/yr). Promotional: Starter $9 first month then $19/mo; Pro $49 first month then $89/mo (monthly billing) | free: Basic free: 10 min video/mo + 500 credits, watermarked
 - [Descript](https://toolpick-ai.vercel.app/tools/descript.html): Hobbyist $24/mo ($16 yearly); Creator $35 ($24); Business $65 ($50) | free: Free: 1 media hour/mo, 720p export
-- [CapCut](https://toolpick-ai.vercel.app/tools/capcut.html): Pro $19.99/mo; Ultra $79/mo; Teams $12.49/seat/mo | free: Free plan with basic editing and templates
+- [CapCut](https://toolpick-ai.vercel.app/tools/capcut.html): Pro $19.99/mo ($179.99/yr); Ultra $79/mo ($900/yr); Teams $12.49/seat/mo | free: Free plan with basic editing and templates
 - [InVideo](https://toolpick-ai.vercel.app/tools/invideo.html): Starter $20/mo ($10 yearly); Plus $60 ($30 yearly), more credits from $150; Max from $250/mo | free: Free editor available
 - [Opus Clip](https://toolpick-ai.vercel.app/tools/opus-clip.html): Starter $15/mo; Pro $29/mo; Business custom | free: Free forever plan ($0)
 - [Captions](https://toolpick-ai.vercel.app/tools/captions.html): Max $24.99/mo; Frontier $69.99/mo (iOS prices per page footnote) | free: Free plan available
@@ -40,7 +40,7 @@
 - [Windsurf](https://toolpick-ai.vercel.app/tools/windsurf.html): Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat | free: Free: $0
 - [Bolt](https://toolpick-ai.vercel.app/tools/bolt.html): Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) | free: Free: 300K tokens/day, 1M/month
 - [v0](https://toolpick-ai.vercel.app/tools/v0.html): Plus $30/user/mo (page shows $90 struck through); Business $100/user/mo | free: Free: $0/mo, 7 messages/day (new users also get $5 in starter credits)
-- [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually); Business $50/mo ($42 annually) | free: Free: $0 (5 build credits/day, up to 30/mo)
+- [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually, 100 credits/mo); Business $50/mo ($42 annually, 100 credits/mo) | free: Free: $0 (no card; free grants; unlimited collaborators; 5 lovable.app domains)
 - [Warp](https://toolpick-ai.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
 - [Qodo](https://toolpick-ai.vercel.app/tools/qodo.html): Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits) | free: 14-day free trial, no card; free for open source projects
 - [Replit](https://toolpick-ai.vercel.app/tools/replit.html): Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom | free: check site
@@ -52,7 +52,7 @@
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
-- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (83% off), Creator $11 first month (50% off) | free: Free: $0
+- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (83% off, until Nov 8, 2026); Creator $11 first month (50% off) | free: Free: $0
 - [Suno](https://toolpick-ai.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
 - [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x

@@ -1702,3 +1702,54 @@ APICOST_PRESETS = [
  dict(id="rag", name="RAG app", inn=10.0, out=2.0, desc="~10M input + 2M output tokens a month"),
  dict(id="agent", name="Heavy agent", inn=50.0, out=15.0, desc="~50M input + 15M output tokens a month"),
 ]
+
+
+# --- daily ops 2026-11-05 ---
+# Verified today: Grammarly (plans page JSON: Pro $30/mo, $60/quarter, $144/yr), Wordtune (plans page: Advanced
+# $6.99/$4.89 yearly, Unlimited $9.99/$6.99 yearly), CapCut (pricing page: Pro $19.99/mo or $179.99/yr, Ultra $79/mo
+# or $900/yr, Teams $12.49/seat/mo), ElevenLabs (pricing page: list prices unchanged; Starter $1 first month tagged
+# "Until Nov 8" / "Ends in 3d 17h"; Creator $11 first month), Lovable (browser: Pro $25/$21 yearly, Business $50/mo;
+# Free $0 with free grants, unlimited collaborators, 5 lovable.app domains — no "5 credits/day" shown; Pro/Business
+# show 100 monthly credits). Business yearly $42 left as previously listed (not re-captured today).
+_EL1105 = (
+    "Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); "
+    "Business $990 ($825). Promotional: Starter $1 first month (83% off, until Nov 8, 2026); "
+    "Creator $11 first month (50% off) (checked 2026-11-05)"
+)
+_LOV1105 = dict(
+    price="Pro $25/mo ($21/mo billed annually, 100 credits/mo); Business $50/mo ($42 annually, 100 credits/mo) (checked 2026-11-05)",
+    free="Free: $0 (no card; free grants; unlimited collaborators; 5 lovable.app domains)",
+)
+_CAP1105 = "Pro $19.99/mo ($179.99/yr); Ultra $79/mo ($900/yr); Teams $12.49/seat/mo (checked 2026-11-05)"
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] == "ElevenLabs":
+            _t["price"] = _EL1105
+            _t["checked"] = "2026-11-05"
+        if _t["name"] == "Lovable":
+            _t.update(_LOV1105)
+            _t["checked"] = "2026-11-05"
+        if _t["name"] == "CapCut":
+            _t["price"] = _CAP1105
+            _t["checked"] = "2026-11-05"
+        if _t["name"] == "Grammarly":
+            _t["checked"] = "2026-11-05"
+            if "(checked 2026-10-23)" in _t.get("price", ""):
+                _t["price"] = _t["price"].replace("(checked 2026-10-23)", "(checked 2026-11-05)")
+        if _t["name"] == "Wordtune":
+            _t["checked"] = "2026-11-05"
+PRICE_TABLE["CapCut"] = (19.99, 15.0, None)  # $179.99/yr ≈ $15/mo
+PRICE_NOTES["2026-11-05|ElevenLabs"] = (
+    "changed",
+    "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The $1 first-month Starter offer is now tagged until Nov 8, 2026 (seen 2026-11-05); Creator first-month $11 (50% off) has no end date stated.",
+)
+PRICE_NOTES["2026-11-05|CapCut"] = (
+    "changed",
+    "CapCut's monthly prices are unchanged (Pro $19.99/mo, Ultra $79/mo, Teams $12.49/seat/mo). We now also show yearly Pro $179.99/yr and Ultra $900/yr.",
+)
+PRICE_NOTES["2026-11-05|Lovable"] = (
+    "changed",
+    "Lovable Pro ($25/mo, $21 yearly) and Business ($50/mo) are unchanged. Free no longer lists a daily credit cap on the pricing page (we dropped “5 build credits/day, up to 30/mo”); Pro and Business each show 100 monthly credits.",
+)
+PRICE_SKIP["2026-11-05|Grammarly"] = "Re-checked 2026-11-05; only the checked date changed, prices unchanged ($30/mo, $60 quarterly, $144/yr)."
+PRICE_SKIP["2026-11-05|Wordtune"] = "Re-checked 2026-11-05; only the checked date changed, prices unchanged."
