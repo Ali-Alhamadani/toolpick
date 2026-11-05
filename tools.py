@@ -1753,3 +1753,62 @@ PRICE_NOTES["2026-11-05|Lovable"] = (
 )
 PRICE_SKIP["2026-11-05|Grammarly"] = "Re-checked 2026-11-05; only the checked date changed, prices unchanged ($30/mo, $60 quarterly, $144/yr)."
 PRICE_SKIP["2026-11-05|Wordtune"] = "Re-checked 2026-11-05; only the checked date changed, prices unchanged."
+
+# --- v62 (2026-11-05): Kling vs CapCut, free AI video limits hub, AI presentation cost calculator ---
+# CapCut yearly Pro/Ultra from the 2026-11-05 CapCut pricing-page check (see _CAP1105 above). Kling from V58 VIDEO4.
+# Presentation prices: each tool's tools.py entry and its own checked date (no new browser check for this release).
+V62_CHECKED = "2026-11-05"
+V62_LABEL = "checked Nov 5, 2026"
+VIDEO4["CapCut"] = dict(
+    entry=19.99, entry_y=None, entry_yr=179.99, top=79, top_name="Ultra", entry_name="Pro",
+    free="Free plan with basic editing and templates", url="https://www.capcut.com/pricing",
+    yearly="Pro $179.99/yr (vs $19.99×12 = $239.88); Ultra $900/yr (vs $79×12 = $948)",
+    promo="not stated",
+    checked="2026-11-05",
+)
+# Preserve Kling's Nov 2 check date on the CapCut compare page (CapCut is Nov 5).
+VIDEO4["Kling AI"]["checked"] = V58_CHECKED
+
+# PRESCOST: m = $/seat/mo billed monthly; y = $/seat/mo billed yearly (None = not stated on the page).
+# cur = "USD" or "EUR". trial = trial text when there is no real free plan. free = free-plan text or None.
+# Per-tool "checked" is the tools.py checked date for that tool; PRESCOST_CHECKED is the latest among them.
+PRESCOST_CHECKED = "2026-10-24"
+PRESCOST = [
+    dict(t="Gamma", src="https://gamma.app/pricing", checked="2026-10-24", cur="USD",
+         free="Free plan available", trial=None,
+         plans=[("Plus", 12, 9, "per seat"),
+                ("Pro", 25, 18, "per seat"),
+                ("Ultra", 100, 90, "per seat")],
+         default=0),
+    dict(t="Canva", src="https://www.canva.com/pricing/", checked="2026-10-24", cur="USD",
+         free="Free plan available", trial=None,
+         plans=[("Pro", 18, 12, "one person; $144/yr"),
+                ("Business", 25, 20.83, "$250/yr per person")],
+         default=0),
+    dict(t="Pitch", src="https://pitch.com/pricing", checked="2026-10-19", cur="EUR",
+         free="Free forever: unlimited presentations", trial=None,
+         plans=[("Plus", 10, None, "euros; yearly not stated"),
+                ("Team", 15, None, "euros; yearly not stated"),
+                ("Business", 20, None, "euros; yearly not stated")],
+         default=0),
+    dict(t="Beautiful.ai", src="https://www.beautiful.ai/pricing", checked="2026-10-19", cur="USD",
+         free=None, trial="14-day free trial (not a free plan)",
+         plans=[("Pro", None, 14.50, "individuals; billed annually only"),
+                ("Team", 50, 40, "per user; Team yearly $40/user/mo")],
+         default=0),
+    dict(t="Plus AI", src="https://plusai.com/pricing", checked="2026-10-19", cur="USD",
+         free=None, trial="7-day free trial (card required)",
+         plans=[("Basic", 15, 10, "per user"),
+                ("Pro", 25, 20, "per user"),
+                ("Team", 40, 30, "per user"),
+                ("Max", 240, 200, "per user")],
+         default=0),
+    dict(t="SlidesAI", src="https://www.slidesai.io/pricing", checked="2026-10-19", cur="USD",
+         free="Basic $0: 12 presentations/year", trial=None,
+         plans=[("$120/yr plan", None, 10, "shown as $10/mo billed $120/yr"),
+                ("$250/yr plan", None, 20.83, "shown as $20.83/mo billed $250/yr")],
+         default=0),
+]
+PRESCOST_LEFT_OUT = [
+    ("Synthesia / InVideo presentation modes", "those products are sold mainly as video tools; this calculator covers presentation-first tools only"),
+]
