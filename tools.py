@@ -1655,3 +1655,50 @@ CODECOST = [
 CODECOST_LEFT_OUT = [("OpenAI Codex", "it comes inside ChatGPT plans rather than as its own coding subscription; see ChatGPT pricing"),
                      ("Replit", "it builds and hosts whole apps rather than assisting in your own editor, a different job"),
                      ("Qodo", "it's a team code-review product billed in credits, a different job and billing")]
+
+# --- v61 (2026-11-05): AI API cost calculator (/ai-api-cost.html) ---
+# Every $/MTok below was read today on the official API pricing page in "src" (raw evidence in /workspace/v61/raw/).
+# inn = input $/MTok; out = output $/MTok. Standard / paid-tier rates only (no batch, priority, flex, or cache write).
+# OpenAI source is platform.openai.com/docs/pricing (openai.com/api/pricing shows ChatGPT Business seats, not token rates).
+APICOST_CHECKED = "2026-11-05"
+APICOST = [
+ dict(prov="OpenAI", k="openai", src="https://platform.openai.com/docs/pricing",
+      note="Standard tier from OpenAI's API pricing docs. Cache writes and Fast/Ultrafast tiers are not used in the monthly estimate.",
+      models=[
+        dict(id="gpt-6-astra", name="GPT-6 Astra", inn=10.0, out=50.0, blurb="Flagship GPT-6 model"),
+        dict(id="gpt-6.1-sol", name="GPT-6.1 Sol", inn=2.0, out=10.0, blurb="Balanced GPT-6.1"),
+        dict(id="gpt-6.1-terra", name="GPT-6.1 Terra", inn=1.0, out=5.0, blurb="Lower-cost GPT-6.1"),
+        dict(id="gpt-6-luna", name="GPT-6 Luna", inn=0.10, out=0.50, blurb="Cheapest GPT-6 listed"),
+      ]),
+ dict(prov="Anthropic", k="anthropic", src="https://www.anthropic.com/pricing",
+      note="Claude Platform API standard rates. Prompt caching and batch (50% off) are not applied in the estimate.",
+      models=[
+        dict(id="fable-5.1", name="Fable 5.1", inn=10.0, out=50.0, blurb="Next-gen long-running agents"),
+        dict(id="opus-5.5", name="Opus 5.5", inn=4.0, out=20.0, blurb="Daily driver for agentic coding"),
+        dict(id="sonnet-5.5", name="Sonnet 5.5", inn=2.0, out=10.0, blurb="High-performance coding and agents"),
+        dict(id="haiku-5.5", name="Haiku 5.5", inn=0.10, out=0.50, blurb="≤100K prompt tokens; >100K is $0.50/$2.50"),
+      ]),
+ dict(prov="Google", k="google", src="https://ai.google.dev/gemini-api/docs/pricing",
+      note="Gemini Developer API Paid Tier, Standard. Where the page shows a promo end date, that current promo rate is used.",
+      models=[
+        dict(id="gemini-4-argon", name="Gemini 4 Argon", inn=2.0, out=10.0, blurb="Flagship; $2/$10 through Nov 30, 2026, then $4/$20"),
+        dict(id="gemini-3.1-pro", name="Gemini 3.1 Pro Preview", inn=2.0, out=12.0, blurb="Prompts ≤200K tokens; >200K is $4/$18"),
+        dict(id="gemini-3.8-flash", name="Gemini 3.8 Flash", inn=0.75, out=3.75, blurb="Through Dec 31, 2026; then $1.50/$7.50"),
+        dict(id="gemini-3.5-flash-lite", name="Gemini 3.5 Flash-Lite", inn=0.30, out=2.50, blurb="High-volume agentic tasks"),
+        dict(id="gemini-3.1-flash-lite", name="Gemini 3.1 Flash-Lite", inn=0.25, out=1.50, blurb="Text/image/video input rate"),
+      ]),
+]
+APICOST_LEFT_OUT = [
+ ("OpenAI Batch / Fast / Ultrafast tiers", "the calculator uses Standard rates only; Batch is half and Fast/Ultrafast are higher on the same docs page"),
+ ("OpenAI prompt-cache write fees (30m / 12h)", "shown on the docs table but not part of the simple input+output monthly estimate"),
+ ("Anthropic prompt caching and batch", "cache read/write and 50% batch discounts are on the pricing page; we price raw input+output"),
+ ("Anthropic Haiku 5.5 >100K prompts", "priced separately at $0.50/$2.50; the card uses the ≤100K rate and notes the higher tier"),
+ ("Gemini Batch / Flex / Priority / Contributor", "Standard paid tier only; other service tiers are on the same pricing page"),
+ ("Gemini Live / image / TTS / embedding models", "billed differently (per-minute audio, per-image, or embedding rates), not plain chat input+output"),
+ ("Azure OpenAI, Amazon Bedrock, Vertex AI list prices", "marketplace markups vary by region and commitment; use each cloud's own calculator"),
+]
+APICOST_PRESETS = [
+ dict(id="light", name="Light chatbot", inn=2.0, out=0.5, desc="~2M input + 0.5M output tokens a month"),
+ dict(id="rag", name="RAG app", inn=10.0, out=2.0, desc="~10M input + 2M output tokens a month"),
+ dict(id="agent", name="Heavy agent", inn=50.0, out=15.0, desc="~50M input + 15M output tokens a month"),
+]

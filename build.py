@@ -4160,6 +4160,134 @@ _v60ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v60\"><a href='
 print("v60 coding cost:", len(_CCD), "tools;", len(V60_CHANGED), "pages changed")
 open("public/llms.txt", "a").write(f"\n## AI coding tool cost calculator (v60, checked {CODECOST_CHECKED})\n- [AI coding tool cost calculator]({BASE}{CC_PATH}): monthly and yearly cost of {', '.join(d['n'] for d in _CCD)} for 1-500 people, by usage (light / daily / heavy) and billing, using individual or team plans (seat limits and flat team fees applied), every price from the official pricing page. Deep link: {CC_PATH}?seats=5&use=heavy&bill=y (also &type=solo, &plan=cursor:2).\n")
 
+# --- v61: AI API cost calculator (/ai-api-cost.html) ---
+# Prices: APICOST in tools.py, each read on the official API pricing page on APICOST_CHECKED. No other prices used.
+from tools import APICOST, APICOST_CHECKED, APICOST_LEFT_OUT, APICOST_PRESETS
+AC_PATH = "/ai-api-cost.html"
+def _acm(v):
+    r = round(float(v), 4)
+    if r == int(r): return "$" + f"{int(r)}"
+    if abs(r - round(r, 2)) < 1e-9: return f"${r:.2f}"
+    s = f"{r:.4f}".rstrip("0").rstrip(".")
+    return "$" + s
+def _acdoll(v):
+    r = round(float(v), 2)
+    return "$" + (f"{int(r):,}" if r == int(r) else f"{r:,.2f}")
+_ACD = []
+for p in APICOST:
+    _ACD.append(dict(k=p["k"], n=p["prov"], src=p["src"], note=p["note"],
+        models=[dict(id=m["id"], name=m["name"], inn=m["inn"], out=m["out"], blurb=m["blurb"]) for m in p["models"]]))
+_ACP = [dict(id=x["id"], name=x["name"], inn=x["inn"], out=x["out"], desc=x["desc"]) for x in APICOST_PRESETS]
+_AC_FLAT = [dict(prov=d["n"], pk=d["k"], src=d["src"], **m) for d in _ACD for m in d["models"]]
+def _accost(m, inn_m, out_m):
+    return m["inn"] * inn_m + m["out"] * out_m
+def _acseg(name, opts, sel):
+    return "".join(f'<input type="radio" name="{name}" id="{name}-{k}" value="{k}"{" checked" if k == sel else ""}><label for="{name}-{k}">{e(l)}</label>' for k, l in opts)
+def _accard(m, tot, best):
+    return (f'<article class="cc-card{" cc-best" if best else ""}" data-id="{e(m["id"])}">'
+            + ('<p class="cc-badge">Lowest cost for you</p>' if best else "")
+            + f'<h3>{e(m["prov"])}: {e(m["name"])}</h3>'
+            + f'<p class="small" style="margin:0">{e(m["blurb"])}</p>'
+            + f'<p class="cc-tot">{_acdoll(tot)}<span class="small">/mo</span></p>'
+            + f'<p class="small" style="margin:0">{_acdoll(tot * 12)} a year · {_acm(m["inn"])}/MTok in · {_acm(m["out"])}/MTok out</p>'
+            + f'<p class="small" style="margin:6px 0 0">Checked {APICOST_CHECKED} · <a href="{e(m["src"])}" rel="nofollow noopener" target="_blank">Official pricing<span class="skip"> for {e(m["prov"])} (opens in a new tab)</span></a></p></article>')
+def _acrender(inn_m=10.0, out_m=2.0):
+    rows = [(m, _accost(m, inn_m, out_m)) for m in _AC_FLAT]
+    rows.sort(key=lambda x: (x[1], x[0]["prov"], x[0]["name"]))
+    b = rows[0] if rows else None
+    if b:
+        nx = rows[1] if len(rows) > 1 else None
+        diff = (f", {_acdoll(nx[1] - b[1])} a month less than {nx[0]['prov']} {nx[0]['name']}" if nx and nx[1] > b[1] else (f", the same as {nx[0]['prov']} {nx[0]['name']}" if nx else ""))
+        head = (f'<p class="small" style="margin:0">Lowest cost for {inn_m:g}M input + {out_m:g}M output tokens a month</p>'
+                f'<p class="vc-big" style="margin:4px 0">{e(b[0]["prov"])} {e(b[0]["name"])}: {_acdoll(b[1])}/mo</p>'
+                f'<p style="margin:0">{_acdoll(b[1] * 12)} a year{e(diff)}. Switch models on a card by changing your token inputs above.</p>')
+    else:
+        head = "<p>Enter monthly input and output tokens to see costs.</p>"
+    return head, "".join(_accard(m, tot, b is not None and m is b[0]) for m, tot in rows)
+_ac_head, _ac_cards = _acrender()
+def _acladder(d):
+    rows = "".join(f'<tr><th scope="row">{e(m["name"])}</th><td>{_acm(m["inn"])}</td><td>{_acm(m["out"])}</td><td>{e(m["blurb"])}</td></tr>' for m in d["models"])
+    return (f'<details class="card cc-d"><summary><h3>{e(d["n"])}: every model we priced</h3></summary>'
+            f'<div class="tw" role="region" aria-label="{e(d["n"])} API prices" tabindex="0"><table><thead><tr><th scope="col">Model</th><th scope="col">Input $/MTok</th><th scope="col">Output $/MTok</th><th scope="col">Notes</th></tr></thead><tbody>{rows}</tbody></table></div>'
+            f'<p class="small">{e(d["note"])} Checked {APICOST_CHECKED} on <a href="{e(d["src"])}" rel="nofollow noopener" target="_blank">{e(dom(d["src"]))}<span class="skip"> (opens in a new tab)</span></a>.</p></details>')
+_ac_ladders = "".join(_acladder(d) for d in _ACD)
+_ac_presets_html = "".join(f'<button type="button" class="bbtn ac-preset" data-in="{p["inn"]}" data-out="{p["out"]}" data-id="{p["id"]}">{e(p["name"])}</button>' for p in _ACP)
+_ac_qa = [
+ ("What will the OpenAI / Claude / Gemini API cost for my usage?", f"Multiply your monthly input MTok by each model's input $/MTok, add monthly output MTok × output $/MTok. Example: 10M in + 2M out on Claude Sonnet 5.5 is 10×$2 + 2×$10 = $40/mo. Checked {APICOST_CHECKED}."),
+ ("Which API is cheapest right now?", f"At equal token volume, the lowest Standard rates we verified are OpenAI GPT-6 Luna and Anthropic Haiku 5.5 (≤100K prompts), both $0.10/MTok in and $0.50/MTok out, then Gemini 3.1 Flash-Lite at $0.25/$1.50. Flagship models (GPT-6 Astra, Fable 5.1) are $10/$50. Checked {APICOST_CHECKED}."),
+ ("Do these prices include prompt caching or batch discounts?", "No. The calculator uses each provider's standard paid input and output token rates only. Anthropic lists prompt-cache read/write and 50% batch; OpenAI lists cache writes and Batch/Fast/Ultrafast; Gemini lists Batch/Flex/Priority. Those can change the bill."),
+ ("What is an MTok?", "One MTok is 1 million tokens. Providers price API use per million input tokens and per million output tokens. A short chat turn is often a few thousand tokens; a RAG pipeline that stuffs big contexts can burn millions of input tokens a month."),
+ ("Why is openai.com/api/pricing not your OpenAI source?", "That URL currently shows ChatGPT Business and Enterprise seat plans, not API token rates. Token rates are on platform.openai.com/docs/pricing, which is what we checked."),
+ ("Are free tiers included?", "Gemini's Free Tier shows free input/output for some Flash models with limits; OpenAI and Anthropic API usage is pay-as-you-go (Claude chat Free is a product plan, not these API rates). The cards show paid Standard rates so you can budget production traffic."),
+]
+_ac_body = f"""<style>.vc-big{{font-size:1.5rem;font-weight:800;margin:10px 0 2px}}.cc-in{{display:flex;flex-wrap:wrap;gap:16px 36px;align-items:flex-start}}.cc-f>span.cc-l,.cc-f>label.cc-l{{display:block;font-weight:600;margin-bottom:6px}}.cc-step{{display:inline-flex;align-items:center;gap:6px}}.cc-step button{{min-width:48px;min-height:48px;border-radius:12px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font-size:1.3rem;font-weight:700;cursor:pointer}}.cc-step input,.ac-num{{width:110px;min-height:48px;text-align:center;font-size:1.1rem;border-radius:10px;border:1px solid var(--bd);background:var(--sf);color:var(--tx)}}.ac-presets{{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}}#ac-head{{margin:16px 0 8px;min-height:110px}}.cc-grid{{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}}.cc-card{{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:4px}}.cc-card h3{{margin:0;font-size:1.05rem}}.cc-tot{{font-size:1.6rem;font-weight:800;margin:6px 0 0;line-height:1.2}}.cc-best{{border:2px solid var(--ok);box-shadow:var(--sh)}}.cc-badge{{margin:0;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ok)}}.cc-d{{margin:10px 0}}.cc-d>summary{{cursor:pointer;min-height:44px;display:flex;align-items:center}}.cc-d>summary h3{{display:inline;margin:0;font-size:1.05rem}}.cc-d table{{min-width:560px}}.cc-d td,.cc-d th{{font-size:.9rem;vertical-align:top}}@media(max-width:640px){{.cc-in{{flex-direction:column;align-items:stretch}}}}@media(prefers-color-scheme:dark){{.cc-badge{{color:#4ade80}}.cc-best{{border-color:#4ade80}}}}@media(prefers-reduced-motion:reduce){{*{{scroll-behavior:auto!important;transition:none!important;animation:none!important}}}}</style>
+<p class="small"><a href="/save-money.html">Save money</a> › AI API cost</p><h1>AI API cost calculator</h1>
+<p class="tag">What will the OpenAI, Claude (Anthropic) and Google Gemini API cost for my usage? Enter monthly input and output tokens (in millions). Every $/MTok comes from the official API pricing page, checked {APICOST_CHECKED}.</p>
+<div class="builder" id="calc"><div class="cc-in">
+<div class="cc-f"><label class="cc-l" for="ac-in">Monthly input tokens (MTok)</label><div class="cc-step"><button type="button" id="ac-in-minus" aria-label="Decrease input MTok">−</button><input type="number" class="ac-num" id="ac-in" min="0" max="10000" step="0.1" value="10" inputmode="decimal"><button type="button" id="ac-in-plus" aria-label="Increase input MTok">+</button></div><p class="small cc-hint">1 MTok = 1 million tokens</p></div>
+<div class="cc-f"><label class="cc-l" for="ac-out">Monthly output tokens (MTok)</label><div class="cc-step"><button type="button" id="ac-out-minus" aria-label="Decrease output MTok">−</button><input type="number" class="ac-num" id="ac-out" min="0" max="10000" step="0.1" value="2" inputmode="decimal"><button type="button" id="ac-out-plus" aria-label="Increase output MTok">+</button></div></div>
+<div class="cc-f"><span class="cc-l">Presets</span><div class="ac-presets">{_ac_presets_html}</div><p class="small cc-hint">{" · ".join(f"<b>{e(p['name'])}:</b> {e(p['desc'])}" for p in _ACP)}</p></div>
+</div>
+<div id="ac-head" class="pick" aria-live="polite" aria-atomic="true">{_ac_head}</div>
+<h2 class="skip">Prices for each model</h2><div class="cc-grid" id="ac-cards">{_ac_cards}</div>
+<p style="margin:12px 0 0"><button type="button" class="bbtn" id="ac-copy">Copy link to these results</button> <button type="button" class="bbtn" id="ac-reset">Start again</button> <span id="ac-st" class="small" role="status"></span></p></div>
+<h2>How we work it out</h2><ul><li><b>Prices:</b> copied from each official API pricing page on {APICOST_CHECKED}, before tax. Nothing is estimated.</li><li><b>Math:</b> monthly cost = (input MTok × $/MTok in) + (output MTok × $/MTok out).</li><li><b>Tier:</b> Standard / paid-tier list rates only. Batch, priority, flex, and prompt-cache writes are listed under Left out.</li><li><b>Promos:</b> where Google shows a promo end date, we use the current promo rate and note the later price on the card.</li><li><b>Not included:</b> tools (web search, grounding), image/audio specialty rates, committed-use discounts, and tax.</li></ul>
+<h2>Every model we priced</h2><p class="small">Open a provider to see each verified input and output rate.</p>{_ac_ladders}
+<h2>Left out</h2><ul>{"".join(f"<li><b>{e(n)}</b>: {e(r)}.</li>" for n, r in APICOST_LEFT_OUT)}</ul>
+{_faq(_ac_qa)}
+<p class="small">Related: <a href="/ai-coding-cost.html">AI coding tool cost calculator</a> · <a href="/ai-usage-limits.html">AI usage limits</a> · <a href="/compare/chatgpt-vs-claude-vs-gemini.html">ChatGPT vs Claude vs Gemini</a> · <a href="/tools/chatgpt.html">ChatGPT</a> · <a href="/tools/claude.html">Claude</a> · <a href="/tools/google-gemini.html">Google Gemini</a> · <a href="/save-money.html">Save money</a> · <a href="/how-we-pick.html">How we pick</a></p>
+<script>(()=>{{const D={json.dumps(_AC_FLAT, separators=(",", ":"))},P={json.dumps(_ACP, separators=(",", ":"))},CK="{APICOST_CHECKED}";
+const $=s=>document.querySelector(s),X=s=>String(s).replace(/[&<>"]/g,c=>({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}})[c]);
+const Mtok=v=>{{const r=Math.round(Number(v)*10000)/10000; if(r===Math.floor(r)) return '$'+r; return '$'+String(r).replace(/(\\.\\d*?[1-9])0+$/,'$1').replace(/\\.0+$/,'');}};
+const Md=v=>{{const r=Math.round(Number(v)*100)/100; return '$'+(r===Math.floor(r)?r.toLocaleString('en-US'):r.toLocaleString('en-US',{{minimumFractionDigits:2,maximumFractionDigits:2}}));}};
+const inEl=$('#ac-in'), outEl=$('#ac-out');
+function st(){{let inn=parseFloat(inEl.value), out=parseFloat(outEl.value); if(!(inn>=0))inn=0; if(!(out>=0))out=0; if(inn>10000)inn=10000; if(out>10000)out=10000; return {{inn,out}}}}
+function cost(m,s){{return m.inn*s.inn + m.out*s.out}}
+function card(m,tot,best){{return `<article class="cc-card${{best?' cc-best':''}}" data-id="${{X(m.id)}}">${{best?'<p class="cc-badge">Lowest cost for you</p>':''}}<h3>${{X(m.prov)}}: ${{X(m.name)}}</h3><p class="small" style="margin:0">${{X(m.blurb)}}</p><p class="cc-tot">${{Md(tot)}}<span class="small">/mo</span></p><p class="small" style="margin:0">${{Md(tot*12)}} a year · ${{Mtok(m.inn)}}/MTok in · ${{Mtok(m.out)}}/MTok out</p><p class="small" style="margin:6px 0 0">Checked ${{CK}} · <a href="${{X(m.src)}}" rel="nofollow noopener" target="_blank">Official pricing<span class="skip"> for ${{X(m.prov)}} (opens in a new tab)</span></a></p></article>`}}
+function qs(s){{const p=new URLSearchParams(); if(s.inn!=10)p.set('in',String(s.inn)); if(s.out!=2)p.set('out',String(s.out)); const pr=P.find(x=>x.inn==s.inn&&x.out==s.out); if(pr)p.set('preset',pr.id); const q=p.toString(); return location.pathname+(q?'?'+q:'')}}
+function render(push){{const s=st(); const rows=D.map(m=>[m,cost(m,s)]).sort((a,b)=>(a[1]-b[1])||a[0].prov.localeCompare(b[0].prov)||a[0].name.localeCompare(b[0].name)); const b=rows[0];
+let h; if(b){{const nx=rows[1]; let diff=''; if(nx)diff=nx[1]>b[1]?`, ${{Md(nx[1]-b[1])}} a month less than ${{nx[0].prov}} ${{nx[0].name}}`:` , the same as ${{nx[0].prov}} ${{nx[0].name}}`;
+h=`<p class="small" style="margin:0">Lowest cost for ${{s.inn}}M input + ${{s.out}}M output tokens a month</p><p class="vc-big" style="margin:4px 0">${{X(b[0].prov)}} ${{X(b[0].name)}}: ${{Md(b[1])}}/mo</p><p style="margin:0">${{Md(b[1]*12)}} a year${{X(diff)}}. Change the inputs above to match your traffic.</p>`}} else h='<p>Enter monthly input and output tokens to see costs.</p>';
+$('#ac-head').innerHTML=h; $('#ac-cards').innerHTML=rows.map(([m,t])=>card(m,t,b&&m===b[0])).join('');
+if(push!==false)history.replaceState(null,'',qs(s))}}
+const P0=new URLSearchParams(location.search);
+if(P0.get('preset')){{const pr=P.find(x=>x.id==P0.get('preset')); if(pr){{inEl.value=pr.inn; outEl.value=pr.out}}}}
+if(P0.get('in'))inEl.value=Math.min(10000,Math.max(0,parseFloat(P0.get('in'))||0));
+if(P0.get('out'))outEl.value=Math.min(10000,Math.max(0,parseFloat(P0.get('out'))||0));
+if(location.search)render(false);
+const clamp=()=>{{const s=st(); inEl.value=s.inn; outEl.value=s.out; render()}};
+inEl.addEventListener('input',()=>render()); outEl.addEventListener('input',()=>render());
+inEl.addEventListener('change',clamp); outEl.addEventListener('change',clamp);
+const bump=(el,d)=>{{el.value=Math.min(10000,Math.max(0,Math.round((parseFloat(el.value)||0)+d)*10)/10); render()}};
+$('#ac-in-minus').addEventListener('click',()=>bump(inEl,-1)); $('#ac-in-plus').addEventListener('click',()=>bump(inEl,1));
+$('#ac-out-minus').addEventListener('click',()=>bump(outEl,-0.5)); $('#ac-out-plus').addEventListener('click',()=>bump(outEl,0.5));
+document.querySelectorAll('.ac-preset').forEach(btn=>btn.addEventListener('click',()=>{{inEl.value=btn.dataset.in; outEl.value=btn.dataset.out; render(); $('#ac-st').textContent='Preset: '+btn.textContent;}}));
+$('#ac-reset').addEventListener('click',()=>{{inEl.value=10; outEl.value=2; render(); $('#ac-st').textContent='Back to the defaults.'; inEl.focus()}});
+$('#ac-copy').addEventListener('click',async()=>{{const u=location.origin+qs(st()); try{{await navigator.clipboard.writeText(u); $('#ac-st').textContent='Link copied: '+u}}catch(err){{$('#ac-st').textContent='Copy this link: '+u}}}});
+}})();</script>"""
+page(AC_PATH, "AI API Cost Calculator (2026): OpenAI vs Claude vs Gemini Token Prices | ToolPick",
+     f"What the OpenAI, Claude and Gemini APIs cost for your monthly input and output tokens. Official $/MTok rates checked {APICOST_CHECKED}.",
+     _ac_body, [{"@context": "https://schema.org", "@type": "WebApplication", "name": "AI API cost calculator", "url": BASE + AC_PATH, "applicationCategory": "FinanceApplication", "operatingSystem": "Any", "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "dateModified": APICOST_CHECKED,
+                 "description": "Compare OpenAI, Anthropic Claude and Google Gemini API costs by monthly input and output tokens using official $/MTok rates."},
+                faq(_ac_qa)[1], crumbs([("ToolPick", "/"), ("Save money", "/save-money.html"), ("AI API cost", AC_PATH)])])
+_lm[AC_PATH] = APICOST_CHECKED
+V61_CHANGED = [AC_PATH]
+def _v61ins(path, marker, html, after=False):
+    _fp = "public" + path
+    if not os.path.exists(_fp): return False
+    _h = open(_fp).read()
+    if ' v61"' in _h or marker not in _h: return False
+    open(_fp, "w").write(_h.replace(marker, (marker + html) if after else (html + marker), 1)); V61_CHANGED.append(path); return True
+for _p in ["/tools/chatgpt.html", "/tools/claude.html", "/tools/google-gemini.html"]:
+    _name = {"/tools/chatgpt.html": "ChatGPT / OpenAI", "/tools/claude.html": "Claude", "/tools/google-gemini.html": "Gemini"}[_p]
+    _v61ins(_p, '<section class="card tbp"', f'<p class="pick v61"><b>Building on the {_name} API?</b> Compare OpenAI, Claude and Gemini token costs for your monthly usage: <a href="{AC_PATH}">AI API cost calculator →</a></p>')
+_ACL = f'<a href="{AC_PATH}">AI API cost calculator</a>'
+for _p in ["/save-money.html", "/ai-coding-cost.html", "/ai-usage-limits.html", "/ai-subscription-costs.html", "/ai-team-plans.html", "/compare/chatgpt-vs-claude-vs-gemini.html", "/compare/chatgpt-vs-claude.html", "/compare/chatgpt-vs-gemini.html", "/compare/claude-vs-gemini.html"]:
+    _v61ins(_p, "</h1>", f'<p class="pick small v61">Paying for API tokens instead of a chat plan? See OpenAI vs Claude vs Gemini $/MTok for your volume: {_ACL} →</p>', after=True)
+_v61ins("/guides.html", "<h2>New guides</h2><ul>", f"<li class=\"v61\"><a href='{AC_PATH}'>AI API cost calculator: OpenAI vs Claude vs Gemini by monthly tokens</a></li>", after=True)
+print("v61 API cost:", len(_AC_FLAT), "models;", len(V61_CHANGED), "pages changed")
+open("public/llms.txt", "a").write(f"\n## AI API cost calculator (v61, checked {APICOST_CHECKED})\n- [AI API cost calculator]({BASE}{AC_PATH}): monthly cost of OpenAI (GPT-6 family), Anthropic Claude (Fable/Opus/Sonnet/Haiku) and Google Gemini API models from official $/MTok input+output rates. Deep link: {AC_PATH}?in=10&out=2&preset=rag.\n")
+
 # --- v39: simplification pass (one nav, one costs page, collapsed details, fewer boxes) ---
 import re as _re, os as _os, glob as _glob
 V39_DATE = "2026-10-20"
@@ -4228,6 +4356,12 @@ for _u in V56_CHANGED: _lm[_u] = IMAGE_CHECKED
 for _u in V57_CHANGED: _lm[_u] = V57_DATE
 for _u in V59_CHANGED: _lm[_u] = USAGE_CHECKED
 for _u in V60_CHANGED: _lm[_u] = CODECOST_CHECKED
+for _u in V61_CHANGED: _lm[_u] = APICOST_CHECKED
+_fpm = "public/my-ai-costs.html"; _hm = open(_fpm).read()
+if ' v61"' not in _hm and "</h1>" in _hm:
+    open(_fpm, "w").write(_hm.replace("</h1>", f'</h1><p class="small v61">Building with APIs? <a href="{AC_PATH}">AI API cost calculator: OpenAI vs Claude vs Gemini →</a></p>', 1))
+    if "/my-ai-costs.html" not in V61_CHANGED: V61_CHANGED.append("/my-ai-costs.html")
+    _lm["/my-ai-costs.html"] = APICOST_CHECKED
 open("/tmp/v47-changed.txt","w").write("\n".join(V47_CHANGED))
 open("/tmp/v44-changed.txt","w").write("\n".join(V44_CHANGED))
 open("/tmp/v42-changed.txt","w").write("\n".join(V42_CHANGED))
