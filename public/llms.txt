@@ -40,7 +40,7 @@
 - [Windsurf](https://toolpick-ai.vercel.app/tools/windsurf.html): Pro $20/mo; Max $200/mo; Teams $80/mo + $40/seat | free: Free: $0
 - [Bolt](https://toolpick-ai.vercel.app/tools/bolt.html): Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) | free: Free: 300K tokens/day, 1M/month
 - [v0](https://toolpick-ai.vercel.app/tools/v0.html): Plus $30/user/mo (page shows $90 struck through); Business $100/user/mo | free: Free: $0/mo, 7 messages/day (new users also get $5 in starter credits)
-- [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually, 100 credits/mo); Business $50/mo ($42 annually, 100 credits/mo) | free: Free: $0 (no card; free grants; unlimited collaborators; 5 lovable.app domains)
+- [Lovable](https://toolpick-ai.vercel.app/tools/lovable.html): Pro $25/mo ($21/mo billed annually, 100 credits/mo); Business $50/mo ($42 annually, 100 credits/mo) | free: Free: $0 (5 build credits/day up to 30/mo; free grants; unlimited collaborators; 5 lovable.app domains)
 - [Warp](https://toolpick-ai.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
 - [Qodo](https://toolpick-ai.vercel.app/tools/qodo.html): Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits) | free: 14-day free trial, no card; free for open source projects
 - [Replit](https://toolpick-ai.vercel.app/tools/replit.html): Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom | free: check site
@@ -52,7 +52,7 @@
 - [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
-- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (83% off, until Nov 8, 2026); Creator $11 first month (50% off) | free: Free: $0
+- [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (83% off); Creator $11 first month (50% off) | free: Free: $0
 - [Suno](https://toolpick-ai.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
 - [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
@@ -441,7 +441,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [AI API cost calculator](https://toolpick-ai.vercel.app/ai-api-cost.html): monthly cost of OpenAI (GPT-6 family), Anthropic Claude (Fable/Opus/Sonnet/Haiku) and Google Gemini API models from official $/MTok input+output rates. Deep link: /ai-api-cost.html?in=10&out=2&preset=rag.
 
 ## Kling vs CapCut, free video limits, presentation cost (v62)
-- [Kling vs CapCut](https://toolpick-ai.vercel.app/kling-vs-capcut.html): generative-video vs editor prices; Kling Standard $8.8/mo vs CapCut Pro $19.99/mo; free plans; Kling checked 2026-11-02, CapCut checked 2026-11-05
+- [Kling vs CapCut](https://toolpick-ai.vercel.app/kling-vs-capcut.html): generative-video vs editor prices; Kling Standard $8.8/mo vs CapCut Pro $19.99/mo; free plans; Kling checked 2026-11-02, CapCut checked 2026-11-06
 - [Free AI video plan limits](https://toolpick-ai.vercel.app/free-ai-video-limits.html): Runway, Pika, Kling AI, HeyGen, Descript, CapCut free inclusions/limits/watermarks/commercial use/upgrades from FREE_LIMITS checked 2026-10-22
 - [AI presentation cost calculator](https://toolpick-ai.vercel.app/ai-presentation-cost.html): Gamma, Canva, Pitch (EUR), Beautiful.ai, Plus AI, SlidesAI by seats and monthly/yearly; Pitch excluded from USD cheapest; deep link /ai-presentation-cost.html?seats=5&bill=y
 

@@ -1916,3 +1916,54 @@ WRITECOST_LEFT_OUT = [
     ("Notion Enterprise", "custom pricing"),
     ("Google AI Ultra 20x", "higher Ultra tier ($199.99/mo); calculator shows Ultra 5x as the published Ultra entry"),
 ]
+
+
+# --- daily ops 2026-11-06 ---
+# Verified today on official pricing pages (WebFetch + HTML; CapCut yearly in page JSON):
+# CapCut https://www.capcut.com/pricing — Pro $19.99/mo, Ultra $79/mo, Teams $12.49/seat/mo (2-seat);
+#   yearly Pro $179.99/yr, Ultra $900/yr (unchanged vs 2026-11-05).
+# Bolt https://bolt.new/pricing — Pro $25/mo, Teams $30/member/mo; Free 300K tokens/day + 1M/mo.
+#   Yearly $18/$27 not in static HTML (JS toggle); left as previously verified 2026-10-22.
+# ElevenLabs https://elevenlabs.io/pricing — list prices unchanged (Starter $6, Creator $22, Pro $99,
+#   Scale $299, Business $990; annual FAQ $5/$18.33/$82.50/$249.17/$825). Promotional first-month
+#   Starter $1 then $6 and Creator $11 then $22 still shown; the "Until Nov 8, 2026" tag is gone
+#   (banner countdown reads Ends in 0d / A-B "Ends September 30"), so the end-date wording was dropped.
+# Lovable https://lovable.dev/pricing FAQ — Free again states daily grant of 5 build credits (up to 30/mo);
+#   restored that into free text (cards still emphasize free grants; Pro/Business 100 credits/mo unchanged).
+_EL1106 = (
+    "Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); "
+    "Business $990 ($825). Promotional: Starter $1 first month (83% off); "
+    "Creator $11 first month (50% off) (checked 2026-11-06)"
+)
+_CAP1106 = "Pro $19.99/mo ($179.99/yr); Ultra $79/mo ($900/yr); Teams $12.49/seat/mo (checked 2026-11-06)"
+_BOLT1106 = "Pro $25/mo ($18/mo billed yearly, $216/yr); Teams $30/member/mo ($27/member/mo billed yearly) (checked 2026-11-06)"
+_LOV1106 = dict(
+    price="Pro $25/mo ($21/mo billed annually, 100 credits/mo); Business $50/mo ($42 annually, 100 credits/mo) (checked 2026-11-06)",
+    free="Free: $0 (5 build credits/day up to 30/mo; free grants; unlimited collaborators; 5 lovable.app domains)",
+)
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] == "ElevenLabs":
+            _t["price"] = _EL1106
+            _t["checked"] = "2026-11-06"
+        if _t["name"] == "CapCut":
+            _t["price"] = _CAP1106
+            _t["checked"] = "2026-11-06"
+        if _t["name"] == "Bolt":
+            _t["price"] = _BOLT1106
+            _t["checked"] = "2026-11-06"
+        if _t["name"] == "Lovable":
+            _t.update(_LOV1106)
+            _t["checked"] = "2026-11-06"
+if "CapCut" in VIDEO4:
+    VIDEO4["CapCut"]["checked"] = "2026-11-06"
+PRICE_SKIP["2026-11-06|CapCut"] = "Re-checked 2026-11-06 on capcut.com/pricing; Pro/Ultra/Teams monthly and Pro/Ultra yearly unchanged."
+PRICE_SKIP["2026-11-06|Bolt"] = "Re-checked 2026-11-06 on bolt.new/pricing; Pro $25/mo, Teams $30/member/mo and free 300K/day 1M/mo unchanged. Yearly $18/$27 left from 2026-10-22 (JS toggle; not in static HTML today)."
+PRICE_NOTES["2026-11-06|ElevenLabs"] = (
+    "changed",
+    "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The $1 first-month Starter and $11 Creator promos are still on the pricing page, but the Until Nov 8 end-date tag is gone (seen 2026-11-06), so that date was dropped from our promo line.",
+)
+PRICE_NOTES["2026-11-06|Lovable"] = (
+    "changed",
+    "Lovable Pro/Business prices are unchanged. The pricing-page FAQ again states Free includes 5 build credits/day (up to 30/mo); we restored that into the free-plan text.",
+)
