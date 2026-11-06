@@ -804,7 +804,7 @@ STUDENT_OFFERS = [
       gets="30% off any paid plan", who="st",
       elig="Students or educators with a valid .edu email address, enrolled at or working at an academic institution.", claim="Contact Wordtune support to apply.",
       src="https://www.wordtune.com/plans", quote="you are eligible for a 30% discount on both our annual and monthly plans",
-      reg="From $6.99/mo ($4.89/mo with yearly discount)", save=None, end=False),
+      reg="Advanced $6.99/mo ($4.89/mo billed yearly)", save=None, end=False),
  dict(k="otter", tool="Otter", kind="off", badge="20% off", offer="20% off Otter Pro: $13.59/mo, or $6.67/mo billed $79.99 a year",
       gets="Otter Pro at a student price", who="st",
       elig="Individual students and teachers with an email address ending in .edu.",
@@ -1811,4 +1811,108 @@ PRESCOST = [
 ]
 PRESCOST_LEFT_OUT = [
     ("Synthesia / InVideo presentation modes", "those products are sold mainly as video tools; this calculator covers presentation-first tools only"),
+]
+
+# --- v63 price bump (2026-11-06 writing-cost check) ---
+_V63 = {
+    "Grammarly": dict(price="Pro $30/mo ($12/mo billed yearly, $144/yr; $60 quarterly) (checked 2026-11-06)", checked="2026-11-06"),
+    "Wordtune": dict(price="Advanced $6.99/mo ($4.89/mo billed yearly); Unlimited $9.99 ($6.99 yearly) (checked 2026-11-06)", checked="2026-11-06"),
+    "Rytr": dict(price="Lite $9/mo ($7.20/mo yearly); Personal $19 ($15.20); Pro $49 ($39.20); yearly saves 20% (checked 2026-11-06)", checked="2026-11-06"),
+    "Jasper": dict(price="Pro $69/seat/mo ($59/seat/mo billed yearly) (checked 2026-11-06)", checked="2026-11-06", free="No free plan; 7-day free trial"),
+    "Copy.ai": dict(price="Chat $29/mo ($24/mo billed yearly, $288/yr); team plans from $1,000/mo (checked 2026-11-06)", checked="2026-11-06"),
+    "Writesonic": dict(price="Starter $99/mo ($79/mo billed annually); Basic $249 ($199); Growth $499 ($399) (checked 2026-11-06)", checked="2026-11-06"),
+    "Claude": dict(price="Pro $20/mo ($17/mo billed yearly); Max $100/mo; Ultra $200/mo (checked 2026-11-06)", checked="2026-11-06"),
+    "Notion AI": dict(price="Plus $12/member/mo ($10 billed yearly); Business $24/member/mo ($20 billed yearly) (checked 2026-11-06)", checked="2026-11-06"),
+    "Google Gemini": dict(price="Google AI Plus $4.99/mo; Google AI Pro $19.99/mo ($199.99/yr ≈ $16.67/mo); Ultra from $99.99/mo (checked 2026-11-06)", checked="2026-11-06"),
+}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _V63:
+            _t.update(_V63[_t["name"]])
+PRICE_TABLE.update({
+    "Grammarly": (30, 12, None),
+    "Wordtune": (6.99, 4.89, None),
+    "Rytr": (9, 7.20, None),
+    "Jasper": (69, 59, None),
+    "Copy.ai": (29, 24, None),
+    "Writesonic": (99, 79, None),
+    "Claude": (20, 17, None),
+    "Notion AI": (12, 10, None),
+    "Google Gemini": (4.99, None, None),
+})
+PRICE_SKIP["2026-11-06|Grammarly"] = "Re-checked 2026-11-06 on grammarly.com/plans JSON; Pro $30/mo, $60 quarterly, $144/yr unchanged."
+PRICE_SKIP["2026-11-06|Wordtune"] = "Re-checked 2026-11-06; Advanced $6.99/$4.89 and Unlimited $9.99/$6.99 unchanged."
+PRICE_NOTES["2026-11-06|Writesonic"] = ("changed", "Writesonic Starter is $99/mo billed monthly or $79/mo billed annually (Save 20%). We previously showed only the annual $79 figure.")
+PRICE_NOTES["2026-11-06|Rytr"] = ("changed", "Rytr yearly rates are now shown as 20% off monthly (Lite $7.20, Personal $15.20, Pro $39.20) from rytr.me/pricing.")
+PRICE_NOTES["2026-11-06|Google Gemini"] = ("changed", "Google AI Pro yearly is $199.99/yr (~$16.67/mo) on one.google.com/about/google-ai-plans/; Plus stays $4.99/mo (yearly not stated).")
+
+
+# --- v63 (2026-11-06): AI writing tool cost calculator (/ai-writing-cost.html) ---
+# Every m/y below was read today on the official pricing page in "src" unless noted.
+# m = $/seat/mo billed monthly; y = $/seat/mo billed yearly (None = not stated on the page).
+# ChatGPT Go/Plus dollar amounts are CMS-keyed on chatgpt.com/pricing (not in static HTML);
+# we keep the last verified consumer prices (2026-10-24) and confirm Pro "from $100" in today's HTML.
+WRITECOST_CHECKED = "2026-11-06"
+WRITECOST = [
+    dict(t="Grammarly", src="https://www.grammarly.com/plans", checked="2026-11-06", cur="USD",
+         free="Free $0: spelling and grammar checks", trial=None,
+         plans=[("Pro", 30, 12, "per seat; also $60 quarterly; yearly is $144/yr")],
+         default=0),
+    dict(t="Wordtune", src="https://www.wordtune.com/plans", checked="2026-11-06", cur="USD",
+         free="Basic $0 (limited rewrites)", trial="3-day free trial on paid plans",
+         plans=[("Advanced", 6.99, 4.89, "per seat; yearly shown as $4.89/mo billed annually"),
+                ("Unlimited", 9.99, 6.99, "per seat; yearly shown as $6.99/mo billed annually")],
+         default=0),
+    dict(t="Rytr", src="https://rytr.me/pricing", checked="2026-11-06", cur="USD",
+         free="Free forever: 10,000 characters/mo", trial=None,
+         plans=[("Lite", 9, 7.20, "yearly saves 20% vs monthly (page wording)"),
+                ("Personal", 19, 15.20, "yearly saves 20% vs monthly (page wording)"),
+                ("Pro", 49, 39.20, "yearly saves 20% vs monthly (page wording)")],
+         default=0),
+    dict(t="Jasper", src="https://www.jasper.ai/pricing", checked="2026-11-06", cur="USD",
+         free=None, trial="7-day free trial of Pro",
+         plans=[("Pro", 69, 59, "per seat")],
+         default=0),
+    dict(t="Copy.ai", src="https://www.copy.ai/prices", checked="2026-11-06", cur="USD",
+         free=None, trial="Free trial available",
+         plans=[("Chat", 29, 24, "5 seats on Chat; yearly billed $288/yr ($24/mo)")],
+         default=0),
+    dict(t="Writesonic", src="https://writesonic.com/pricing", checked="2026-11-06", cur="USD",
+         free="Start free (trial)", trial=None,
+         plans=[("Starter", 99, 79, "per month; annual Save 20% → $79/mo billed annually"),
+                ("Basic", 249, 199, "per month; annual $199/mo billed annually"),
+                ("Growth", 499, 399, "per month; annual $399/mo billed annually")],
+         default=0),
+    dict(t="Claude", src="https://claude.com/pricing", checked="2026-11-06", cur="USD",
+         free="Free plan $0", trial=None,
+         plans=[("Pro", 20, 17, "yearly $200 billed up front ($17/mo)"),
+                ("Max", 100, None, "billed monthly only on the page"),
+                ("Ultra", 200, None, "billed monthly only on the page")],
+         default=0),
+    dict(t="ChatGPT", src="https://chatgpt.com/pricing", checked="2026-10-24", cur="USD",
+         free="Free $0: unlimited text chats on GPT-6 (limits on tools)", trial=None,
+         plans=[("Go", 8, None, "consumer Go; US $ from 2026-10-24 check (CMS-keyed today)"),
+                ("Plus", 20, None, "consumer Plus; US $ from 2026-10-24 check (CMS-keyed today)"),
+                ("Pro", 100, None, "from $100/mo (3 tiers); “from $100” confirmed in HTML 2026-11-06"),
+                ("Business", 25, 20, "per seat; yearly from 2026-10-24 check")],
+         default=1),
+    dict(t="Notion AI", src="https://www.notion.com/pricing", checked="2026-11-06", cur="USD",
+         free="Free plan $0 (AI trial only)", trial=None,
+         plans=[("Plus", 12, 10, "per member; workspace plan (AI trial on Free)"),
+                ("Business", 24, 20, "per member; $240/yr → $20/mo")],
+         default=1),
+    dict(t="Google Gemini", src="https://one.google.com/about/google-ai-plans/", checked="2026-11-06", cur="USD",
+         free="Gemini app free with a Google Account ($0/mo)", trial=None,
+         plans=[("Google AI Plus", 4.99, None, "400 GB storage; yearly not stated on page we read"),
+                ("Google AI Pro", 19.99, 16.67, "yearly $199.99/yr → $16.67/mo"),
+                ("Google AI Ultra 5x", 99.99, None, "Ultra 5x; yearly not stated on page we read")],
+         default=1),
+]
+WRITECOST_LEFT_OUT = [
+    ("Copy.ai Growth / Expansion / Scale", "team GTM plans from $1,000/mo — different job and seat scale than a writing seat"),
+    ("Jasper Business / Enterprise", "contact-sales / custom pricing on the page"),
+    ("Grammarly Enterprise", "contact sales only"),
+    ("ChatGPT Enterprise", "contact sales; consumer Go/Plus US dollars are CMS-keyed on the pricing page today"),
+    ("Notion Enterprise", "custom pricing"),
+    ("Google AI Ultra 20x", "higher Ultra tier ($199.99/mo); calculator shows Ultra 5x as the published Ultra entry"),
 ]
