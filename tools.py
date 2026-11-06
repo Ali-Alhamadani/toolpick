@@ -1917,22 +1917,21 @@ WRITECOST_LEFT_OUT = [
     ("Google AI Ultra 20x", "higher Ultra tier ($199.99/mo); calculator shows Ultra 5x as the published Ultra entry"),
 ]
 
-
 # --- daily ops 2026-11-06 ---
-# Verified today on official pricing pages (WebFetch + HTML; CapCut yearly in page JSON):
+# Verified today on official pricing pages (browser for JS toggles + WebFetch/HTML):
 # CapCut https://www.capcut.com/pricing — Pro $19.99/mo, Ultra $79/mo, Teams $12.49/seat/mo (2-seat);
-#   yearly Pro $179.99/yr, Ultra $900/yr (unchanged vs 2026-11-05).
-# Bolt https://bolt.new/pricing — Pro $25/mo, Teams $30/member/mo; Free 300K tokens/day + 1M/mo.
-#   Yearly $18/$27 not in static HTML (JS toggle); left as previously verified 2026-10-22.
+#   yearly Pro $179.99/yr, Ultra $900/yr; Teams yearly $107.5/seat (2 seats) seen but not in short string.
+# Bolt https://bolt.new/pricing — Pro $25/mo or $18/mo yearly ($216/yr); Teams $30/$27 yearly ($324/yr);
+#   Free 300K tokens/day + 1M/mo (browser monthly+yearly).
 # ElevenLabs https://elevenlabs.io/pricing — list prices unchanged (Starter $6, Creator $22, Pro $99,
-#   Scale $299, Business $990; annual FAQ $5/$18.33/$82.50/$249.17/$825). Promotional first-month
-#   Starter $1 then $6 and Creator $11 then $22 still shown; the "Until Nov 8, 2026" tag is gone
-#   (banner countdown reads Ends in 0d / A-B "Ends September 30"), so the end-date wording was dropped.
+#   Scale $299, Business $990; annual $5/$18.33/$82.50/$249.17/$825). Promotional: Starter $1 first
+#   month then $6, card tagged Until Nov 16 (banner countdown ~10d 17h on 2026-11-06); Creator $11
+#   first month then $22 (50% off, no end date). Static HTML earlier showed a stale 0d countdown A/B.
 # Lovable https://lovable.dev/pricing FAQ — Free again states daily grant of 5 build credits (up to 30/mo);
-#   restored that into free text (cards still emphasize free grants; Pro/Business 100 credits/mo unchanged).
+#   restored that into free text (Pro/Business 100 credits/mo unchanged).
 _EL1106 = (
     "Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); "
-    "Business $990 ($825). Promotional: Starter $1 first month (83% off); "
+    "Business $990 ($825). Promotional: Starter $1 first month (83% off, until Nov 16, 2026); "
     "Creator $11 first month (50% off) (checked 2026-11-06)"
 )
 _CAP1106 = "Pro $19.99/mo ($179.99/yr); Ultra $79/mo ($900/yr); Teams $12.49/seat/mo (checked 2026-11-06)"
@@ -1957,11 +1956,11 @@ for _c in CATEGORIES:
             _t["checked"] = "2026-11-06"
 if "CapCut" in VIDEO4:
     VIDEO4["CapCut"]["checked"] = "2026-11-06"
-PRICE_SKIP["2026-11-06|CapCut"] = "Re-checked 2026-11-06 on capcut.com/pricing; Pro/Ultra/Teams monthly and Pro/Ultra yearly unchanged."
-PRICE_SKIP["2026-11-06|Bolt"] = "Re-checked 2026-11-06 on bolt.new/pricing; Pro $25/mo, Teams $30/member/mo and free 300K/day 1M/mo unchanged. Yearly $18/$27 left from 2026-10-22 (JS toggle; not in static HTML today)."
+PRICE_SKIP["2026-11-06|CapCut"] = "Re-checked 2026-11-06 on capcut.com/pricing (browser); Pro/Ultra/Teams monthly and Pro/Ultra yearly unchanged. Teams yearly $107.5/seat (2 seats) seen; not added to the short price string."
+PRICE_SKIP["2026-11-06|Bolt"] = "Re-checked 2026-11-06 on bolt.new/pricing (browser monthly+yearly); Pro $25/$18 yearly ($216/yr), Teams $30/$27 yearly ($324/yr), free 300K/day 1M/mo unchanged."
 PRICE_NOTES["2026-11-06|ElevenLabs"] = (
     "changed",
-    "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The $1 first-month Starter and $11 Creator promos are still on the pricing page, but the Until Nov 8 end-date tag is gone (seen 2026-11-06), so that date was dropped from our promo line.",
+    "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The $1 first-month Starter offer is now tagged Until Nov 16, 2026 on the pricing page (banner countdown ~10d 17h on 2026-11-06); Creator first-month $11 (50% off) has no end date stated. Replaced the prior Until Nov 8 wording.",
 )
 PRICE_NOTES["2026-11-06|Lovable"] = (
     "changed",
