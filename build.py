@@ -1528,6 +1528,31 @@ for _c in CATEGORIES:
                              ps=_perseat(_t), fr=realfree(_t), cats=[], bestFor=[], j=list(CAPS[_t["name"]]))
         if _c["id"] not in [x["id"] for x in _dmap[_k]["cats"]]: _dmap[_k]["cats"].append(dict(id=_c["id"], name=_c["name"]))
         if _t["name"] == _c["best"] and _c["id"] not in _dmap[_k]["bestFor"]: _dmap[_k]["bestFor"].append(_c["id"])
+# --- v64: dealbreaker filters (data training, refunds, student deals, yearly saving) ---
+# Reuses facts already verified on official pages: tools.py PRIVACY (PRIVACY_CHECKED), REFUNDS (REFUND_CHECKED),
+# STUDENT_OFFERS (STUDENT_CHECKED) and the monthly-vs-yearly entry-plan prices (each tool's own checked date).
+# A tool missing from a list is "not checked" (empty string) and is never guessed into a filter.
+V64_DATE = "2026-11-07"
+_P64 = {p["t"]: p for p in _tm0.PRIVACY}; _R64 = {r["t"]: r for r in _tm0.REFUNDS}; _S64 = {}
+for _o in _tm0.STUDENT_OFFERS: _S64.setdefault(_o["tool"], []).append(_o)
+_PK64 = {"y": "Trains by default (you can opt out)", "x": "Trains, no opt-out found", "c": "Only if you allow it", "n": "Doesn't train by default", "u": "Unclear, see policy"}
+def _hrs64(h): return f"{h // 24}-day" if h >= 48 and h % 24 == 0 else f"{h}-hour"
+def _rl64(r):
+    if r["k"] == "n": return "No refunds"
+    if r["k"] == "c": return "Case by case"
+    if not r["wm"]: return "Refund rule stated"
+    s = _hrs64(r["wm"]) + " window"
+    if r["wy"] and r["wy"] != r["wm"]: s = f"{_hrs64(r['wm'])} monthly, {_hrs64(r['wy'])} yearly"
+    return s + " (conditions apply)"
+for _k64, _v in _dmap.items():
+    _p = _P64.get(_v["n"]); _r = _R64.get(_v["n"]); _so = _S64.get(_v["n"], []); _my = _mym.get(_k64)
+    _v["pv"] = _p["k"] if _p else ""; _v["pb"] = _p["bk"] if _p else ""
+    _v["rf"] = _r["k"] if _r else ""; _v["rl"] = _rl64(_r) if _r else ""
+    _sb = sorted(_so, key=lambda o: ({"free": 0, "off": 1, "ask": 2}[o["kind"]], 0 if "s" in o["who"] else 1))
+    _v["st"] = _sb[0]["kind"] if _sb else ""; _v["sl"] = _sb[0]["badge"] if _sb else ""; _v["sk"] = _sb[0]["k"] if _sb else ""
+    _v["ys"] = _my["pct"] if _my and _my["both"] and _my["sv"] > 0 else 0
+for _n64 in list(_P64) + list(_R64) + list(_S64):
+    assert any(v["n"] == _n64 for v in _dmap.values()), ("v64: not in directory", _n64)
 _DLIST = sorted(_dmap.values(), key=lambda x: x["n"].lower())
 DDATA = json.dumps(_DLIST).replace("</", "<\\/")
 _JOBC = {}
@@ -1535,7 +1560,7 @@ for _v in _DLIST:
     for _j in _v["j"]: _JOBC[_j] = _JOBC.get(_j, 0) + 1
 JOBDATA = json.dumps({k: CAP_LABEL.get(k, k) for k in _JOBC})
 CATDATA = json.dumps([dict(id=c["id"], n=c["name"], need=c["need"]) for c in CATEGORIES])
-DIR_DATE = "2026-10-28"
+DIR_DATE = "2026-11-07"  # v64 dealbreaker filters
 def _d_pv(v):
     if v is None: return None
     if isinstance(v, (int, float)): return (float(v), "$")
@@ -1555,9 +1580,16 @@ def _d_card(t):  # mirrors card() in the page script, used to pre-render the def
     ent = (f'<p class="dent"><b>From {_d_money(*en)}/mo</b> <span class="small">lowest verified entry{" · per seat" if t["ps"] else ""}</span></p>' if en
            else '<p class="small check">No verified numeric entry price — check the official page.</p>')
     return (f'<article class="card dcard{" best" if bv else ""}" data-s="{t["s"]}"><div class="th"><span class="logo"><img src="https://www.google.com/s2/favicons?domain={t["dm"]}&amp;sz=64" alt="{e(t["n"])} logo" width="28" height="28" loading="lazy"></span><div><div class="badges">{b}</div><h3><a href="{t["u"]}">{e(t["n"])}</a></h3></div></div>'
-            f'<p class="djob"><span class="small">Main job:</span> {e(jobs[0])}{(" <span class=small>· also " + e(", ".join(jobs[1:])) + "</span>") if len(jobs) > 1 else ""}</p><p>{e(t["d"])}</p>{ent}<p class="price small">{e(t["p"])}</p><p class="small">{e(t["f"])}</p>'
+            f'<p class="djob"><span class="small">Main job:</span> {e(jobs[0])}{(" <span class=small>· also " + e(", ".join(jobs[1:])) + "</span>") if len(jobs) > 1 else ""}</p><p>{e(t["d"])}</p>{ent}<p class="price small">{e(t["p"])}</p><p class="small">{e(t["f"])}</p>{_d_facts(t)}'
             f'<p class="small meta">{e(", ".join(c["name"] for c in t["cats"]))} · checked {t["k"]} · <a href="{e(t["pr"])}" rel="noopener" target="_blank">Official pricing</a></p>'
             f'<div class="dact"><a class="bbtn" href="{t["u"]}">Details</a><button type="button" class="bbtn addbtn" data-add="{t["s"]}" aria-pressed="false">+ Compare</button></div></article>')
+def _d_facts(t):  # v64: mirrors facts() in the page script
+    li = []
+    if t["pv"]: li.append(f'<li class="f{"ok" if t["pv"] in "nc" else "wa" if t["pv"] in "yx" else "mu"}"><a href="/ai-data-privacy.html?tool={t["s"]}">Your data: {e(_PK64[t["pv"]])}</a></li>')
+    if t["rf"]: li.append(f'<li class="f{"ok" if t["rf"] == "w" else "mu" if t["rf"] == "c" else "wa"}"><a href="/ai-refund-policies.html?tool={t["s"]}#check">Refunds: {e(t["rl"])}</a></li>')
+    if t["st"]: li.append(f'<li class="f{"ok" if t["st"] != "ask" else "mu"}"><a href="/ai-student-discounts.html#o-{t["sk"]}">Students: {e(t["sl"] if t["st"] != "ask" else "ask support")}</a></li>')
+    if t["ys"]: li.append(f'<li class="fok"><a href="/monthly-or-yearly.html?tool={t["s"]}">Yearly billing saves {t["ys"]}%</a></li>')
+    return f'<ul class="dfx" aria-label="Dealbreakers for {e(t["n"])}">' + "".join(li) + '</ul>' if li else ''
 def _d_sortkey(t):
     en = _d_entry(t)
     return (0 if t["bestFor"] else 1, (0 if t["fr"] else 1) if en else 2, en[0] if en else 1e9, t["n"].lower())
@@ -1565,7 +1597,7 @@ _D_SSR = "".join(_d_card(t) for t in sorted(_DLIST, key=_d_sortkey))
 _D_CHIPS = '<button type="button" class="dchip" data-cat="" aria-pressed="true">All <span class="dn2">' + str(len(_DLIST)) + '</span></button>' + "".join(
     f'<button type="button" class="dchip" data-cat="{c["id"]}" aria-pressed="false">{e(c["name"])} <span class="dn2">{len({slug(t["name"]) for t in c["tools"]})}</span></button>' for c in CATEGORIES)
 _D_QUICK = "".join(f'<button type="button" class="dchip dq" data-q="{k}" aria-pressed="false">{lab}</button>' for k, lab in
-                   [("free", "Free plan"), ("u10", "Under $10/mo"), ("bv", "Best Value picks"), ("monthly", "Pay monthly")])
+                   [("free", "Free plan"), ("u10", "Under $10/mo"), ("bv", "Best Value picks"), ("monthly", "Pay monthly"), ("train", "No training without my OK"), ("refund", "Refund window"), ("student", "Student deal"), ("yearly", "Saves with yearly")])
 _D_JOBOPTS = '<option value="">Any job</option>' + "".join(f'<option value="{k}">{e(CAP_LABEL.get(k, k))} ({n})</option>' for k, n in sorted(_JOBC.items(), key=lambda x: CAP_LABEL.get(x[0], x[0]).lower()))
 DIR_CSS = """<style>
 .dhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px}.dhead h1{margin-bottom:4px}
@@ -1623,6 +1655,14 @@ DIR_CSS = """<style>
 .dtray .bbtn.primary{background:#fff;color:var(--tx);border-color:#fff}
 .dtray .bbtn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
 .dnote{margin-top:var(--s5)}
+.dfx{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;font-size:.86rem}
+.dfx li{display:flex;align-items:flex-start;gap:7px;margin:0}
+.dfx li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;margin-top:.45em;background:var(--mu)}
+.dfx li.fok::before{background:var(--ok)}.dfx li.fwa::before{background:var(--warn)}
+.dfx a{color:var(--tx);text-decoration:underline;text-decoration-color:var(--bd);text-underline-offset:2px;min-height:24px;display:inline-block}
+.dfx a:hover{text-decoration-color:var(--ac);color:var(--ac)}
+.dgrp{grid-column:1/-1;font-size:.8rem;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:var(--s2) 0 0;border-top:1px solid var(--bd);padding-top:var(--s3)}
+.dtab td.fx{font-size:.85rem;min-width:120px}
 @media(max-width:640px){.dtag2,#d-qh,.dlab{display:none}.dhead+.tag{font-size:.98rem}.drow,.drow.wrapr{flex-wrap:nowrap;overflow-x:auto}.dempty .drow{flex-wrap:wrap}.dshort{font-size:.82rem;gap:2px 12px}.dbar{padding:var(--s3)}.dres h2{font-size:1.05rem}.dtray .tl{flex-basis:100%}.dtray .bbtn{flex:1 1 0}}
 </style>"""
 directory_body = DIR_CSS + f"""<div class="dhead"><h1>Browse all AI tools</h1></div>
@@ -1633,18 +1673,23 @@ directory_body = DIR_CSS + f"""<div class="dhead"><h1>Browse all AI tools</h1></
 <p class="small" id="d-qh" style="margin:6px 0 0">Matches tool names, what each tool does, and categories.</p>
 <p class="dlab" id="d-catl">Category</p><div class="drow" id="d-cats" role="group" aria-labelledby="d-catl">{_D_CHIPS}</div>
 <p class="dlab" id="d-ql">Quick filters</p><div class="drow wrapr" id="d-quick" role="group" aria-labelledby="d-ql">{_D_QUICK}</div>
-<details class="dmore" id="d-more"><summary>More filters<span class="dtag2">: what it does, price range, billing, seats</span></summary><div class="dsel">
+<details class="dmore" id="d-more"><summary>More filters<span class="dtag2">: what it does, price, billing, seats, privacy, refunds, student deals</span></summary><div class="dsel">
 <div><label for="d-job">What it does</label><select id="d-job" name="job">{_D_JOBOPTS}</select></div>
 <div><label for="d-price">Starting price (verified)</label><select id="d-price" name="price"><option value="any">Any price</option><option value="free">Free to start (real free plan)</option><option value="u10">Under $10/mo</option><option value="10-25">$10–$25/mo</option><option value="over25">Over $25/mo</option><option value="unverified">Price not verified</option></select></div>
 <div><label for="d-free">Free plan</label><select id="d-free" name="free"><option value="any">Any</option><option value="yes">Has a real free plan</option><option value="no">No real free plan</option></select></div>
 <div><label for="d-billing">Billing (verified)</label><select id="d-billing" name="billing"><option value="any">Any</option><option value="monthly">Can pay monthly</option><option value="annual">Has a yearly-billing price</option><option value="both">Both monthly and yearly</option></select></div>
 <div><label for="d-seat">Seat pricing</label><select id="d-seat" name="seat"><option value="any">Any</option><option value="perseat">Entry price is per seat</option><option value="flat">Entry price not per seat</option></select></div>
+<p class="dgrp" id="d-dbl">Dealbreakers (from official policy pages)</p>
+<div><label for="d-train">Your data and AI training</label><select id="d-train" name="train" aria-describedby="d-dbl"><option value="any">Any</option><option value="off">Doesn't train by default, or only if I allow it</option><option value="never">Doesn't train by default</option><option value="optout">I can switch training off</option><option value="biz">Team plans protected by default</option></select></div>
+<div><label for="d-refund">Refunds</label><select id="d-refund" name="refund" aria-describedby="d-dbl"><option value="any">Any</option><option value="window">States a refund window</option><option value="maybe">Refund possible (window or case by case)</option></select></div>
+<div><label for="d-student">Student and teacher deals</label><select id="d-student" name="student" aria-describedby="d-dbl"><option value="any">Any</option><option value="yes">Free or discounted for students</option><option value="free">Free for students</option></select></div>
+<div><label for="d-yearly">Yearly billing</label><select id="d-yearly" name="yearly" aria-describedby="d-dbl"><option value="any">Any</option><option value="save">Saves with yearly billing</option><option value="20">Saves 20% or more yearly</option><option value="40">Saves 40% or more yearly</option></select></div>
 </div></details></form>
-<div class="dres"><h2><span id="dir-count" role="status" aria-live="polite">{len(_DLIST)} tools</span></h2><div class="dtools"><label for="d-sort" class="skip">Sort by</label><select id="d-sort" name="sort" aria-label="Sort by"><option value="value">Sort: Best Value first</option><option value="price">Sort: Lowest price</option><option value="name">Sort: Name A–Z</option></select><div class="dview" role="group" aria-label="View"><button type="button" data-v="cards" aria-pressed="true">Cards</button><button type="button" data-v="table" aria-pressed="false">Table</button></div></div></div>
+<div class="dres"><h2><span id="dir-count" role="status" aria-live="polite">{len(_DLIST)} tools</span></h2><div class="dtools"><label for="d-sort" class="skip">Sort by</label><select id="d-sort" name="sort" aria-label="Sort by"><option value="value">Sort: Best Value first</option><option value="price">Sort: Lowest price</option><option value="name">Sort: Name A–Z</option><option value="yearly">Sort: Biggest yearly saving</option><option value="checked">Sort: Recently checked</option></select><div class="dview" role="group" aria-label="View"><button type="button" data-v="cards" aria-pressed="true">Cards</button><button type="button" data-v="table" aria-pressed="false">Table</button></div></div></div>
 <div class="dact2" id="d-active" aria-label="Active filters"></div>
 <div id="dir-out"><div class="grid">{_D_SSR}</div></div>
 <div class="dtray" id="dir-tray" hidden><div class="tl" id="tray-list" aria-live="polite"></div><a class="bbtn primary" id="dir-go" href="/compare-builder.html">Compare</a><button type="button" class="bbtn ghost" id="tray-clear">Clear</button></div>
-<details class="bnote dnote"><summary><h2 style="display:inline;margin:0;font-size:1.05rem">How these filters work</h2></summary><p class="small" style="margin:8px 0 0"><b>What it does</b> comes from each tool's own website (checked 2026-10-20); the first job listed is the tool's main job, which is what “same job” means everywhere on ToolPick. <b>Price filters</b> use the lowest verified monthly or yearly-billing entry price in our price table. Tools without a numeric entry price (“check site”, custom or usage-only) only appear under “Price not verified” and sort last by price — we never guess them into a range. <b>Free plan</b> means a real free plan; free trials and one-time credits don't count. <b>Best Value</b> is ToolPick's pick for a category. Search only looks at our saved text, so it can't promise a feature a tool's site doesn't state.</p><p class="small" style="margin:12px 0 0">Want a ranked answer instead? <a href="/">Describe your need in the finder →</a> · <a href="/help-me-choose.html">Help me choose in 5 steps</a> · <a href="/stacks.html">Starter stacks by role</a> · <a href="/pay-less.html">Pay less for a tool you use</a></p></details>
+<details class="bnote dnote"><summary><h2 style="display:inline;margin:0;font-size:1.05rem">How these filters work</h2></summary><p class="small" style="margin:8px 0 0"><b>What it does</b> comes from each tool's own website (checked 2026-10-20); the first job listed is the tool's main job, which is what “same job” means everywhere on ToolPick. <b>Price filters</b> use the lowest verified monthly or yearly-billing entry price in our price table. Tools without a numeric entry price (“check site”, custom or usage-only) only appear under “Price not verified” and sort last by price — we never guess them into a range. <b>Free plan</b> means a real free plan; free trials and one-time credits don't count. <b>Best Value</b> is ToolPick's pick for a category. <b>Dealbreakers</b> reuse facts we read on each tool's official pages: whether it trains AI on your data (privacy and help pages, checked __PCK__, __PN__ tools), refund rules (help pages, checked __RCK__, __RN__ tools), student and teacher deals (official student pages, checked __SCK__) and the yearly-billing saving on the cheapest paid plan (pricing pages, each tool's own checked date). A tool we haven't checked shows “not checked” and is left out of that filter — we never guess it in. Refund windows have conditions (for example “if unused”); read the rule before you buy. Search only looks at our saved text, so it can't promise a feature a tool's site doesn't state.</p><p class="small" style="margin:12px 0 0">Want a ranked answer instead? <a href="/">Describe your need in the finder →</a> · <a href="/help-me-choose.html">Help me choose in 5 steps</a> · <a href="/stacks.html">Starter stacks by role</a> · <a href="/pay-less.html">Pay less for a tool you use</a></p></details>
 <script>const DD=__DD__,JOBS=__JOBS__,CATS=__CATS__;</script>""" + r"""<script>
 (function(){
 const byS={};DD.forEach(t=>byS[t.s]=t);const $=id=>document.getElementById(id);
@@ -1660,8 +1705,15 @@ DD.forEach(t=>{t.jl=t.j.map(k=>JOBS[k]||k);t.hay=(t.n+' '+t.d+' '+t.jl.join(' ')
 function toks(q){return q.toLowerCase().replace(/[^a-z0-9.+#\s-]/g,' ').split(/\s+/).filter(w=>w&&!STOP.has(w))}
 function tokHit(t,w){if(t.hay.includes(w))return true;const s=SYN[w];if(s&&t.hay.includes(s))return true;if(w.length>4&&w.endsWith('s')&&t.hay.includes(w.slice(0,-1)))return true;return false}
 let sel=[];try{sel=JSON.parse(sessionStorage.getItem('tpCmp')||'[]').filter(s=>byS[s]).slice(0,3)}catch(e){}
-const S={q:'',category:'',job:'',free:'any',price:'any',billing:'any',seat:'any',bv:false,sort:'value',view:'cards'};
-function share(){const p=new URLSearchParams();if(S.q.trim())p.set('q',S.q.trim());if(S.category)p.set('category',S.category);if(S.job)p.set('job',S.job);['free','price','billing','seat'].forEach(k=>{if(S[k]!='any')p.set(k,S[k])});if(S.bv)p.set('bv','1');if(S.sort!='value')p.set('sort',S.sort);if(S.view!='cards')p.set('view',S.view);const s=p.toString();return '/tools.html'+(s?'?'+s:'')}
+const S={q:'',category:'',job:'',free:'any',price:'any',billing:'any',seat:'any',train:'any',refund:'any',student:'any',yearly:'any',bv:false,sort:'value',view:'cards'};
+const FK=['free','price','billing','seat','train','refund','student','yearly'];
+const PK={y:'Trains by default (you can opt out)',x:'Trains, no opt-out found',c:'Only if you allow it',n:"Doesn't train by default",u:'Unclear, see policy'};
+function facts(t){const li=[];if(t.pv)li.push(`<li class="f${'nc'.includes(t.pv)?'ok':'yx'.includes(t.pv)?'wa':'mu'}"><a href="/ai-data-privacy.html?tool=${t.s}">Your data: ${X(PK[t.pv])}</a></li>`);
+if(t.rf)li.push(`<li class="f${t.rf=='w'?'ok':t.rf=='c'?'mu':'wa'}"><a href="/ai-refund-policies.html?tool=${t.s}#check">Refunds: ${X(t.rl)}</a></li>`);
+if(t.st)li.push(`<li class="f${t.st!='ask'?'ok':'mu'}"><a href="/ai-student-discounts.html#o-${t.sk}">Students: ${X(t.st!='ask'?t.sl:'ask support')}</a></li>`);
+if(t.ys)li.push(`<li class="fok"><a href="/monthly-or-yearly.html?tool=${t.s}">Yearly billing saves ${t.ys}%</a></li>`);
+return li.length?`<ul class="dfx" aria-label="Dealbreakers for ${X(t.n)}">${li.join('')}</ul>`:''}
+function share(){const p=new URLSearchParams();if(S.q.trim())p.set('q',S.q.trim());if(S.category)p.set('category',S.category);if(S.job)p.set('job',S.job);FK.forEach(k=>{if(S[k]!='any')p.set(k,S[k])});if(S.bv)p.set('bv','1');if(S.sort!='value')p.set('sort',S.sort);if(S.view!='cards')p.set('view',S.view);const s=p.toString();return '/tools.html'+(s?'?'+s:'')}
 function match(t,v,skip){skip=skip||'';const en=entry(t);
 if(skip!='category'&&v.category&&!t.cats.some(c=>c.id==v.category))return false;
 if(skip!='job'&&v.job&&!t.j.includes(v.job))return false;
@@ -1669,6 +1721,10 @@ if(skip!='free'&&(v.free=='yes'&&!t.fr||v.free=='no'&&t.fr))return false;
 if(skip!='price'){if(v.price=='free'&&!t.fr)return false;if(v.price=='u10'&&!(en&&en.amt<10))return false;if(v.price=='10-25'&&!(en&&en.amt>=10&&en.amt<=25))return false;if(v.price=='over25'&&!(en&&en.amt>25))return false;if(v.price=='unverified'&&en)return false}
 if(skip!='billing'&&(v.billing=='monthly'&&t.m==null||v.billing=='annual'&&t.a==null||v.billing=='both'&&(t.m==null||t.a==null)))return false;
 if(skip!='seat'&&(v.seat=='perseat'&&!t.ps||v.seat=='flat'&&t.ps))return false;
+if(skip!='train'&&v.train!='any'&&!(v.train=='off'?t.pv&&'nc'.includes(t.pv):v.train=='never'?t.pv=='n':v.train=='optout'?t.pv&&'ncy'.includes(t.pv):t.pb=='n'))return false;
+if(skip!='refund'&&v.refund!='any'&&!(v.refund=='window'?t.rf=='w':t.rf=='w'||t.rf=='c'))return false;
+if(skip!='student'&&v.student!='any'&&!(v.student=='free'?t.st=='free':t.st=='free'||t.st=='off'))return false;
+if(skip!='yearly'&&v.yearly!='any'&&!(v.yearly=='save'?t.ys>0:t.ys>=+v.yearly))return false;
 if(skip!='bv'&&v.bv&&!(v.category?t.bestFor.includes(v.category):t.bestFor.length))return false;
 if(skip!='q'&&v.q.trim()){const w=toks(v.q);if(w.length&&!w.every(x=>tokHit(t,x)))return false}
 return true}
@@ -1676,21 +1732,23 @@ function isBV(t){return S.category?t.bestFor.includes(S.category):t.bestFor.leng
 function qscore(t){const w=toks(S.q);if(!w.length)return 0;let s=0;w.forEach(x=>{if(t.nl==x||t.nl.startsWith(x))s+=10;else if(t.nl.includes(x))s+=6;if(t.jl[0]&&(t.jl[0].toLowerCase().includes(x)||(SYN[x]&&t.jl[0].toLowerCase().includes(SYN[x]))))s+=4});return s}
 function sorted(list){const en=entry;
 if(S.sort=='name')return list.sort((a,b)=>a.n.localeCompare(b.n));
+if(S.sort=='yearly')return list.sort((a,b)=>(b.ys-a.ys)||a.n.localeCompare(b.n));
+if(S.sort=='checked')return list.sort((a,b)=>b.k.localeCompare(a.k)||a.n.localeCompare(b.n));
 if(S.sort=='price')return list.sort((a,b)=>{const ea=en(a),eb=en(b);if(ea&&eb&&ea.amt!=eb.amt)return ea.amt-eb.amt;if(ea&&!eb)return -1;if(!ea&&eb)return 1;return a.n.localeCompare(b.n)});
 return list.sort((a,b)=>{const qa=qscore(a),qb=qscore(b);if(qa!=qb)return qb-qa;const ba=isBV(a)?0:1,bb=isBV(b)?0:1;if(ba!=bb)return ba-bb;const ea=en(a),eb=en(b);const ga=ea?(a.fr?0:1):2,gb=eb?(b.fr?0:1):2;if(ga!=gb)return ga-gb;if(ea&&eb&&ea.amt!=eb.amt)return ea.amt-eb.amt;if(ea&&!eb)return -1;if(!ea&&eb)return 1;return a.n.localeCompare(b.n)})}
 function cbtn(t,cls){const on=sel.includes(t.s);return `<button type="button" class="bbtn addbtn${cls||''}" data-add="${t.s}" aria-pressed="${on}" aria-label="${on?'Remove '+X(t.n)+' from compare':'Add '+X(t.n)+' to compare'}">${on?'✓ In compare':'+ Compare'}</button>`}
 function card(t){const en=entry(t),bv=isBV(t);
-return `<article class="card dcard${bv?' best':''}" data-s="${t.s}"><div class="th"><span class="logo"><img src="https://www.google.com/s2/favicons?domain=${t.dm}&amp;sz=64" alt="${X(t.n)} logo" width="28" height="28" loading="lazy"></span><div><div class="badges">${bv?'<span class="badge b-best">BEST VALUE</span>':''}${t.fr?'<span class="badge b-free">FREE PLAN</span>':''}${en?'':'<span class="badge b-rank">PRICE NOT VERIFIED</span>'}</div><h3><a href="${t.u}">${X(t.n)}</a></h3></div></div><p class="djob"><span class="small">Main job:</span> ${X(t.jl[0])}${t.jl.length>1?' <span class=small>· also '+X(t.jl.slice(1).join(', '))+'</span>':''}</p><p>${X(t.d)}</p>${en?`<p class="dent"><b>From ${money(en.amt,en.cur)}/mo</b> <span class="small">lowest verified entry${t.ps?' · per seat':''}</span></p>`:'<p class="small check">No verified numeric entry price — check the official page.</p>'}<p class="price small">${X(t.p)}</p><p class="small">${X(t.f)}</p><p class="small meta">${X(t.cats.map(c=>c.name).join(', '))} · checked ${t.k} · <a href="${X(t.pr)}" rel="noopener" target="_blank">Official pricing</a></p><div class="dact"><a class="bbtn" href="${t.u}">Details</a>${cbtn(t)}</div></article>`}
-function table(list){return '<div class="dtab" tabindex="0" role="region" aria-label="Tools table, scroll sideways for more"><table><caption class="skip">AI tools matching your filters</caption><thead><tr><th scope="col">Tool</th><th scope="col">Main job</th><th scope="col">From (verified)</th><th scope="col">Free plan</th><th scope="col">Billing verified</th><th scope="col">Checked</th><th scope="col">Compare</th></tr></thead><tbody>'+list.map(t=>{const en=entry(t);const bill=[t.m!=null?'monthly':'',t.a!=null?'yearly':''].filter(Boolean).join(' + ')||'—';return `<tr><th scope="row"><a href="${t.u}">${X(t.n)}</a>${isBV(t)?' <span class="badge b-best">BEST VALUE</span>':''}</th><td>${X(t.jl[0])}</td><td>${en?'<b>'+money(en.amt,en.cur)+'/mo</b>'+(t.ps?' per seat':''):'<span class="small">not verified</span>'}</td><td>${t.fr?'<span class="yes">Yes</span>':'No'}</td><td>${bill}</td><td>${t.k}</td><td>${cbtn(t)}</td></tr>`}).join('')+'</tbody></table></div>'}
-const LAB={free:{yes:'Free plan',no:'No free plan'},price:{free:'Free to start',u10:'Under $10/mo','10-25':'$10–$25/mo',over25:'Over $25/mo',unverified:'Price not verified'},billing:{monthly:'Pay monthly',annual:'Yearly price',both:'Monthly + yearly'},seat:{perseat:'Per-seat price',flat:'Not per seat'}};
-function actives(){const a=[];if(S.q.trim())a.push(['q','“'+S.q.trim()+'”']);if(S.category)a.push(['category',catName[S.category]]);if(S.job)a.push(['job',JOBS[S.job]]);['free','price','billing','seat'].forEach(k=>{if(S[k]!='any')a.push([k,LAB[k][S[k]]])});if(S.bv)a.push(['bv','Best Value picks']);return a}
+return `<article class="card dcard${bv?' best':''}" data-s="${t.s}"><div class="th"><span class="logo"><img src="https://www.google.com/s2/favicons?domain=${t.dm}&amp;sz=64" alt="${X(t.n)} logo" width="28" height="28" loading="lazy"></span><div><div class="badges">${bv?'<span class="badge b-best">BEST VALUE</span>':''}${t.fr?'<span class="badge b-free">FREE PLAN</span>':''}${en?'':'<span class="badge b-rank">PRICE NOT VERIFIED</span>'}</div><h3><a href="${t.u}">${X(t.n)}</a></h3></div></div><p class="djob"><span class="small">Main job:</span> ${X(t.jl[0])}${t.jl.length>1?' <span class=small>· also '+X(t.jl.slice(1).join(', '))+'</span>':''}</p><p>${X(t.d)}</p>${en?`<p class="dent"><b>From ${money(en.amt,en.cur)}/mo</b> <span class="small">lowest verified entry${t.ps?' · per seat':''}</span></p>`:'<p class="small check">No verified numeric entry price — check the official page.</p>'}<p class="price small">${X(t.p)}</p><p class="small">${X(t.f)}</p>${facts(t)}<p class="small meta">${X(t.cats.map(c=>c.name).join(', '))} · checked ${t.k} · <a href="${X(t.pr)}" rel="noopener" target="_blank">Official pricing</a></p><div class="dact"><a class="bbtn" href="${t.u}">Details</a>${cbtn(t)}</div></article>`}
+function table(list){return '<div class="dtab" tabindex="0" role="region" aria-label="Tools table, scroll sideways for more"><table><caption class="skip">AI tools matching your filters</caption><thead><tr><th scope="col">Tool</th><th scope="col">Main job</th><th scope="col">From (verified)</th><th scope="col">Free plan</th><th scope="col">Billing verified</th><th scope="col">Your data (AI training)</th><th scope="col">Refunds</th><th scope="col">Students</th><th scope="col">Yearly saves</th><th scope="col">Checked</th><th scope="col">Compare</th></tr></thead><tbody>'+list.map(t=>{const en=entry(t);const bill=[t.m!=null?'monthly':'',t.a!=null?'yearly':''].filter(Boolean).join(' + ')||'—';return `<tr><th scope="row"><a href="${t.u}">${X(t.n)}</a>${isBV(t)?' <span class="badge b-best">BEST VALUE</span>':''}</th><td>${X(t.jl[0])}</td><td>${en?'<b>'+money(en.amt,en.cur)+'/mo</b>'+(t.ps?' per seat':''):'<span class="small">not verified</span>'}</td><td>${t.fr?'<span class="yes">Yes</span>':'No'}</td><td>${bill}</td><td class="fx">${t.pv?'<a href="/ai-data-privacy.html?tool='+t.s+'">'+X(PK[t.pv])+'</a>':'<span class="small">not checked</span>'}</td><td class="fx">${t.rf?'<a href="/ai-refund-policies.html?tool='+t.s+'#check">'+X(t.rl)+'</a>':'<span class="small">not checked</span>'}</td><td class="fx">${t.st?'<a href="/ai-student-discounts.html#o-'+t.sk+'">'+X(t.st!='ask'?t.sl:'ask support')+'</a>':'<span class="small">none found</span>'}</td><td class="fx">${t.ys?t.ys+'%':'<span class="small">—</span>'}</td><td>${t.k}</td><td>${cbtn(t)}</td></tr>`}).join('')+'</tbody></table></div>'}
+const LAB={free:{yes:'Free plan',no:'No free plan'},price:{free:'Free to start',u10:'Under $10/mo','10-25':'$10–$25/mo',over25:'Over $25/mo',unverified:'Price not verified'},billing:{monthly:'Pay monthly',annual:'Yearly price',both:'Monthly + yearly'},seat:{perseat:'Per-seat price',flat:'Not per seat'},train:{off:"No training without my OK",never:"Doesn't train by default",optout:'Can switch training off',biz:'Team plans protected'},refund:{window:'Refund window',maybe:'Refund possible'},student:{yes:'Student deal',free:'Free for students'},yearly:{save:'Saves with yearly','20':'Saves 20%+ yearly','40':'Saves 40%+ yearly'}};
+function actives(){const a=[];if(S.q.trim())a.push(['q','“'+S.q.trim()+'”']);if(S.category)a.push(['category',catName[S.category]]);if(S.job)a.push(['job',JOBS[S.job]]);FK.forEach(k=>{if(S[k]!='any')a.push([k,LAB[k][S[k]]])});if(S.bv)a.push(['bv','Best Value picks']);return a}
 function reset(k){if(k=='q')S.q='';else if(k=='category'||k=='job')S[k]='';else if(k=='bv')S.bv=false;else S[k]='any'}
-function syncUI(){$('d-q').value!==S.q&&($('d-q').value=S.q);$('d-qx').hidden=!S.q;$('d-job').value=S.job;['free','price','billing','seat'].forEach(k=>$('d-'+k).value=S[k]);$('d-sort').value=S.sort;
+function syncUI(){$('d-q').value!==S.q&&($('d-q').value=S.q);$('d-qx').hidden=!S.q;$('d-job').value=S.job;FK.forEach(k=>$('d-'+k).value=S[k]);$('d-sort').value=S.sort;
 document.querySelectorAll('#d-cats .dchip').forEach(b=>{const on=b.dataset.cat==S.category;b.setAttribute('aria-pressed',on);const n=DD.filter(t=>(!b.dataset.cat||t.cats.some(c=>c.id==b.dataset.cat))&&match(t,S,'category')).length;b.querySelector('.dn2').textContent=n;b.disabled=!n&&!on});
-const Q={free:S.free=='yes'||S.price=='free',u10:S.price=='u10',bv:S.bv,monthly:S.billing=='monthly'};document.querySelectorAll('#d-quick .dq').forEach(b=>b.setAttribute('aria-pressed',!!Q[b.dataset.q]));
+const Q={free:S.free=='yes'||S.price=='free',u10:S.price=='u10',bv:S.bv,monthly:S.billing=='monthly',train:S.train=='off',refund:S.refund=='window',student:S.student=='yes',yearly:S.yearly=='save'};document.querySelectorAll('#d-quick .dq').forEach(b=>b.setAttribute('aria-pressed',!!Q[b.dataset.q]));
 document.querySelectorAll('.dview button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v==S.view));
 const jc={};DD.filter(t=>match(t,S,'job')).forEach(t=>t.j.forEach(k=>jc[k]=(jc[k]||0)+1));[...$('d-job').options].forEach(o=>{if(!o.value)return;const n=jc[o.value]||0;o.textContent=JOBS[o.value]+' ('+n+')';o.disabled=!n&&o.value!=S.job});
-if(S.job||S.price!='any'&&S.price!='u10'&&S.price!='free'||S.billing!='any'&&S.billing!='monthly'||S.seat!='any'||S.free=='no')$('d-more').open=true}
+if(S.job||S.price!='any'&&S.price!='u10'&&S.price!='free'||S.billing!='any'&&S.billing!='monthly'||S.seat!='any'||S.free=='no'||!['any','off'].includes(S.train)||S.refund=='maybe'||S.student=='free'||!['any','save'].includes(S.yearly))$('d-more').open=true}
 function render(push){const list=sorted(DD.filter(t=>match(t,S)));const out=$('dir-out');
 $('dir-count').textContent=list.length==DD.length?DD.length+' tools':list.length+' of '+DD.length+' tools';
 const a=actives();$('d-active').innerHTML=a.length?a.map(([k,l])=>`<button type="button" class="dchip" data-rm="${k}" aria-label="Remove filter: ${X(l)}">${X(l)}</button>`).join('')+'<button type="button" class="dclr" id="d-clear">Clear all</button>':'';
@@ -1707,24 +1765,26 @@ document.querySelectorAll('[data-add="'+s+'"]').forEach(b=>{const on=sel.include
 document.addEventListener('click',ev=>{const b=ev.target.closest('button');if(!b)return;
 if(b.dataset.add){toggle(b.dataset.add,b);return}
 if(b.dataset.rm){reset(b.dataset.rm);render();return}
-if(b.id=='d-clear'){Object.assign(S,{q:'',category:'',job:'',free:'any',price:'any',billing:'any',seat:'any',bv:false});render();$('d-q').focus();return}
+if(b.id=='d-clear'){Object.assign(S,{q:'',category:'',job:'',free:'any',price:'any',billing:'any',seat:'any',train:'any',refund:'any',student:'any',yearly:'any',bv:false});render();$('d-q').focus();return}
 if(b.dataset.cat!=null&&b.closest('#d-cats')){S.category=b.dataset.cat;render();return}
-if(b.dataset.q){const k=b.dataset.q,on=b.getAttribute('aria-pressed')=='true';if(k=='free'){S.free=on?'any':'yes';if(on&&S.price=='free')S.price='any'}else if(k=='u10')S.price=on?'any':'u10';else if(k=='bv')S.bv=!on;else if(k=='monthly')S.billing=on?'any':'monthly';render();return}
+if(b.dataset.q){const k=b.dataset.q,on=b.getAttribute('aria-pressed')=='true';if(k=='free'){S.free=on?'any':'yes';if(on&&S.price=='free')S.price='any'}else if(k=='u10')S.price=on?'any':'u10';else if(k=='bv')S.bv=!on;else if(k=='monthly')S.billing=on?'any':'monthly';else if(k=='train')S.train=on?'any':'off';else if(k=='refund')S.refund=on?'any':'window';else if(k=='student')S.student=on?'any':'yes';else if(k=='yearly')S.yearly=on?'any':'save';render();return}
 if(b.dataset.v){S.view=b.dataset.v;render();return}
 if(b.id=='d-qx'){S.q='';render();$('d-q').focus();return}
 if(b.id=='tray-clear'){sel=[];document.querySelectorAll('[data-add]').forEach(x=>{x.setAttribute('aria-pressed',false);x.textContent='+ Compare'});tray();return}});
 $('dir-go').addEventListener('click',ev=>{if(sel.length<2)ev.preventDefault()});
 let tm;$('d-q').addEventListener('input',ev=>{S.q=ev.target.value;$('d-qx').hidden=!S.q;clearTimeout(tm);tm=setTimeout(()=>render(),120)});
 $('d-q').addEventListener('keydown',ev=>{if(ev.key=='Escape'&&S.q){S.q='';render()}});
-['job','free','price','billing','seat','sort'].forEach(k=>$('d-'+k).addEventListener('change',ev=>{S[k]=ev.target.value;render()}));
+['job','sort'].concat(FK).forEach(k=>$('d-'+k).addEventListener('change',ev=>{S[k]=ev.target.value;render()}));
 const p=new URLSearchParams(location.search);const ok=(id,v)=>v&&[...$(id).options].some(o=>o.value==v);
 S.q=(p.get('q')||'').slice(0,80);if(p.get('category')&&catName[p.get('category')])S.category=p.get('category');if(p.get('job')&&JOBS[p.get('job')])S.job=p.get('job');
-['free','price','billing','seat','sort'].forEach(k=>{if(ok('d-'+k,p.get(k)))S[k]=p.get(k)});S.bv=p.get('bv')=='1';if(p.get('view')=='table')S.view='table';
+FK.concat(['sort']).forEach(k=>{if(ok('d-'+k,p.get(k)))S[k]=p.get(k)});S.bv=p.get('bv')=='1';if(p.get('view')=='table')S.view='table';
 const any=[...p.keys()].length>0;if(any)render(false);else{syncUI();tray();document.querySelectorAll('#dir-out [data-add]').forEach(b=>{if(sel.includes(b.dataset.add)){b.setAttribute('aria-pressed',true);b.textContent='✓ In compare'}})}
+document.querySelectorAll('#d-cats,#d-quick').forEach(r=>{const b=r.querySelector('[aria-pressed=true]:not([data-cat=""])');if(b&&r.scrollWidth>r.clientWidth)r.scrollLeft=Math.max(0,b.offsetLeft-r.offsetLeft-12)});
 })();
 </script>"""
+directory_body = directory_body.replace("__PCK__", _tm0.PRIVACY_CHECKED).replace("__RCK__", _tm0.REFUND_CHECKED).replace("__SCK__", _tm0.STUDENT_CHECKED).replace("__PN__", str(len(_P64))).replace("__RN__", str(len(_R64)))
 directory_body = directory_body.replace("__DD__", DDATA).replace("__JOBS__", JOBDATA).replace("__CATS__", CATDATA)
-page("/tools.html", "Browse All AI Tools — Search & Filter by Job, Free Plan, Price | ToolPick", f"Search and filter all {total_tools} AI tools by what they do, category, real free plan, verified starting price and billing. Compare up to 3 side by side, with checked dates and official pricing links.", directory_body,
+page("/tools.html", "Browse All AI Tools — Filter by Job, Price, Free Plan, Privacy & Refunds | ToolPick", f"Filter all {total_tools} AI tools by what they do, real free plan, verified price, billing, whether they train on your data, refund window, student deals and yearly savings. Compare up to 3, with checked dates.", directory_body,
      [{"@context":"https://schema.org","@type":"ItemList","name":"All AI tools on ToolPick","itemListElement":[{"@type":"ListItem","position":i+1,"url":BASE+v["u"],"name":v["n"]} for i,v in enumerate(_DLIST)]}, crumbs([("ToolPick","/"),("Browse all tools","/tools.html")])])
 
 
@@ -4683,6 +4743,36 @@ for _fp in _glob.glob("public/**/*.html", recursive=True):
     open(_fp, "w").write(_h2); V58_CHANGED.append(_fp[6:])
 print("v58 search:", len(_S58_ROWS), "index rows;", len(V58_CHANGED), "pages got header search")
 open("public/llms.txt", "a").write(f"\n## Search (v58)\n- [Search ToolPick]({BASE}{S58_PATH}): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of {_s58_n} pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: {BASE}/search-index.json\n")
+
+# --- v64: dealbreaker filter links from category pages and the policy/savings guides ---
+_V64_F = [("train=off", "No AI training without your OK", lambda v: v["pv"] in ("n", "c") and v["pv"] != ""),
+          ("refund=window", "States a refund window", lambda v: v["rf"] == "w"),
+          ("student=yes", "Student deal", lambda v: v["st"] in ("free", "off")),
+          ("yearly=save", "Saves with yearly billing", lambda v: v["ys"] > 0)]
+V64_CHANGED = ["/tools.html"]
+for _c in CATEGORIES:
+    _fp = f"public/best-ai-{_c['id']}-tools.html"; _h = open(_fp).read()
+    _ins = [f'<a href="/tools.html?category={_c["id"]}&amp;{q}">{e(lab)} ({sum(1 for v in _DLIST if any(x["id"] == _c["id"] for x in v["cats"]) and f(v))})</a>' for q, lab, f in _V64_F
+            if any(any(x["id"] == _c["id"] for x in v["cats"]) and f(v) for v in _DLIST)]
+    if not _ins: continue
+    _anchor = 'in the full directory →</a> Search, and filter by what it does, free plan, verified price and billing.</p>'
+    assert _anchor in _h, _fp
+    _h = _h.replace(_anchor, _anchor + f'<p class="v64"><b>Dealbreakers?</b> Filter {e(_c["name"])} tools: ' + " · ".join(_ins) + ' <span class="small">(from official policy and pricing pages)</span></p>', 1)
+    open(_fp, "w").write(_h); V64_CHANGED.append(f"/best-ai-{_c['id']}-tools.html")
+_V64_G = {"/ai-data-privacy.html": ("train=off", "Browse every tool that doesn't train on your data without your OK, with prices and free plans"),
+          "/ai-refund-policies.html": ("refund=window", "Browse every tool that states a refund window, with prices and free plans"),
+          "/ai-student-discounts.html": ("student=yes", "Browse every tool with a student deal, filtered by job and price"),
+          MY_PATH: ("yearly=save&amp;sort=yearly", "Browse every tool that saves with yearly billing, biggest saving first")}
+for _u, (_q, _lab) in _V64_G.items():
+    _fp = "public" + _u; _h = open(_fp).read()
+    _i = _h.find("</h1>"); assert _i > 0, _u
+    _j = _h.find("</p>", _i); assert _j > 0, _u
+    _h = _h[:_j + 4] + f'<p class="small v64">Filter the directory by this: <a href="/tools.html?{_q}">{_lab} →</a></p>' + _h[_j + 4:]
+    open(_fp, "w").write(_h); V64_CHANGED.append(_u)
+_lm["/tools.html"] = V64_DATE
+open("public/llms.txt", "a").write(f"\n## Dealbreaker filters in the tools directory (v64, {V64_DATE})\n- [Browse all AI tools with dealbreaker filters]({BASE}/tools.html?train=off): filter all {total_tools} tools by whether they train AI on your data (?train=off|never|optout|biz; from official privacy pages checked {_tm0.PRIVACY_CHECKED}, {len(_P64)} tools), refund rules (?refund=window|maybe; official help pages checked {_tm0.REFUND_CHECKED}, {len(_R64)} tools), student deals (?student=yes|free; checked {_tm0.STUDENT_CHECKED}) and yearly-billing saving on the cheapest paid plan (?yearly=save|20|40). Sort by ?sort=yearly or ?sort=checked. Combine with ?category=, ?job=, ?free=yes, ?price=u10. Tools we haven't checked are shown as 'not checked' and left out of that filter, never guessed.\n"
+    + "".join(f"  - {lab}: {', '.join(v['n'] for v in _DLIST if f(v))}\n" for q, lab, f in _V64_F))
+print("v64 dealbreakers:", {q: sum(1 for v in _DLIST if f(v)) for q, lab, f in _V64_F}, len(V64_CHANGED), "pages changed")
 
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))

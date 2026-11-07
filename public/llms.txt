@@ -460,3 +460,10 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## Search (v58)
 - [Search ToolPick](https://toolpick-ai.vercel.app/search.html): search every ToolPick page (tools with checked prices, comparisons, best-tool-for-a-job, alternatives, pricing explainers, calculators) by tool name, job or 'X vs Y'; full A–Z index of 306 pages. Params: ?q=free%20alternative%20to%20midjourney. Machine-readable index: https://toolpick-ai.vercel.app/search-index.json
+
+## Dealbreaker filters in the tools directory (v64, 2026-11-07)
+- [Browse all AI tools with dealbreaker filters](https://toolpick-ai.vercel.app/tools.html?train=off): filter all 82 tools by whether they train AI on your data (?train=off|never|optout|biz; from official privacy pages checked 2026-10-29, 21 tools), refund rules (?refund=window|maybe; official help pages checked 2026-10-27, 22 tools), student deals (?student=yes|free; checked 2026-10-24) and yearly-billing saving on the cheapest paid plan (?yearly=save|20|40). Sort by ?sort=yearly or ?sort=checked. Combine with ?category=, ?job=, ?free=yes, ?price=u10. Tools we haven't checked are shown as 'not checked' and left out of that filter, never guessed.
+  - No AI training without your OK: Claude, Descript, Fireflies, Microsoft Copilot, Notion AI, Synthesia, Zapier
+  - States a refund window: ChatGPT, Cursor, Descript, ElevenLabs, Fireflies, Gamma, Jasper, Midjourney, Notion AI, Perplexity, Runway
+  - Student deal: Beautiful.ai, Canva, Consensus, ElevenLabs, GitHub Copilot, Google Gemini, Le Chat (Mistral), Lovable, Microsoft Copilot, Notion AI, Otter, Perplexity, Reclaim, v0, Wordtune
+  - Saves with yearly billing: Bolt, Canva, CapCut, Claude, ClickUp, Consensus, Copy.ai, Descript, ElevenLabs, Elicit, Fireflies, Frase, Gamma, Grammarly, HeyGen, Ideogram, InVideo, Jasper, Krisp, Lovable, Luma Dream Machine, Magnific, Midjourney, Notion AI, Otter, Photoroom, Pika, Plus AI, Predis.ai, Reclaim, Replit, ResearchRabbit, Runway, Rytr, Superhuman, Synthesia, Udio, Wordtune, Writesonic
