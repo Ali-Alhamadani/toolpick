@@ -1966,3 +1966,38 @@ PRICE_NOTES["2026-11-06|Lovable"] = (
     "changed",
     "Lovable Pro/Business prices are unchanged. The pricing-page FAQ again states Free includes 5 build credits/day (up to 30/mo); we restored that into the free-plan text.",
 )
+
+# --- daily ops 2026-11-07 ---
+# Verified today on official pricing pages (browser, both billing toggles):
+# Leonardo https://leonardo.ai/pricing (Solo) — monthly Essential $12, Premium $30, Ultimate $60;
+#   yearly view $10 / $24 / $48 per month (no yearly totals shown). Free 150 fast tokens/day. Team: Starter $72/mo ($24/seat), Growth $144/mo ($48/seat).
+# Recraft https://www.recraft.ai/pricing — annual Basic $10/mo ($120), Pro $16/mo ($192), Teams $18/seat/mo;
+#   monthly Basic $12, Pro $20, Teams $22/seat. (Teams annual total shown as $211, not added.)
+# Consensus https://consensus.app/pricing/ — Pro $20/mo or $12/mo annual ($144); Deep $65/mo or $45/mo annual ($540).
+# Murf https://murf.ai/pricing Studio tab — monthly Creator $29, Business $99; yearly Creator $19/mo ($228), Business $66/mo ($792).
+# Photoroom https://www.photoroom.com/pricing (HTML) — Pro $7.50, Max $20.99, Ultra $82.50 per month billed yearly: unchanged.
+# Voiceflow https://www.voiceflow.com/pricing — still usage-based, businesses request pricing: unchanged.
+_U1107 = {
+    "Leonardo": "Essential $12/mo ($10/mo billed yearly); Premium $30 ($24); Ultimate $60 ($48) (checked 2026-11-07)",
+    "Recraft": "Basic $12/mo ($10/mo billed annually, $120/yr); Pro $20 ($16 annually, $192/yr); Teams $22/seat ($18/seat annually) (checked 2026-11-07)",
+    "Consensus": "Pro $20/mo ($12/mo annually), $144/yr; Deep $65/mo ($45/mo annually), $540/yr (checked 2026-11-07)",
+    "Murf": "Studio: Creator $29/mo ($19/mo billed annually, $228/yr); Business $99/mo ($66/mo annually, $792/yr). API from $0.01/1,000 chars (checked 2026-11-07)",
+}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _U1107:
+            _t["price"] = _U1107[_t["name"]]
+            _t["checked"] = "2026-11-07"
+        if _t["name"] in ("Photoroom", "Voiceflow"):
+            _t["checked"] = "2026-11-07"
+PRICE_TABLE.update({"Leonardo": (12, 10, None), "Recraft": (12, 10, None), "Consensus": (20, 12, None),
+                    "Murf": (29, 19, "API $0.01-$0.03 per 1,000 characters")})
+PLANNER_PRICES.update({
+    "Leonardo": ("Essential", 12, 10, "Essential $12 /month; yearly view $10 /month"),
+    "Recraft": ("Basic", 12, 10, "Basic $12 billed monthly; $10 per month billed annually $120"),
+    "Consensus": ("Pro", 20, 12, "Pro $20/mo monthly; $12/mo $144 annually"),
+})
+PRICE_NOTES["2026-11-07|Leonardo"] = ("changed", "Leonardo's monthly prices are unchanged (Essential $12, Premium $30, Ultimate $60). We added the yearly-billing rates shown on the pricing page: $10, $24 and $48 per month.")
+PRICE_NOTES["2026-11-07|Recraft"] = ("changed", "Recraft's annual prices are unchanged (Basic $10/mo, Pro $16/mo, Teams $18/seat). We added the monthly-billing prices: Basic $12, Pro $20, Teams $22/seat.")
+PRICE_NOTES["2026-11-07|Consensus"] = ("changed", "Consensus prices are unchanged (Pro $20/mo or $12/mo annually; top plan $65/mo or $45/mo annually). We now name the top plan (Deep) and add the annual totals ($144 and $540).")
+PRICE_NOTES["2026-11-07|Murf"] = ("changed", "Murf Studio's annual prices are unchanged (Creator $19/mo, Business $66/mo). We added the monthly-billing prices: Creator $29/mo, Business $99/mo.")

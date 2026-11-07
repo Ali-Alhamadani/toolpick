@@ -44,17 +44,17 @@
 - [Warp](https://toolpick-ai.vercel.app/tools/warp.html): $20/mo (includes $20 of agent usage) | free: Free: $0
 - [Qodo](https://toolpick-ai.vercel.app/tools/qodo.html): Pro Team $30 (up to 30 users); credit packs at $0.012/credit (2,500, 5,000 or 20,000 credits) | free: 14-day free trial, no card; free for open source projects
 - [Replit](https://toolpick-ai.vercel.app/tools/replit.html): Core $20/mo ($18/mo billed annually); Pro $100/mo ($90/mo billed annually); Enterprise custom | free: check site
-- [Leonardo](https://toolpick-ai.vercel.app/tools/leonardo.html): Essential $12/mo; Premium $30; Ultimate $60 | free: Free: 150 fast tokens/day
+- [Leonardo](https://toolpick-ai.vercel.app/tools/leonardo.html): Essential $12/mo ($10/mo billed yearly); Premium $30 ($24); Ultimate $60 ($48) | free: Free: 150 fast tokens/day
 - [Midjourney](https://toolpick-ai.vercel.app/tools/midjourney.html): Basic $10/mo ($8 yearly); Standard $30 ($24); Pro $60 ($48); Mega $120 ($96) | free: No free plan (subscription only)
 - [Ideogram](https://toolpick-ai.vercel.app/tools/ideogram.html): Plus $20/mo ($15 yearly); Pro $60 ($42); Team $30/user ($20) | free: Free weekly credits for eligible accounts
 - [Krea](https://toolpick-ai.vercel.app/tools/krea.html): Basic $9/mo ($5 yearly); Pro $35/mo ($21 yearly); Max $105 ($63 yearly); Business $200 ($160 yearly) | free: Free: 100 units/day
 - [Canva](https://toolpick-ai.vercel.app/tools/canva.html): Pro $18/mo or $144/yr; Business $25/mo or $250/yr per person | free: Free plan available
-- [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $10/mo billed annually ($120/yr); Pro $16/mo annually ($192/yr); Teams $18/seat annually | free: Free plan (images not licensed for commercial use)
+- [Recraft](https://toolpick-ai.vercel.app/tools/recraft.html): Basic $12/mo ($10/mo billed annually, $120/yr); Pro $20 ($16 annually, $192/yr); Teams $22/seat ($18/seat annually) | free: Free plan (images not licensed for commercial use)
 - [Magnific](https://toolpick-ai.vercel.app/tools/magnific.html): Premium $20/mo ($14.50 annually); Premium+ $45 ($33.75); Pro Starter $110 ($82.50) | free: No free plan shown
 - [Photoroom](https://toolpick-ai.vercel.app/tools/photoroom.html): Pro $7.50/mo billed yearly (list $12.99); Max $20.99 (list $34.99); Ultra $82.50 (list $99) | free: No free plan; trial available
 - [ElevenLabs](https://toolpick-ai.vercel.app/tools/elevenlabs.html): Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); Business $990 ($825). Promotional: Starter $1 first month (83% off, until Nov 16, 2026); Creator $11 first month (50% off) | free: Free: $0
 - [Suno](https://toolpick-ai.vercel.app/tools/suno.html): Pro $8/mo; Premier $24/mo (yearly billing prices) | free: Free: 50 credits/day
-- [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $19/mo ($228 billed annually); Business $66/mo ($792 annually). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
+- [Murf](https://toolpick-ai.vercel.app/tools/murf.html): Studio: Creator $29/mo ($19/mo billed annually, $228/yr); Business $99/mo ($66/mo annually, $792/yr). API from $0.01/1,000 chars | free: Free: 10 minutes of voice generation
 - [Speechify](https://toolpick-ai.vercel.app/tools/speechify.html): Premium $29/mo (billed monthly) | free: Free plan, speeds up to 1.5x
 - [Otter](https://toolpick-ai.vercel.app/tools/otter.html): List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). Promotional (first-time subscribers): Pro $8.49/mo monthly or $4.17/mo yearly (save 50%); Business $24/user/mo for 3 months (20% off) | free: Basic: free forever
 - [Udio](https://toolpick-ai.vercel.app/tools/udio.html): Standard $10/mo ($8 annually); Pro $30/mo ($24 annually) | free: Free: 100 credits/mo
@@ -76,7 +76,7 @@
 - [Ocoya](https://toolpick-ai.vercel.app/tools/ocoya.html): Starter $29/mo; Team $79/mo (billed monthly) | free: Free trial
 - [Elicit](https://toolpick-ai.vercel.app/tools/elicit.html): Industry: Pro $75/mo ($49/mo yearly, $588/yr); Scale $279/mo ($169 yearly, $2,028/yr). Academic: Plus from $11/mo yearly ($19 monthly); Pro $69 ($39); Scale $149 ($89) | free: Basic: free
 - [Scite](https://toolpick-ai.vercel.app/tools/scite.html): Basic $12/mo; Pro $40/mo | free: 7-day free trial
-- [Consensus](https://toolpick-ai.vercel.app/tools/consensus.html): Pro $20/mo ($12/mo annually); higher plan $65/mo ($45 annually) | free: Free plan available
+- [Consensus](https://toolpick-ai.vercel.app/tools/consensus.html): Pro $20/mo ($12/mo annually), $144/yr; Deep $65/mo ($45/mo annually), $540/yr | free: Free plan available
 - [SciSpace](https://toolpick-ai.vercel.app/tools/scispace.html): Premium from $12/mo billed yearly (monthly price: check site) | free: No free plan shown
 - [Humata](https://toolpick-ai.vercel.app/tools/humata.html): Expert $9.99/mo; Team $49/user/mo | free: Free: 60 pages/mo
 - [You.com API](https://toolpick-ai.vercel.app/tools/you-com-api.html): API only: Search $5 per 1,000 calls | free: $100 free API credit
@@ -269,8 +269,8 @@ Data: https://toolpick-ai.vercel.app/tools.json
 - [Claude alternatives](https://toolpick-ai.vercel.app/alternatives/claude.html): 4 same-job tools (general AI chatbot): Le Chat (Mistral), Google Gemini, Microsoft Copilot, ChatGPT; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 - [Google Gemini alternatives](https://toolpick-ai.vercel.app/alternatives/google-gemini.html): 4 same-job tools (general AI chatbot): ChatGPT, Microsoft Copilot, Le Chat (Mistral), Claude; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 - [Microsoft Copilot alternatives](https://toolpick-ai.vercel.app/alternatives/microsoft-copilot.html): 4 same-job tools (general AI chatbot): Google Gemini, ChatGPT, Le Chat (Mistral), Claude; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
-- [Midjourney alternatives](https://toolpick-ai.vercel.app/alternatives/midjourney.html): 5 same-job tools (image generation): Krea, Leonardo, Ideogram, Magnific, Recraft; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
-- [ElevenLabs alternatives](https://toolpick-ai.vercel.app/alternatives/elevenlabs.html): 2 same-job tools (text to speech): Speechify, Murf; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
+- [Midjourney alternatives](https://toolpick-ai.vercel.app/alternatives/midjourney.html): 5 same-job tools (image generation): Krea, Leonardo, Recraft, Ideogram, Magnific; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
+- [ElevenLabs alternatives](https://toolpick-ai.vercel.app/alternatives/elevenlabs.html): 2 same-job tools (text to speech): Murf, Speechify; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 - [Runway alternatives](https://toolpick-ai.vercel.app/alternatives/runway.html): 4 same-job tools (video generation): Kling AI, Pika, InVideo, Luma Dream Machine; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 - [Grammarly alternatives](https://toolpick-ai.vercel.app/alternatives/grammarly.html): 2 same-job tools (writing assistant): Wordtune, Rytr; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
 - [Otter alternatives](https://toolpick-ai.vercel.app/alternatives/otter.html): 2 same-job tools (meeting notes): Fireflies, Fathom; which is cheaper (like-for-like billing and tier), which has a real free plan, Best Value pick; monthly/yearly prices, main limit, checked dates
@@ -349,7 +349,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Captions: Max $24.99/mo monthly (https://www.captions.ai/pricing)
   - Chatbase: Hobby $32/mo billed yearly (https://www.chatbase.co/pricing)
   - Claude: Pro $20/mo monthly $17/mo billed yearly (https://claude.com/pricing)
-  - Consensus: Pro $12/mo billed yearly (https://consensus.app/pricing/)
+  - Consensus: Pro $20/mo monthly $12/mo billed yearly (https://consensus.app/pricing/)
   - Cursor: Plus $8/mo monthly (https://cursor.com/pricing)
   - Descript: Hobbyist $24/mo monthly $16/mo billed yearly (https://www.descript.com/pricing)
   - ElevenLabs: Starter $6/mo monthly $5/mo billed yearly (https://elevenlabs.io/pricing)
@@ -366,7 +366,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Krea: Basic $9/mo monthly (https://www.krea.ai/pricing)
   - Krisp: Core $16/mo monthly $8/mo billed yearly (https://krisp.ai/pricing/)
   - Le Chat (Mistral): Pro $14.99/mo monthly (https://mistral.ai/pricing)
-  - Leonardo: Essential $12/mo monthly (https://leonardo.ai/pricing)
+  - Leonardo: Essential $12/mo monthly $10/mo billed yearly (https://leonardo.ai/pricing)
   - Lindy: Credits $29.99/mo monthly (https://www.lindy.ai/pricing)
   - Lovable: Pro $25/mo monthly (https://lovable.dev/pricing)
   - Luma Dream Machine: Plus $30/mo monthly $25/mo billed yearly (https://lumalabs.ai/pricing)
@@ -380,7 +380,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Plus AI: Basic $15/mo monthly $10/mo billed yearly (https://plusai.com/pricing)
   - Predis.ai: Rise $79/mo monthly $39.5/mo billed yearly (https://predis.ai/pricing/)
   - Reclaim: Starter $12/mo monthly $10/mo billed yearly (https://reclaim.ai/pricing)
-  - Recraft: Basic $10/mo billed yearly (https://www.recraft.ai/pricing)
+  - Recraft: Basic $12/mo monthly $10/mo billed yearly (https://www.recraft.ai/pricing)
   - Riverside: Pro $24/mo billed yearly (https://riverside.com/pricing)
   - Runway: Standard $15/mo monthly $12/mo billed yearly (https://runway.com/pricing)
   - Rytr: Lite $9/mo monthly (https://rytr.me/pricing)
@@ -466,4 +466,4 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - No AI training without your OK: Claude, Descript, Fireflies, Microsoft Copilot, Notion AI, Synthesia, Zapier
   - States a refund window: ChatGPT, Cursor, Descript, ElevenLabs, Fireflies, Gamma, Jasper, Midjourney, Notion AI, Perplexity, Runway
   - Student deal: Beautiful.ai, Canva, Consensus, ElevenLabs, GitHub Copilot, Google Gemini, Le Chat (Mistral), Lovable, Microsoft Copilot, Notion AI, Otter, Perplexity, Reclaim, v0, Wordtune
-  - Saves with yearly billing: Bolt, Canva, CapCut, Claude, ClickUp, Consensus, Copy.ai, Descript, ElevenLabs, Elicit, Fireflies, Frase, Gamma, Grammarly, HeyGen, Ideogram, InVideo, Jasper, Krisp, Lovable, Luma Dream Machine, Magnific, Midjourney, Notion AI, Otter, Photoroom, Pika, Plus AI, Predis.ai, Reclaim, Replit, ResearchRabbit, Runway, Rytr, Superhuman, Synthesia, Udio, Wordtune, Writesonic
+  - Saves with yearly billing: Bolt, Canva, CapCut, Claude, ClickUp, Consensus, Copy.ai, Descript, ElevenLabs, Elicit, Fireflies, Frase, Gamma, Grammarly, HeyGen, Ideogram, InVideo, Jasper, Krisp, Leonardo, Lovable, Luma Dream Machine, Magnific, Midjourney, Murf, Notion AI, Otter, Photoroom, Pika, Plus AI, Predis.ai, Reclaim, Recraft, Replit, ResearchRabbit, Runway, Rytr, Superhuman, Synthesia, Udio, Wordtune, Writesonic
