@@ -448,6 +448,9 @@ Data: https://toolpick-ai.vercel.app/tools.json
 ## AI writing cost (v63)
 - [AI writing cost calculator](https://toolpick-ai.vercel.app/ai-writing-cost.html): Grammarly, Wordtune, Rytr, Jasper, Copy.ai, Writesonic, Claude, ChatGPT, Notion AI, Google Gemini by seats and monthly/yearly; shareable /ai-writing-cost.html?seats=5&bill=y; prices checked 2026-11-06
 
+## Compare builder 2.0 (v65, 2026-11-08)
+- [Compare any AI tools side by side](https://toolpick-ai.vercel.app/compare-builder.html?tools=chatgpt,claude&want=privacy,price): pick any 2-3 of the 82 tools; shows price and cheapest checked plan, free plan, yearly saving, student deal, team per-seat price, refunds and cancelling, data training and usage limits side by side, each cell with its official source and checked date, an 'Ahead' mark per row by fixed rules, a 'What matters to you?' tally (want=price,free,yearly,student,team,refund,privacy) and a plain-language 'Which should you pick?' verdict with 'Pick X if' reasons. Shareable ?tools=a,b,c&want=. Every /compare/ page links into it with add-a-third-tool suggestions.
+
 
 ## My AI costs
 - [My AI costs](https://toolpick-ai.vercel.app/my-ai-costs.html): one page with tabs for the subscription audit, watchlist, renewal reminders, cost calculator, and real cost of AI video and voice. Old URLs redirect to the matching #tab.
