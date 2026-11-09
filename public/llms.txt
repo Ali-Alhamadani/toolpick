@@ -216,7 +216,7 @@
 - [Best AI video tools under $20](https://toolpick-ai.vercel.app/best-ai-video-tools-under-20.html): verified entry under $20/mo, each tool's main job shown; cheapest only compared within a job
 
 ## Help me choose
-- [Help me choose wizard](https://toolpick-ai.vercel.app/help-me-choose.html): 5-step guided shortlist, e.g. ?category=audio&budget=10&billing=monthly&seats=1&free=any&annual=any
+- [Find my AI tool](https://toolpick-ai.vercel.app/help-me-choose.html): 4-question guided picker with ranked picks and reasons, e.g. ?job=voiceovers&budget=10&m_free=must
 
 ## Compare builder
 - [Compare builder](https://toolpick-ai.vercel.app/compare-builder.html): pick any 2-3 tools, e.g. ?tools=elevenlabs,descript,heygen
@@ -450,6 +450,9 @@ Data: https://toolpick-ai.vercel.app/tools.json
 
 ## Compare builder 2.0 (v65, 2026-11-08)
 - [Compare any AI tools side by side](https://toolpick-ai.vercel.app/compare-builder.html?tools=chatgpt,claude&want=privacy,price): pick any 2-3 of the 82 tools; shows price and cheapest checked plan, free plan, yearly saving, student deal, team per-seat price, refunds and cancelling, data training and usage limits side by side, each cell with its official source and checked date, an 'Ahead' mark per row by fixed rules, a 'What matters to you?' tally (want=price,free,yearly,student,team,refund,privacy) and a plain-language 'Which should you pick?' verdict with 'Pick X if' reasons. Shareable ?tools=a,b,c&want=. Every /compare/ page links into it with add-a-third-tool suggestions.
+
+## Find my AI tool (help me choose 2.0, v66, 2026-11-09)
+- [Find my AI tool](https://toolpick-ai.vercel.app/help-me-choose.html?job=voiceovers&budget=10&m_free=must): 4-question picker over all 82 tools and 35 jobs. Answers: job=<job id> or category=<category id>; budget=free|10|25|50 (monthly, all seats; default any); billing=y (yearly; default monthly); seats=1-50 (multiplies only per-seat prices); must-haves or nice-to-haves m_free, m_privacy (no AI training on your data without your OK), m_student, m_refund (refund window), m_yearly (cheaper yearly) = must|nice; pri=fit|cheap|privacy|free. Returns ranked picks with visible points and reasons, a checklist of each asked fact (yes / partly / no / not checked, with official source and checked date), 'Left out and why', and loosen-one-rule suggestions. Tools not checked for a fact are never counted as having it. Facts checked: privacy 22 tools, refunds 23, student deals 23, yearly saving 43, free plan all.
 
 
 ## My AI costs
