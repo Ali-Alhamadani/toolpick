@@ -2001,3 +2001,25 @@ PRICE_NOTES["2026-11-07|Leonardo"] = ("changed", "Leonardo's monthly prices are 
 PRICE_NOTES["2026-11-07|Recraft"] = ("changed", "Recraft's annual prices are unchanged (Basic $10/mo, Pro $16/mo, Teams $18/seat). We added the monthly-billing prices: Basic $12, Pro $20, Teams $22/seat.")
 PRICE_NOTES["2026-11-07|Consensus"] = ("changed", "Consensus prices are unchanged (Pro $20/mo or $12/mo annually; top plan $65/mo or $45/mo annually). We now name the top plan (Deep) and add the annual totals ($144 and $540).")
 PRICE_NOTES["2026-11-07|Murf"] = ("changed", "Murf Studio's annual prices are unchanged (Creator $19/mo, Business $66/mo). We added the monthly-billing prices: Creator $29/mo, Business $99/mo.")
+
+# --- weekly pass 2026-11-09 ---
+# Verified today on official pricing pages (HTML fetch):
+# Chatbase https://www.chatbase.co/pricing — Hobby $40/mo ($32 yearly); the $150 ($120 yearly) plan is now called Basic (was Standard); Enterprise custom.
+# Botpress https://botpress.com/pricing — Free 100 convos; Plus $150/mo billed annually, 250 convos, packs of 100 for $65; NEW Team $750/mo billed annually, 1,500 convos, packs $50.
+# Elicit https://elicit.com/pricing (Industry, yearly) — Pro $49/user/mo ($588/yr) unchanged; Scale $229/user/mo ($2,748/yr), was $169 ($2,028/yr).
+# Ideogram ($20/$15, $60/$42, Team $30/$20 per user), Buffer ($5/$10 per channel/mo, $60/$120 yearly), Humata ($9.99, Team $49/user), Motion ($19/$29 per seat): unchanged.
+_U1109 = {
+    "Chatbase": "Hobby $40/mo ($32 yearly); Basic $150 ($120 yearly); Enterprise custom (checked 2026-11-09)",
+    "Botpress": "Plus $150/mo billed annually (250 conversations, extra packs of 100 for $65); Team $750/mo billed annually (1,500 conversations, packs $50) (checked 2026-11-09)",
+    "Elicit": "Industry: Pro $49/user/mo billed yearly ($588/yr); Scale $229/user/mo billed yearly ($2,748/yr). Monthly and Academic prices not re-checked Nov 9 (on Oct 15: Pro $75 monthly; Academic from $11/mo yearly) (checked 2026-11-09)",
+}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _U1109:
+            _t["price"] = _U1109[_t["name"]]
+            _t["checked"] = "2026-11-09"
+        if _t["name"] in ("Ideogram", "Buffer", "Humata", "Motion"):
+            _t["checked"] = "2026-11-09"
+PRICE_NOTES["2026-11-09|Chatbase"] = ("changed", "Chatbase prices are unchanged, but the $150/mo ($120 yearly) plan has been renamed from Standard to Basic.")
+PRICE_NOTES["2026-11-09|Botpress"] = ("changed", "Botpress Plus is unchanged at $150/mo billed annually. A new Team plan was added: $750/mo billed annually with 1,500 conversations.")
+PRICE_NOTES["2026-11-09|Elicit"] = ("changed", "Elicit's Industry Scale plan went up from $169 to $229 per user/month billed yearly ($2,748/yr). Pro is unchanged at $49/user/month billed yearly.")
