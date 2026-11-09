@@ -5569,8 +5569,8 @@
    "free": "Lite: free forever"
   },
   "ClickUp": {
-   "price": "Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly)",
-   "free": "Free plan"
+   "price": "Core $12/user/mo ($9 yearly); Business $25 ($17 yearly); MAX $120 ($100 yearly); Enterprise custom (checked 2026-11-09)",
+   "free": "Free Forever: $0 (60 MB storage, unlimited tasks, unlimited free members)"
   },
   "Taskade": {
    "price": "Pro $10/mo (yearly, 10 users incl.); $25; $100; $250",

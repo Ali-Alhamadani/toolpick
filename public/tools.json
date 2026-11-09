@@ -1195,13 +1195,13 @@
      "name": "ClickUp",
      "url": "https://clickup.com",
      "pricing": "https://clickup.com/pricing",
-     "price": "Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly)",
-     "free": "Free plan",
+     "price": "Core $12/user/mo ($9 yearly); Business $25 ($17 yearly); MAX $120 ($100 yearly); Enterprise custom",
+     "free": "Free Forever: $0 (60 MB storage, unlimited tasks, unlimited free members)",
      "about": "Project management with built-in AI.",
-     "checked": "2026-10-19",
+     "checked": "2026-11-09",
      "affiliate": "",
-     "monthly": 10,
-     "annual": 7,
+     "monthly": 12,
+     "annual": 9,
      "per_output": null
     },
     {

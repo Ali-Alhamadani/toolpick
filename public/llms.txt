@@ -86,7 +86,7 @@
 - [Fathom](https://toolpick-ai.vercel.app/tools/fathom.html): From $15/user/mo; Business $25-$34/user/mo | free: Free plan
 - [Motion](https://toolpick-ai.vercel.app/tools/motion.html): Pro AI $19/seat/mo; Business AI $29/seat/mo | free: Free trial
 - [Reclaim](https://toolpick-ai.vercel.app/tools/reclaim.html): Starter $12/seat/mo ($10 yearly); Business $18 ($15 yearly) | free: Lite: free forever
-- [ClickUp](https://toolpick-ai.vercel.app/tools/clickup.html): Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly) | free: Free plan
+- [ClickUp](https://toolpick-ai.vercel.app/tools/clickup.html): Core $12/user/mo ($9 yearly); Business $25 ($17 yearly); MAX $120 ($100 yearly); Enterprise custom | free: Free Forever: $0 (60 MB storage, unlimited tasks, unlimited free members)
 - [Taskade](https://toolpick-ai.vercel.app/tools/taskade.html): Pro $10/mo (yearly, 10 users incl.); $25; $100; $250 | free: Free: $0
 - [Superhuman](https://toolpick-ai.vercel.app/tools/superhuman.html): $12/member/mo yearly ($15 monthly); $33 ($40) | free: Free: $0
 - [Zapier](https://toolpick-ai.vercel.app/tools/zapier.html): Professional from $19.99/mo; Team from $69/mo | free: Free forever: 100 tasks/mo
@@ -349,6 +349,7 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Captions: Max $24.99/mo monthly (https://www.captions.ai/pricing)
   - Chatbase: Hobby $32/mo billed yearly (https://www.chatbase.co/pricing)
   - Claude: Pro $20/mo monthly $17/mo billed yearly (https://claude.com/pricing)
+  - ClickUp: Core $12/mo monthly $9/mo billed yearly (https://clickup.com/pricing)
   - Consensus: Pro $20/mo monthly $12/mo billed yearly (https://consensus.app/pricing/)
   - Cursor: Plus $8/mo monthly (https://cursor.com/pricing)
   - Descript: Hobbyist $24/mo monthly $16/mo billed yearly (https://www.descript.com/pricing)
@@ -402,7 +403,6 @@ Data: https://toolpick-ai.vercel.app/tools.json
   - Paid plan left out: Surfer (the cheapest plan (Discovery, 49 USD per month) doesn't say whether it's billed monthly or yearly)
   - Paid plan left out: v0 (the Plus plan shows $30 per user with $90 struck through, so we're waiting to see which price sticks)
   - Paid plan left out: Wordtune (two different price sets showed tonight ($6.99/$4.89 and $6.99/$9.99 billed annually))
-  - Paid plan left out: ClickUp (the plans changed (now Core $9 and Business $17 per user billed yearly); we'll update the tool data first)
   - Paid plan left out: Motion (the Pro AI plan showed "This plan is not available")
   - Paid plan left out: Pitch (priced in euros only)
   - Paid plan left out: Fathom (no single starting price on the page)

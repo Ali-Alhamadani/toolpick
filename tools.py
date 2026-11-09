@@ -128,7 +128,7 @@ CATEGORIES += [
   T("Otter","https://otter.ai","https://otter.ai/pricing","Pro $16.99/user/mo ($8.33 yearly); Business $30 ($19.99 yearly)","Basic: free forever","Meeting transcription and notes."),
   T("Motion","https://www.usemotion.com","https://www.usemotion.com/pricing","Pro AI $19/seat/mo; Business AI $29/seat/mo","Free trial","AI calendar that auto-schedules your tasks."),
   T("Reclaim","https://reclaim.ai","https://reclaim.ai/pricing","$10/seat/mo for small teams",CK,"Smart calendar scheduling for habits and tasks."),
-  T("ClickUp","https://clickup.com","https://clickup.com/pricing","Unlimited $10/user/mo ($7 yearly); Business $19 ($12 yearly)","Free plan","Project management with built-in AI."),
+  T("ClickUp","https://clickup.com","https://clickup.com/pricing","Core $12/user/mo ($9 yearly); Business $25 ($17 yearly); MAX $120 ($100 yearly); Enterprise custom (checked 2026-11-09)","Free Forever: $0 (60 MB storage, unlimited tasks, unlimited free members)","Project management with built-in AI."),
   T("Taskade","https://www.taskade.com","https://www.taskade.com/pricing","Pro $10/mo (yearly, 10 users incl.); $25; $100; $250","Free: $0","Projects, notes and AI agents in one workspace."),
   T("Superhuman","https://superhuman.com","https://superhuman.com/plans","$12/member/mo yearly ($15 monthly); $33 ($40)","Free: $0","AI assistance across your apps (includes Grammarly)."),
   T("Zapier","https://zapier.com","https://zapier.com/pricing","Professional from $19.99/mo; Team from $69/mo","Free forever: 100 tasks/mo","Automate workflows between 7,000+ apps with AI."),
@@ -158,7 +158,7 @@ PRICE_TABLE = {
  "Opus Clip":(15,None,None),"Captions":(24.99,None,None),"Wordtune":(6.99,4.89,None),"Rytr":(7.50,None,None),"Warp":(20,None,None),"Qodo":(30,None,None),"Magnific":(20,14.50,None),
  "Photoroom":(None,7.50,None),"Riverside":(None,24,None),"Krisp":(16,8,None),"Buffer":(5,None,"per channel"),"Surfer":(None,82,None),"Writesonic":(None,79,None),"Frase":(49,39,None),
  "Predis.ai":(79,39.50,None),"Ocoya":(29,None,None),"Elicit":(None,11,None),"Scite":(12,None,None),"Humata":(None,None,"$0.01-$0.02 per extra page"),"You.com API":(None,None,"$5 per 1,000 search calls"),
- "Fireflies":(18,10,None),"Fathom":(None,None,None),"Motion":(19,None,None),"Reclaim":(10,None,None),"ClickUp":(10,7,None),"Taskade":(None,10,None),"Superhuman":(15,12,None),
+ "Fireflies":(18,10,None),"Fathom":(None,None,None),"Motion":(19,None,None),"Reclaim":(10,None,None),"ClickUp":(12,9,None),"Taskade":(None,10,None),"Superhuman":(15,12,None),
  "Zapier":(19.99,None,"Free tier: 100 tasks/mo"),"Zapier Agents":(19.99,None,None),"Botpress":(None,150,"$0.65 per extra conversation (pack of 100 for $65)"),"Chatbase":(40,32,None),"Lindy":(29.99,None,None),"ResearchRabbit":(12.50,10,None),"Google Gemini":(4.99,None,None),"n8n":(None,"€20",None),
 }
 # Jobs pages: "best AI tool for [job]" -> (title, category id, intro, tool names in ranked order)
@@ -934,7 +934,7 @@ TEAM_LEFT_OUT = [  # tool, why (all read on TEAM_CHECKED)
  ("v0", "the paid plan is now called Plus, and its card shows $30 per user with $90 struck through, so we're waiting to see which price sticks"),
  ("Zapier", "Team is “from $69/month” for 25 users, but the page doesn't say which billing period that is"),
  ("Grammarly", "the page shows Pro at $12 per member but didn't state the billing period in the text we could read"),
- ("ClickUp", "its AI is a separate per-user add-on on top of the workspace plan"),
+ ("ClickUp", "AI is included — every plan ships with ClickUp Brain² and a monthly credit allowance (trial on Free/Core); extra AI credits $10 per 10K credits"),
  ("Replit", "its pricing page showed a security check today"),
 ]
 
@@ -1322,7 +1322,6 @@ PLANNER_LEFT_OUT = [  # paid plan left out of the planner tonight (free plan may
  ("Surfer", "the cheapest plan (Discovery, 49 USD per month) doesn't say whether it's billed monthly or yearly"),
  ("v0", "the Plus plan shows $30 per user with $90 struck through, so we're waiting to see which price sticks"),
  ("Wordtune", "two different price sets showed tonight ($6.99/$4.89 and $6.99/$9.99 billed annually)"),
- ("ClickUp", "the plans changed (now Core $9 and Business $17 per user billed yearly); we'll update the tool data first"),
  ("Motion", "the Pro AI plan showed \"This plan is not available\""),
  ("Pitch", "priced in euros only"), ("Fathom", "no single starting price on the page"), ("Qodo", "a team code-review plan, not a single-user plan"),
  ("Murf", "the pricing page needs JavaScript we couldn't read"), ("SciSpace", "no price showed on the page tonight"),
@@ -2012,14 +2011,20 @@ _U1109 = {
     "Chatbase": "Hobby $40/mo ($32 yearly); Basic $150 ($120 yearly); Enterprise custom (checked 2026-11-09)",
     "Botpress": "Plus $150/mo billed annually (250 conversations, extra packs of 100 for $65); Team $750/mo billed annually (1,500 conversations, packs $50) (checked 2026-11-09)",
     "Elicit": "Industry: Pro $49/user/mo billed yearly ($588/yr); Scale $229/user/mo billed yearly ($2,748/yr). Monthly and Academic prices not re-checked Nov 9 (on Oct 15: Pro $75 monthly; Academic from $11/mo yearly) (checked 2026-11-09)",
+    "ClickUp": "Core $12/user/mo ($9 yearly); Business $25 ($17 yearly); MAX $120 ($100 yearly); Enterprise custom (checked 2026-11-09)",
 }
 for _c in CATEGORIES:
     for _t in _c["tools"]:
         if _t["name"] in _U1109:
             _t["price"] = _U1109[_t["name"]]
             _t["checked"] = "2026-11-09"
+        if _t["name"] == "ClickUp":
+            _t["free"] = "Free Forever: $0 (60 MB storage, unlimited tasks, unlimited free members)"
         if _t["name"] in ("Ideogram", "Buffer", "Humata", "Motion"):
             _t["checked"] = "2026-11-09"
+PRICE_TABLE.update({"ClickUp": (12, 9, None)})
+PLANNER_PRICES.update({"ClickUp": ("Core", 12, 9, "Core $12/user/mo; $9/user/mo billed yearly")})
 PRICE_NOTES["2026-11-09|Chatbase"] = ("changed", "Chatbase prices are unchanged, but the $150/mo ($120 yearly) plan has been renamed from Standard to Basic.")
 PRICE_NOTES["2026-11-09|Botpress"] = ("changed", "Botpress Plus is unchanged at $150/mo billed annually. A new Team plan was added: $750/mo billed annually with 1,500 conversations.")
 PRICE_NOTES["2026-11-09|Elicit"] = ("changed", "Elicit's Industry Scale plan went up from $169 to $229 per user/month billed yearly ($2,748/yr). Pro is unchanged at $49/user/month billed yearly.")
+PRICE_NOTES["2026-11-09|ClickUp"] = ("up", "ClickUp renamed Unlimited to Core and raised prices: Core is $12/user/mo ($9 yearly), was Unlimited $10 ($7); Business is $25 ($17 yearly), was $19 ($12). New MAX plan at $120/user/mo ($100 yearly). AI is included on every plan (Brain² credit allowance; trial on Free/Core); extra AI credits $10 per 10K.")
