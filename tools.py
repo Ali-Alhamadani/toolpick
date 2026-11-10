@@ -2028,3 +2028,33 @@ PRICE_NOTES["2026-11-09|Chatbase"] = ("changed", "Chatbase prices are unchanged,
 PRICE_NOTES["2026-11-09|Botpress"] = ("changed", "Botpress Plus is unchanged at $150/mo billed annually. A new Team plan was added: $750/mo billed annually with 1,500 conversations.")
 PRICE_NOTES["2026-11-09|Elicit"] = ("changed", "Elicit's Industry Scale plan went up from $169 to $229 per user/month billed yearly ($2,748/yr). Pro is unchanged at $49/user/month billed yearly.")
 PRICE_NOTES["2026-11-09|ClickUp"] = ("up", "ClickUp renamed Unlimited to Core and raised prices: Core is $12/user/mo ($9 yearly), was Unlimited $10 ($7); Business is $25 ($17 yearly), was $19 ($12). New MAX plan at $120/user/mo ($100 yearly). AI is included on every plan (Brain² credit allowance; trial on Free/Core); extra AI credits $10 per 10K.")
+
+# --- v67 (2026-11-10): price history - what kind of change each recorded diff is ---
+# Re-checks where only the "(checked ...)" date changed are not price changes (prices identical on the official page).
+for _n in ("Notion AI", "Jasper", "Claude"):
+    PRICE_SKIP[f"2026-11-06|{_n}"] = "Re-checked 2026-11-06; only the checked date changed, prices unchanged."
+PRICE_NOTES["2026-11-06|Copy.ai"] = ("changed", "Copy.ai Chat is unchanged at $29/mo ($24/mo billed yearly, $288/yr). We now also list its team plans, which start at $1,000/mo.")
+# kind per recorded change ("date|tool"). Kinds: raise, cut, cheaper (new cheaper plan), top (new higher plan), newplan,
+# rename (same price, new plan name), restructure (plans reorganized; old/new not like-for-like), promo (intro offer started/ended/changed), detail (we added detail; no price change),
+# correction (we fixed our own listing), currency. Optional moves: (plan, billing, before $, after $) restating only the
+# documented old/new price text of that change. Unlisted changes fall back to their PRICE_NOTES tag.
+V67_KIND = {
+ "2026-11-09|Elicit": ("raise", [("Industry Scale", "per user/mo, billed yearly", 169, 229)]),
+ "2026-11-09|ClickUp": ("raise", [("Unlimited, now Core", "per user/mo, billed monthly", 10, 12), ("Unlimited, now Core", "per user/mo, billed yearly", 7, 9), ("Business", "per user/mo, billed monthly", 19, 25), ("Business", "per user/mo, billed yearly", 12, 17)]),
+ "2026-11-09|Chatbase": ("rename", []), "2026-11-09|Botpress": ("top", []),
+ "2026-11-07|Recraft": ("detail", []), "2026-11-07|Murf": ("detail", []), "2026-11-07|Leonardo": ("detail", []), "2026-11-07|Consensus": ("detail", []),
+ "2026-11-06|Writesonic": ("detail", []), "2026-11-06|Rytr": ("detail", []), "2026-11-06|Google Gemini": ("detail", []), "2026-11-06|Copy.ai": ("detail", []),
+ "2026-11-06|Lovable": ("detail", []), "2026-11-06|ElevenLabs": ("promo", []), "2026-11-05|ElevenLabs": ("promo", []), "2026-11-05|Lovable": ("detail", []),
+ "2026-11-05|CapCut": ("detail", []), "2026-11-02|Opus Clip": ("detail", []),
+ "2026-11-02|Kling AI": ("raise", [("Premier", "billed yearly, per year", 1490, 1639.99), ("Ultra+", "billed yearly, per year", 4457, 4902.99)]),
+ "2026-11-02|ElevenLabs": ("promo", []), "2026-11-02|Claude": ("top", []), "2026-11-01|InVideo": ("detail", []), "2026-10-31|v0": ("rename", []),
+ "2026-10-27|Synthesia": ("cut", [("Starter", "per month, billed monthly", 29, 19), ("Pro", "per month, billed yearly", 64, 59)]),
+ "2026-10-27|ElevenLabs": ("promo", []), "2026-10-24|ChatGPT": ("detail", []),
+ "2026-10-23|Notion AI": ("correction", []), "2026-10-23|Jasper": ("correction", []), "2026-10-23|Grammarly": ("correction", []),
+ "2026-10-22|Krea": ("cheaper", [("Cheapest paid plan (new Basic vs Pro)", "per month, billed monthly", 35, 9)]), "2026-10-22|Bolt": ("detail", []),
+ "2026-10-21|Otter": ("promo", []),
+ "2026-10-19|Surfer": ("cheaper", [("Cheapest plan (new Discovery)", "per month, billed yearly", 82, 49)]),
+ "2026-10-19|Rytr": ("restructure", []),  # old text didn't say monthly vs yearly, so not called a raise
+ "2026-10-19|Qodo": ("newplan", []), "2026-10-19|n8n": ("currency", []), "2026-10-19|ElevenLabs": ("promo", []),
+ "2026-10-17|Kling AI": ("correction", []),
+}
