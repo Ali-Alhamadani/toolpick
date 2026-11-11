@@ -4838,6 +4838,7 @@ for _u67 in V67_LINKED: _lm[_u67] = "2026-11-10"
 V66_LINKED = link_v66(dict(e=e, JOBS=JOBS, CATEGORIES=CATEGORIES)); print("v66 entry links:", len(V66_LINKED), "pages")
 _lm["/help-me-choose.html"] = "2026-11-09"  # v66 (a later pass resets it)
 _lm["/ai-price-history.html"] = "2026-11-10"  # v67
+for _u68 in V68_PAGES + V68_LINKED: _lm[_u68] = "2026-11-11"  # v68 (after later lastmod passes)
 open("public/sitemap.xml","w").write('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + "".join(f"<url><loc>{BASE}{u}</loc>" + (f"<lastmod>{_lm[u]}</lastmod>" if u in _lm else "") + "</url>" for u in URLS) + "</urlset>")
 open("public/tools.json","w").write(json.dumps({"checked":CHECKED,"categories":CATEGORIES},indent=1))
 print("pages:", len(URLS), "unique tools:", total_tools, {c["id"]:len(c["tools"]) for c in CATEGORIES})
