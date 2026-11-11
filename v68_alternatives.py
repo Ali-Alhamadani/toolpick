@@ -33,7 +33,7 @@ CSS = ("<style>.a68top{display:grid;gap:var(--s4);grid-template-columns:repeat(a
        ".a68f h2{font-size:1.05rem;margin:0 0 8px}.a68c{display:flex;flex-wrap:wrap;gap:8px}"
        ".a68c button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--bd);background:var(--sf);color:var(--tx);font:inherit;font-size:.92rem;cursor:pointer}"
        ".a68c button[aria-pressed=true]{background:var(--ac);border-color:var(--ac);color:var(--sf);font-weight:700}.a68c button[aria-pressed=true]::before{content:'✓'}"
-       ".a68c button:disabled{opacity:.55;cursor:not-allowed}.a68c button .n{font-size:.8rem;opacity:.85}.a68c button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}"
+       ".a68c button:disabled{opacity:.55;cursor:not-allowed}.a68c button .n{font-size:.8rem}.a68c button:focus-visible{outline:3px solid var(--ac);outline-offset:2px}"
        "#a68st{margin:8px 0 0;min-height:1.4em}.a68g h2{margin:var(--s6) 0 4px}.a68g>.small{margin:0 0 8px}"
        ".a68l{display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));margin:var(--s3) 0}"
        ".a68k{scroll-margin-top:150px}.a68k h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px}.a68k h3 a{min-height:32px;display:inline-flex;align-items:center}"
