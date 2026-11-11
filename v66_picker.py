@@ -101,6 +101,7 @@ def build_v66(ctx):
     for j in J:
         assert all(s in names for s in j["t"] + [a for a, b in j["same"]]), j
         assert os.path.exists("public" + j["jp"]), j["jp"]
+    global TD_LAST; TD_LAST = TD  # v68 reuses these per-tool facts
     DATA = json.dumps(dict(t=TD, j=J, c=C), separators=(",", ":")).replace("</", "<\\/")
 
     # ---------- step 1 options: jobs grouped by category + "anything in X" ----------
