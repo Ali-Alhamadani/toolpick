@@ -52,7 +52,7 @@ CSS = ("<style>.a68top{display:grid;gap:var(--s4);grid-template-columns:repeat(a
        ".tp68 ul{margin:6px 0 0;padding-left:1.1em}.tp68 li{margin:2px 0}.tp68 li::marker{color:var(--ok)}.tp68 li>a{display:inline;padding:0}"
        "@media(max-width:640px){.a68f{position:static}.a68q li{grid-template-columns:1fr;gap:2px}.a68now dl{grid-template-columns:1fr}.a68now dd{margin-bottom:6px}"
        ".a68t table{min-width:0}.a68t tr:first-child{display:none}.a68t table,.a68t tbody,.a68t tr,.a68t td,.a68t th{display:block;width:100%}.a68t tr{border-bottom:1px solid var(--bd);padding:8px 4px}"
-       ".a68t td,.a68t th{border:0;padding:3px 12px}.a68t td::before{content:attr(data-l);display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu)}}</style>")
+       ".a68t caption{display:block;width:100%;box-sizing:border-box}.a68t td,.a68t th{border:0;padding:3px 12px}.a68t td::before{content:attr(data-l);display:block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--mu)}}</style>")
 
 JS = r"""(()=>{const B=[...document.querySelectorAll('.a68c button')],K=[...document.querySelectorAll('.a68k')],G=[...document.querySelectorAll('.a68g')],st=document.getElementById('a68st'),L=JSON.parse(document.getElementById('a68L').textContent);
 function on(){return B.filter(b=>b.getAttribute('aria-pressed')=='true').map(b=>b.dataset.w)}
