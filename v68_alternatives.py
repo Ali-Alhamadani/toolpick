@@ -16,8 +16,8 @@ KEYS = [("cheaper", "Cheaper", "Costs less for the same job"), ("free", "Real fr
         ("privacy", "No AI training by default", "Doesn't train on your content unless you opt in"), ("refund", "Refund window", "States a refund window"),
         ("student", "Student deal", "Free or discounted for students"), ("yearly", "Cheaper yearly", "Saves if you pay for a year"),
         ("stable", "No price rise", "No price rise recorded in our checks")]
-FACTS = [("free", "Free plan", "/free-plan-limits.html"), ("privacy", "No AI training by default", "/ai-data-privacy.html"),
-         ("refund", "Refund window", "/ai-refund-policies.html"), ("student", "Student deal", "/ai-student-discounts.html"),
+FACTS = [("free", "Free plan", "/free-plan-limits.html"), ("privacy", "No AI training by default", "/ai-privacy-refund-checker.html"),
+         ("refund", "Refund window", "/ai-privacy-refund-checker.html"), ("student", "Student deal", "/ai-privacy-refund-checker.html"),
          ("yearly", "Yearly saving", "/monthly-or-yearly.html")]
 ICON = {"y": ("✓", "Yes"), "p": ("~", "Partly"), "n": ("✕", "No"), "u": ("?", "Not checked")}
 

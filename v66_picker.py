@@ -57,7 +57,7 @@ def build_v66(ctx):
         elif n in SCHOOL:
             F["student"] = ["p", "Only through your school: " + SCHOOL[n][0], SCHOOL[n][1], T.STUDENT_CHECKED]; cover["student"] += 1
         elif n in STN:
-            F["student"] = ["n", "No student deal on its official page", STN[n][1], T.STUDENT_CHECKED]; cover["student"] += 1
+            F["student"] = ["n", "No student deal on its official page" if len(STN[n]) < 3 else "No student deal on its pricing page", STN[n][1], STN[n][2] if len(STN[n]) > 2 else T.STUDENT_CHECKED]; cover["student"] += 1
         else:
             F["student"] = ["u", "Not checked yet", "", ""]
         # refunds
@@ -113,9 +113,9 @@ def build_v66(ctx):
         g.append(f'<div class="g66" data-g="{c["id"]}"><h3>{e(c["name"])} <span class="small">{e(c["need"])}</span></h3><div class="ol66">{opts}</div></div>')
     STEP1 = "".join(g)
     MUST = [("free", "A real free plan", "Free trials and one-time credits don't count.", "/free-plan-limits.html", "Free plan limits"),
-            ("privacy", "Doesn't train AI on my data without my OK", f"Read on official privacy pages (checked {T.PRIVACY_CHECKED}); {cover['privacy']} of {len(TD)} tools checked so far.", "/ai-data-privacy.html", "Data privacy"),
-            ("student", "A student deal", f"Free or discounted plans for students on official pages (checked {T.STUDENT_CHECKED}); {cover['student']} tools checked.", "/ai-student-discounts.html", "Student discounts"),
-            ("refund", "A refund window if it's not for me", f"From official help pages (checked {T.REFUND_CHECKED}); {cover['refund']} tools checked.", "/ai-refund-policies.html", "Refund rules"),
+            ("privacy", "Doesn't train AI on my data without my OK", f"Read on official privacy pages (checked {T.PRIVACY_CHECKED} to {T.V69_CHECKED}); {cover['privacy']} of {len(TD)} tools checked so far.", "/ai-privacy-refund-checker.html", "Privacy checker"),
+            ("student", "A student deal", f"Free or discounted plans for students on official pages (checked {T.STUDENT_CHECKED} to {T.V69_CHECKED}); {cover['student']} tools checked.", "/ai-privacy-refund-checker.html?student=deal", "Student deals"),
+            ("refund", "A refund window if it's not for me", f"From official help pages and terms (checked {T.REFUND_CHECKED} to {T.V69_CHECKED}); {cover['refund']} tools checked.", "/ai-privacy-refund-checker.html?refund=window", "Refund checker"),
             ("yearly", "Cheaper if I pay yearly", f"Same plan, monthly vs billed yearly; {cover['yearly']} tools checked.", "/monthly-or-yearly.html", "Monthly or yearly?")]
     mrows = "".join(f'<fieldset class="m66"><legend><b>{e(lab)}</b><span class="small">{e(sub)} <a href="{href}">{e(hl)}</a></span></legend><div class="sg66">'
                     + "".join(f'<label><input type="radio" name="m_{k}" value="{v}"{" checked" if v == "any" else ""}><span>{t}</span></label>' for v, t in (("any", "Don't mind"), ("nice", "Nice to have"), ("must", "Must have")))
