@@ -74,7 +74,20 @@ def build_v66(ctx):
             F["refund"] = ["u", ("Refund rule unclear on its page" if n in RLO else "Not checked yet"), "", ""]
         # yearly saving (same cheapest paid plan, numeric USD monthly + per-month billed yearly)
         mm, ma = b.get("mm"), b.get("ma")
-        if n in T.V57_YEARLY:
+        r70 = (ctx.get("V70") or {}).get(n)  # v70 (2026-11-13): tonight's check of the official pricing page wins
+        if r70 and r70["code"] != "nc":
+            ck70 = T.V70_CK; u70 = r70["src"]
+            if r70["code"] == "save":
+                F["yearly"] = ["y", f"Yearly billing saves {r70['pct']}% (${r70['y']:g} vs ${r70['m']:g}/mo)", u70, ck70]; cover["yearly"] += 1
+            elif r70["code"] == "same":
+                F["yearly"] = ["n", "No saving for paying yearly", u70, ck70]; cover["yearly"] += 1
+            elif r70["code"] == "mo":
+                F["yearly"] = ["n", f"No yearly price for {r70['pl']} on its pricing page", u70, ck70]; cover["yearly"] += 1
+            elif r70["code"] == "yr":
+                F["yearly"] = ["u", "Only a billed-yearly price is shown", u70, ck70]
+            else:
+                F["yearly"] = ["u", "No fixed plan price (usage-based or custom)", u70, ck70]
+        elif n in T.V57_YEARLY:
             pl, m_, y_, q_, u_ = T.V57_YEARLY[n]
             F["yearly"] = ["n", f"Monthly billing only on {pl}", u_, T.V57_CHECKED]; cover["yearly"] += 1
         elif d.get("ys", 0) > 0:

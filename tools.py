@@ -2242,3 +2242,171 @@ V69_STUDENT_NONE = [(t, _NS, u) for t, u in [
  ("Frase", "https://www.frase.io/pricing"), ("Predis.ai", "https://predis.ai/pricing/"), ("Ocoya", "https://www.ocoya.com/pricing"),
  ("Elicit", "https://elicit.com/pricing"), ("Fireflies", "https://fireflies.ai/pricing"), ("Fathom", "https://www.fathom.ai/pricing")]]
 V69_STUDENT_NONE.append(("Taskade", "“Taskade does not publish a standing student, startup, nonprofit, or education discount program.”", "https://www.taskade.com/pricing"))
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# v70 (2026-11-13): monthly vs yearly - every tool's cheapest paid plan re-read on its official pricing page tonight.
+# m = monthly price; y = per-month price billed yearly; yt = yearly total when the page states it. Quotes are exact page text.
+V70_CK = "2026-11-13"
+V70_YEARLY = [
+ ("Runway","Standard",15,12,None,"both","Standard Billed annually. Save $36/year. For curious creators trying AI video $15 $12 /month","","https://runway.com/pricing",""),
+ ("Pika","Starter",10,8,None,"both","Price / mo $0 $10 $35 $95–$880","Price / mo (annual, –20%) $0 $8 $28","https://pika.art/pricing",""),
+ ("Luma Dream Machine","Plus",30,None,300,"both","Plus $30/month Start Now","Plus $25/month $300 billed yearly","https://lumalabs.ai/pricing",""),
+ ("Kling AI","Standard",8.8,None,79.2,"both","Then $8.8/month First-purchase offer available once.","Standard $ 79.2 / Year $120 34% Off Then $79.2/year. Save $26.4 vs. monthly","https://kling.ai/app/membership/membership-plan","List prices; the first month or year can be discounted."),
+ ("HeyGen","Creator",29,24,None,"both","the Creator plan costs $29/month (or $24/month if you pay annually)","","https://www.heygen.com/pricing",""),
+ ("Synthesia","Starter",19,14,168,"both","$9 first month then $19 per month","Starter $14/mo $168/yr, billed yearly","https://www.synthesia.io/pricing","Monthly plan can start at $9 for the first month."),
+ ("Descript","Hobbyist",24,16,None,"both","Saving up to 35% over monthly plan Hobbyist $16 $24 per person / month","","https://www.descript.com/pricing","The page shows the yearly price next to the crossed-out monthly price."),
+ ("CapCut","Pro",19.99,None,179.99,"both","Pro USD 19.99 /month","Pro USD 179.99 /year","https://www.capcut.com/pricing","CapCut says prices are for reference; sign in for final pricing."),
+ ("InVideo","Starter",20,10,None,"both","$20 per seat/mo, billed monthly","STARTER $10 per seat/mo, billed annually","https://invideo.io/pricing",""),
+ ("Opus Clip","Starter",15,None,None,"mo","Starter For individual creators $15 USD/mo Starter plan only available in monthly","","https://www.opus.pro/pricing","Higher plans have yearly billing; Starter is monthly only."),
+ ("Captions","Max",24.99,None,None,"mo","Max Use generative AI to make new footage, AI actors and more $24.99/mo","","https://www.captions.ai/pricing","The page says yearly plans exist at a discount but doesn't show the yearly price."),
+ ("Claude","Pro",20,17,200,"both","$20 if billed monthly.","$17 Per month with annual subscription discount ($200 billed up front).","https://claude.com/pricing",""),
+ ("ChatGPT","Go",8,None,None,"mo","Go Best for longer conversations $8 / month","We offer monthly plans for Go, Plus and Business and annual plans for Business and Enterprise.","https://chatgpt.com/pricing","Go and Plus are monthly only."),
+ ("Google Gemini","Google AI Plus",4.99,None,None,"mo","Google AI Plus $4.99/mo","","https://one.google.com/about/google-ai-plans/","No yearly price shown for Plus; Google AI Pro is Monthly ($19.99) or Annual ($199.99)."),
+ ("Grammarly","Pro",None,None,None,"nc","","","https://www.grammarly.com/plans","The plans page only shows “Pro $12 USD” without saying how it is billed, so we couldn’t check monthly vs yearly."),
+ ("Notion AI","Plus",12,10,None,"both","Plus* $12 per seat / month","Plus* $10 per seat/month","https://www.notion.com/pricing",""),
+ ("Copy.ai","Chat",29,24,288,"both","$29/mo Billed monthly","$24/mo Billed $288/yr","https://www.copy.ai/prices",""),
+ ("Jasper","Pro",69,59,None,"both","Pro: $59/month billed yearly or $69/month billed monthly","","https://www.jasper.ai/pricing",""),
+ ("Wordtune","Advanced",None,6.99,None,"yr","","Advanced For those looking to perfect their writing — for limited daily use. $6.99 per month/ billed annually","https://www.wordtune.com/plans","Only the billed-yearly price is shown."),
+ ("Rytr","Lite",9,7.5,None,"both","Lite Unlimited content creation $9 /mo","Lite Unlimited content creation $7.50 /mo billed annually","https://rytr.me/pricing",""),
+ ("GitHub Copilot","Pro",10,None,None,"mo","Pro For everyday coding with agents in GitHub Copilot. $ 10 USD per user / month","","https://github.com/features/copilot/plans","No yearly price on the plans page."),
+ ("Cursor","Plus",8,None,None,"mo","Plus $8 /month Get Plus","","https://cursor.com/pricing","No yearly price on the pricing page."),
+ ("Windsurf","Pro",20,None,None,"mo","Pro POPULAR $20 PER MONTH","","https://windsurf.com/pricing","No yearly price on the pricing page."),
+ ("Bolt","Pro",25,18,216,"both","Pro $25 /month Billed monthly","Pro $18 /month Total of $216 $300 / year Billed annually","https://bolt.new/pricing",""),
+ ("v0","Plus",30,None,None,"mo","Plus Popular $30 $90 /user/month","","https://v0.app/pricing","No yearly price on the pricing page."),
+ ("Lovable","Pro",25,21,None,"both","Originally $25 per month $21 / month, billed annually","","https://lovable.dev/pricing",""),
+ ("Warp","Build",20,18,None,"both","Monthly plan $20 /month","Annual plan $18 /month","https://www.warp.dev/pricing",""),
+ ("Qodo","Pro Team",None,None,None,"none","No annual commitment on Pro Team plan","","https://www.qodo.ai/pricing/","Priced per credit ($0.015/credit), not a fixed monthly plan."),
+ ("Replit","Core",20,18,None,"both","Core $20 / month","Core $20 $18 / month, billed annually","https://replit.com/pricing",""),
+ ("Leonardo","Essential",12,10,None,"both","ESSENTIAL $12 /month ex. tax.","ESSENTIAL $10 /month ex. tax.","https://leonardo.ai/pricing","Prices exclude tax."),
+ ("Midjourney","Basic",10,8,96,"both","Monthly Price $10 $30 $60 $120 Annual Price $96 ($8 / month)","","https://docs.midjourney.com/hc/en-us/articles/27870484040333-Comparing-Midjourney-Plans",""),
+ ("Ideogram","Plus",20,15,180,"both","Plus plan $20/mo","$20 per month, $180 billed annually","https://ideogram.ai/pricing",""),
+ ("Krea","Basic",9,5.25,None,"both","Basic $9/month Upgrade","Annual Save 40% with annual Free $0/month Get Free Basic $5.25/month","https://www.krea.ai/pricing",""),
+ ("Canva","Pro",18,None,144,"both","US$ 18 /month for one person","US$ 144 /year for one person","https://www.canva.com/pricing/",""),
+ ("Recraft","Basic",12,10,120,"both","$12 billed monthly","$10 per month billed annually $120","https://www.recraft.ai/pricing",""),
+ ("Magnific","Premium",20,14.5,None,"both","Premium For creatives exploring AI tools and stock content $20 $14.50 /month billed annually","","https://www.magnific.com/pricing","The page shows the yearly price next to the crossed-out monthly price."),
+ ("Photoroom","Pro",12.99,7.5,None,"both","$12.99 Per month 8,000 AI credits","$12.99 $7.50 Per month, billed yearly","https://www.photoroom.com/pricing",""),
+ ("ElevenLabs","Starter",6,5,None,"both","Then $6 per month","The equivalent monthly price on an annual plan is $5 for Starter","https://elevenlabs.io/pricing","A $1 first month offer may show."),
+ ("Suno","Pro",10,8,96,"both","$10 / month Get Pro","$10 $8 / month Billed $96/year","https://suno.com/pricing",""),
+ ("Murf","Creator (Studio)",None,19,228,"yr","","Creator Starter plan to create voiceovers for Individuals & Freelancers $19 / month $228 Billed Annually","https://murf.ai/pricing","The monthly toggle didn’t show a monthly price when we checked."),
+ ("Speechify","Premium",29,None,139,"both","$29 /MONTH or $139 billed yearly","","https://speechify.com/pricing/",""),
+ ("Otter","Pro",16.99,8.33,None,"both","Pro For individuals and small teams $16.99 /user/month","Pro $8.33 user/month","https://otter.ai/pricing","First-time subscribers may see a lower intro price."),
+ ("Udio","Standard",10,8,96,"both","$10/month Subscribe to Standard","$10 $8/month $96 billed annually","https://www.udio.com/pricing",""),
+ ("Riverside","Pro",35,24,288,"both","Pro Create polished, high-quality content $35 /month","$35 $24 /month Billed $288 annually","https://riverside.com/pricing","The page’s FAQ still says Pro drops “from $29 to $24”; we use the plan cards ($35 monthly)."),
+ ("Krisp","Core",16,8,None,"both","Core Best for individuals and small teams $16/mo/user","Core Best for individuals and small teams $8/mo/user","https://krisp.ai/pricing/",""),
+ ("Pitch","Plus",None,13,None,"yr","","PLUS 1 $13 / seat / month (paying yearly)","https://pitch.com/pricing","Only the yearly price is shown; prices show in euros in some regions."),
+ ("Beautiful.ai","Pro",45,14.5,None,"both","Everything in Pro plan (billed monthly) $45","Pro INDIVIDUALS $14.50 /MO Billed annually","https://www.beautiful.ai/pricing","Monthly Pro is pitched for one-off projects."),
+ ("Plus AI","Basic",15,10,None,"both","Basic $10 per user/month, billed annually. $15/user billed monthly.","","https://plusai.com/pricing",""),
+ ("SlidesAI","Pro",12,10,120,"both","Pro Perfect plan for students $12 /user/month","Pro Perfect plan for students $10.00 /user/month Billed at $120 /user/year","https://www.slidesai.io/pricing",""),
+ ("Gamma","Plus",12,9,108,"both","Plus For extra AI power and removing Gamma branding $12 USD / month","Plus For extra AI power and removing Gamma branding $9 USD / month $108 billed annually","https://gamma.app/pricing",""),
+ ("Le Chat (Mistral)","Pro",14.99,None,None,"mo","$14.99 /mo Excluding taxes","","https://mistral.ai/pricing","No yearly price on the pricing page."),
+ ("Perplexity","Pro",None,17,None,"yr","","Advanced answers and top AI models $17 /month when billed annually","https://www.perplexity.ai/pro","Only the billed-yearly price is shown."),
+ ("Microsoft Copilot","Microsoft 365 Personal",9.99,None,99.99,"both","Microsoft 365 Personal $9.99 $6.99/first month $99.99 $69.99/first year","","https://www.microsoft.com/en-us/microsoft-365/buy/compare-all-microsoft-365-products","List prices; first month/year offers can be lower. Copilot Pro is no longer sold."),
+ ("Buffer","Essentials",6,5,60,"both","Essentials Recommended $6 /month 1 channel · Billed monthly","Essentials Recommended $5 /month 1 channel · $60 billed yearly (save 2 months)","https://buffer.com/pricing","Per channel."),
+ ("Surfer","Discovery",59,49,None,"both","Discovery 59 USD /month Start for Free","Discovery 49 USD /month billed yearly","https://surferseo.com/pricing/",""),
+ ("Writesonic","Starter",None,79,None,"yr","","STARTER $79 Save $240/year per month, billed annually","https://writesonic.com/pricing","Only the billed-yearly price is shown."),
+ ("Frase","Starter",49,39,468,"both","Starter For solos and freelancers running one site. $49 /mo, billed monthly","$39 was $49 /mo, $468 billed yearly","https://www.frase.io/pricing",""),
+ ("Predis.ai","Rise",79,40,474,"both","Rise $ 79 /month","Rise $ 40 /month $79 $474 Billed Yearly","https://predis.ai/pricing/",""),
+ ("Ocoya","Starter",29,None,290,"both","Starter is $290 a year instead of $348","","https://www.ocoya.com/pricing","The monthly card can show a crossed-out $41."),
+ ("Elicit","Pro",75,49,588,"both","Pro For systematic reviews $75 Per user/month, billed monthly","Pro For systematic reviews $49 Save 35% Per user/month, billed as $588 annually","https://elicit.com/pricing",""),
+ ("Scite","Basic",None,12,None,"yr","","Basic For the full Scite platform $12 / month Billed yearly Save $96","https://scite.ai/pricing","Only the billed-yearly price is shown."),
+ ("Consensus","Pro",20,12,144,"both","Cited AI analysis of peer-reviewed research. $20/mo Upgrade to Pro","$12/mo $144 annually Saving $96/yr","https://consensus.app/pricing/",""),
+ ("SciSpace","Premium",20,12,None,"both","Premium Higher usage $20 /month billed monthly","Premium Higher usage $20 $12 /month billed annually","https://scispace.com/pricing",""),
+ ("Humata","Expert",9.99,None,None,"mo","Expert Popular $ 9 99 / month","","https://www.humata.ai/pricing","No yearly price on the pricing page."),
+ ("You.com API","API",None,None,None,"none","Web Search APIs, priced per call","","https://you.com/plans","Pay per call; no subscription."),
+ ("ResearchRabbit","ResearchRabbit+",12.5,10,None,"both","ResearchRabbit+ $10* per month $12.5* per month Annual plan Monthly plan","","https://www.researchrabbit.ai/pricing",""),
+ ("Scholarcy","Plus",9.99,None,90,"both","Monthly plan $9.99/month","Scholarcy Plus 25% discount $90.00/year","https://www.scholarcy.com/pricing",""),
+ ("Fireflies","Pro",18,10,None,"both","Pro For professional individuals and small teams $18 $10 per seat / month, billed annually","","https://fireflies.ai/pricing","The page shows the yearly price next to the crossed-out monthly price."),
+ ("Fathom","Premium",20,16,None,"both","Premium $20 /month / per user","Premium $16 /month / per user","https://www.fathom.ai/pricing","Individual plan; team plans need 2+ users."),
+ ("Motion","Pro AI",29,19,None,"both","Pro AI For professionals and small teams $ 29 /seat /mo","Pay annually (Save 33%) Pro AI For professionals and small teams $ 19 /seat /mo","https://www.usemotion.com/pricing",""),
+ ("Reclaim","Starter",12,10,None,"both","Starter For small teams. $12 per seat/month","Starter For small teams. $10 per seat/month","https://reclaim.ai/pricing",""),
+ ("ClickUp","Core",12,9,None,"both","Core $12 user / mo · billed monthly","Core $9 Regular price $12 user / mo · billed yearly","https://clickup.com/pricing",""),
+ ("Taskade","Pro",20,10,120,"both","$20 /mo Yearly billed monthly · 10 users Save $120","$10 /mo Yearly $120 billed yearly · 10 users","https://www.taskade.com/pricing","Includes 10 users."),
+ ("Superhuman","Pro",15,12,None,"both","$12 per member / month, billed annually $15 when billed monthly","","https://superhuman.com/plans",""),
+ ("Zapier","Professional",29.99,19.99,None,"both","Professional Starting from $29.99 /month","Professional Starting from $19.99 /month","https://zapier.com/pricing","Pay yearly is the page default (Save 33%)."),
+ ("Botpress","Plus",189,150,None,"both","Plus YOUR BEST FIT $189/mo billed monthly","Plus YOUR BEST FIT $150/mo billed annually","https://botpress.com/pricing",""),
+ ("Chatbase","Basic",150,120,None,"both","Basic $150 $150 /month billed yearly Save $360 yearly","Basic $120 $120 /month billed yearly Save $360 yearly","https://www.chatbase.co/pricing","The cheaper Hobby plan is no longer listed."),
+ ("Lindy","Team",29.99,None,None,"mo","Team Buy the credits you need. $ 29.99 /mo","","https://www.lindy.ai/pricing","No yearly price on the pricing page."),
+ ("Zapier Agents","Zapier Professional",29.99,19.99,None,"both","Professional Starting from $29.99 /month","Professional Starting from $19.99 /month","https://zapier.com/pricing","Same Zapier Professional plan."),
+ ("Relevance AI","Enterprise",None,None,None,"none","Enterprise For companies looking to decouple growth from headcount via an AI Workforce. Custom","","https://relevanceai.com/pricing","Custom pricing only."),
+ ("Voiceflow","Usage",None,None,None,"none","Usage-based billing with optional auto top-ups","","https://www.voiceflow.com/pricing","Usage-based."),
+ ("n8n","Starter",24,20,None,"both","Starter Build and run your first workflows and agents. $24 /mo, billed monthly","Starter Build and run your first workflows and agents. $20 /mo, billed annually","https://n8n.io/pricing/",""),
+]
+
+# Site-wide price fixes found by tonight's check (PRICE_TABLE = cheapest paid plan: monthly, per-month billed yearly).
+PRICE_TABLE.update({
+ "Rytr": (9, 7.5, None), "Wordtune": (None, 6.99, None), "Krea": (9, 5.25, None), "Warp": (20, 18, None),
+ "Buffer": (6, 5, None), "Motion": (29, 19, None), "Zapier": (29.99, 19.99, "Free tier: 100 tasks/mo"), "Zapier Agents": (29.99, 19.99, None),
+ "Botpress": (189, 150, "$0.65 per extra conversation (pack of 100 for $65)"), "Chatbase": (150, 120, None), "Taskade": (20, 10, None),
+ "Speechify": (29, 11.58, None), "Riverside": (35, 24, None), "Fathom": (20, 16, None), "Surfer": (59, 49, None), "Beautiful.ai": (45, 14.5, None),
+ "SlidesAI": (12, 10, None), "Suno": (10, 8, None), "Ocoya": (29, 24.17, None), "Scholarcy": (9.99, 7.5, None), "Kling AI": (8.8, 6.6, None),
+ "Microsoft Copilot": (9.99, 8.33, None), "Pitch": (None, 13, None), "Scite": (None, 12, None), "n8n": (24, 20, None),
+})
+_U1113 = {
+ "Rytr": "Lite $9/mo ($7.50/mo billed annually); Personal $19/mo ($15/mo billed annually)",
+ "Wordtune": "Advanced $6.99/mo billed annually; Unlimited $9.99/mo billed annually (monthly prices not shown)",
+ "Krea": "Basic $9/mo ($5.25/mo billed yearly); Pro $35 ($21); Max $70 ($42); Business $200 ($160)",
+ "Warp": "Build $20/mo ($18/mo on the annual plan), includes $20 of agent usage; Max $200/mo",
+ "Buffer": "Essentials $6/mo per channel ($5/mo billed yearly, $60/yr)",
+ "Motion": "Pro AI $29/seat/mo ($19 billed annually); Business AI $49/seat/mo ($29 billed annually)",
+ "Zapier": "Professional from $29.99/mo ($19.99/mo billed yearly)",
+ "Zapier Agents": "Zapier Professional from $29.99/mo ($19.99/mo billed yearly); Agents Pro $400/yr ($33.33/mo)",
+ "Botpress": "Plus $189/mo billed monthly or $150/mo billed annually (250 conversations/mo, extra packs of 100 for $65); Team $939/mo billed monthly (1,500 conversations/mo)",
+ "Chatbase": "Basic $150/mo ($120/mo billed yearly); Business $500 ($400 yearly); Enterprise custom",
+ "Taskade": "Pro $20/mo ($10/mo billed yearly, $120/yr; 10 users incl.); Business $50/mo",
+ "Speechify": "Premium $29/mo or $139 billed yearly",
+ "Riverside": "Pro $35/mo ($24/mo billed annually, $288/yr); Grow $45 ($34, $408/yr)",
+ "Fathom": "Premium $20/user/mo ($16 billed annually); Team $19 ($15), 2-user min; Business $34 ($25)",
+ "Surfer": "Discovery $59/mo ($49/mo billed yearly); AI Search Analytics $95 ($82); Standard $119 ($99); Pro $219 ($182)",
+ "Beautiful.ai": "Pro $14.50/mo (billed annually) or $45 billed monthly; Team $40/user/mo yearly ($50 monthly)",
+ "SlidesAI": "Pro $12/mo ($10/mo billed $120/yr); Premium $25/mo ($20.83/mo billed $250/yr)",
+ "Suno": "Pro $10/mo ($8/mo billed yearly, $96/yr); Premier $24/mo billed yearly",
+ "Ocoya": "Starter $29/mo ($290/yr); Team $79/mo ($790/yr); Agency $1,990/yr",
+ "Scholarcy": "$9.99/month or $90/year",
+ "Pitch": "Plus €10/seat/mo paying yearly in Europe, $13 in the US; Team €15 ($19); Business €20 ($25)",
+ "Scite": "Basic $12/mo billed yearly; Pro $40/mo billed yearly",
+ "n8n": "Starter $24/mo ($20/mo billed annually); Pro $60 ($50); Business $960 ($800)",
+}
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _U1113:
+            _t["price"] = _U1113[_t["name"]]
+            _t["checked"] = V70_CK
+        if _t["name"] == "Perplexity":
+            _t["pricing"] = "https://www.perplexity.ai/pro"  # old /pricing URL returns 404 (2026-11-13)
+            _t["price"] = "Pro $17/mo billed annually; Max $167/mo billed annually; monthly prices not shown"; _t["checked"] = V70_CK
+        if _t["name"] == "Pitch" and "€10" in _t.get("why", ""):
+            _t["why"] = "Free plan with unlimited presentations; paid plans from $13/seat/mo billed yearly."
+for _o in STUDENT_OFFERS:  # v70: Wordtune's plans page now shows Advanced at $6.99/mo billed annually (monthly price not shown)
+    if _o["tool"] == "Wordtune": _o["reg"] = "Advanced $6.99/mo billed annually"
+for _c in WRITECOST:  # v70: Wordtune plans page (2026-11-13) shows only billed-annually prices
+    if _c["t"] == "Wordtune":
+        _c["plans"] = [["Advanced", None, 6.99, "per seat; $6.99/mo billed annually (monthly price not shown)"], ["Unlimited", None, 9.99, "per seat; $9.99/mo billed annually (monthly price not shown)"]]
+        _c["checked"] = V70_CK
+for _c in WRITECOST:  # v70: Rytr yearly prices on its pricing page (2026-11-13)
+    if _c["t"] == "Rytr":
+        _c["plans"] = [["Lite", 9, 7.5, "$7.50/mo billed annually"], ["Personal", 19, 15, "$15/mo billed annually"]]
+        _c["checked"] = V70_CK
+for _c in PRESCOST:  # v70: presentation prices re-read on the official pricing pages (2026-11-13)
+    if _c["t"] == "Pitch":
+        _c["plans"] = [["Plus", 10, None, "euros, paying yearly ($13/seat/mo in the US)"], ["Team", 15, None, "euros, paying yearly ($19 in the US)"], ["Business", 20, None, "euros, paying yearly ($25 in the US)"]]
+        _c["checked"] = V70_CK
+    if _c["t"] == "Beautiful.ai":
+        _c["plans"][0] = ["Pro", 45, 14.5, "individuals; $45 billed monthly or $14.50/mo billed annually"]
+        _c["checked"] = V70_CK
+    if _c["t"] == "SlidesAI":
+        _c["plans"] = [["Pro", 12, 10, "$12/mo monthly; $10/mo billed $120/yr"], ["Premium", 25, 20.83, "$25/mo monthly; $20.83/mo billed $250/yr"]]
+        _c["checked"] = V70_CK
+# v70 (2026-11-13): how tonight's listing changes are classified on the price history page
+V67_KIND.update({
+ "2026-11-13|Wordtune": ["raise", [["Advanced", "per month, billed yearly", 4.89, 6.99], ["Unlimited", "per month, billed yearly", 6.99, 9.99]]],
+ "2026-11-13|Rytr": ["restructure", [["Lite", "per month, billed yearly", 7.2, 7.5], ["Personal", "per month, billed yearly", 15.2, 15]]],
+ "2026-11-13|Krea": ["restructure", [["Basic", "per month, billed yearly", 5, 5.25], ["Max", "per month, billed monthly", 105, 70], ["Max", "per month, billed yearly", 63, 42]]],
+ "2026-11-13|Chatbase": ["restructure", []],
+ "2026-11-13|Buffer": ["correction", []], "2026-11-13|Motion": ["correction", []], "2026-11-13|Zapier": ["correction", []],
+ "2026-11-13|Zapier Agents": ["correction", []], "2026-11-13|Scite": ["correction", []],
+ "2026-11-13|Warp": ["detail", []], "2026-11-13|Botpress": ["detail", []], "2026-11-13|Taskade": ["detail", []], "2026-11-13|Speechify": ["detail", []],
+ "2026-11-13|Riverside": ["detail", []], "2026-11-13|Fathom": ["detail", []], "2026-11-13|Surfer": ["detail", []], "2026-11-13|Beautiful.ai": ["detail", []],
+ "2026-11-13|SlidesAI": ["detail", []], "2026-11-13|Suno": ["detail", []], "2026-11-13|Ocoya": ["detail", []], "2026-11-13|Scholarcy": ["detail", []],
+ "2026-11-13|Pitch": ["detail", []], "2026-11-13|n8n": ["detail", []], "2026-11-13|Perplexity": ["detail", []],
+})
