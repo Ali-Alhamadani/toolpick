@@ -2410,3 +2410,75 @@ V67_KIND.update({
  "2026-11-13|SlidesAI": ["detail", []], "2026-11-13|Suno": ["detail", []], "2026-11-13|Ocoya": ["detail", []], "2026-11-13|Scholarcy": ["detail", []],
  "2026-11-13|Pitch": ["detail", []], "2026-11-13|n8n": ["detail", []], "2026-11-13|Perplexity": ["detail", []],
 })
+
+# --- weekly pass 2026-11-16 ---
+# Official pricing pages read 2026-11-16 (headless-browser render of the public page, monthly/yearly toggles clicked where needed).
+# Changes (exact page wording in comments):
+# ElevenLabs: Starter card "Until Dec 1 $1 first month Then $6 per month"; Creator "$11 first month Then $22 per month" (list prices
+#   and annual $5/$18.33/$82.50/$249.17/$825 unchanged per the FAQ).
+# InVideo: Max "$150 ... per seat/mo, billed monthly" (5,000 credits; "Renews at $150"), "$75 per seat/mo, billed annually";
+#   Starter $20/$10 and Plus $60/$30 unchanged.
+# Lindy: "Team ... $49.99 /mo 5,000 credits / mo"; "Top up anytime, $10 per 1,000 credits"; "Every active user in your workspace is
+#   billed, from $49.99 a month for 5,000 credits each."; Free "$50 in credits for free".
+# Qodo: "$0.015/credit, pooled across the team"; packs "2,000 credits", "4,000 credits", "16,000 credits"; "No annual commitment on
+#   Pro Team plan"; Enterprise "CUSTOM PLAN FOR 30+ USERS". No $30 Pro Team price shown.
+# Otter: monthly Pro "$16.99 /user/month" (no intro price shown); Business "$30 $24 /user/month 20% off for 3 months+";
+#   annual Pro $8.33, Business $19.99.
+# SciSpace: Premium "$20 /month" (monthly) / "$12 /month billed annually"; Advanced $90 / $70; Max $200 / $160.
+# Magnific: plans now named Premium ($20 / $14.50 annually), Plus ($45 / $33.75), Pro ($110 / $82.50).
+CK1116 = "2026-11-16"
+_U1116 = {
+ "ElevenLabs": ("Starter $6/mo ($5/mo billed yearly); Creator $22 ($18.33); Pro $99 ($82.50); Scale $299 ($249.17); "
+                "Business $990 ($825). Promotional: Starter $1 first month (83% off, until Dec 1, 2026); "
+                "Creator $11 first month (50% off) (checked 2026-11-16)"),
+ "InVideo": "Starter $20/mo ($10 yearly); Plus $60 ($30 yearly); Max from $150/mo ($75/mo billed annually) (checked 2026-11-16)",
+ "Lindy": "Team $49.99/mo per active user (5,000 credits/mo); top-ups $10 per 1,000 credits",
+ "Qodo": "Pro Team: $0.015 per credit pooled across the team (packs of 2,000, 4,000 or 16,000 credits/mo, no annual commitment); Enterprise custom (30+ users)",
+ "Otter": ("List prices: Pro $16.99/user/mo ($8.33/mo yearly); Business $30/user/mo ($19.99/mo yearly). "
+           "Promotional: Business $24/user/mo for 3 months (20% off, monthly billing) (checked 2026-11-16)"),
+ "SciSpace": "Premium $20/mo ($12/mo billed yearly); Advanced $90 ($70); Max $200 ($160)",
+ "Magnific": "Premium $20/mo ($14.50 annually); Plus $45 ($33.75); Pro $110 ($82.50)",
+}
+# Tools whose official page showed the same prices as our text on 2026-11-16 (all listed plans/billing views seen).
+_V1116 = {"Relevance AI", "Descript", "Cursor", "Windsurf", "Plus AI", "Le Chat (Mistral)", "Frase", "Predis.ai", "You.com API",
+          "ResearchRabbit", "Fireflies", "Reclaim", "Superhuman", "Microsoft Copilot", "ChatGPT", "Gamma", "Synthesia",
+          "GitHub Copilot", "v0", "Runway", "Pika", "Luma Dream Machine", "Kling AI", "HeyGen", "Opus Clip", "Captions", "Replit",
+          "Midjourney", "Udio", "Krisp", "CapCut", "Claude", "Claude (Pro)", "Google Gemini", "Jasper", "Notion AI", "Bolt", "Lovable",
+          "Leonardo", "Recraft", "Consensus", "Photoroom", "Voiceflow", "ClickUp", "Ideogram", "Elicit", "Humata", "Wordtune",
+          "Warp", "Krea", "Suno", "Speechify", "Riverside", "Pitch", "Beautiful.ai", "SlidesAI", "Perplexity", "Buffer", "Ocoya",
+          "Scite", "Scholarcy", "Fathom", "Motion", "Zapier", "Botpress", "n8n"} | set(_U1116)
+for _c in CATEGORIES:
+    for _t in _c["tools"]:
+        if _t["name"] in _U1116:
+            _t["price"] = _U1116[_t["name"]]
+        if _t["name"] == "Lindy":
+            _t["free"] = "Free: $50 in credits"
+        if _t["name"] in _V1116:
+            _t["checked"] = CK1116
+PRICE_TABLE.update({"Lindy": (49.99, None, "Top-ups $10 per 1,000 credits"), "Qodo": (None, None, "$0.015 per credit"), "SciSpace": (20, 12, None)})
+PLANNER_PRICES["Lindy"] = ("Team", 49.99, None, "Team ... $ 49.99 /mo 5,000 credits / mo")
+PLANNER_NOTES["Lindy"] = "credit-based; $49.99 buys 5,000 credits a month per active user"
+PLANNER_PER["Lindy"] = "per active user"
+V70_YEARLY[:] = [(("Lindy","Team",49.99,None,None,"mo","Team Buy the credits you need. $ 49.99 /mo","","https://www.lindy.ai/pricing","No yearly price on the pricing page.")
+                  if _r[0] == "Lindy" else _r) for _r in V70_YEARLY]
+for _o in STUDENT_OFFERS:
+    if _o.get("tool") == "Otter" and "note" in _o:
+        _o["note"] = "Otter's first-time Pro promo ($8.49/mo, seen 2026-10-21) was no longer shown on 2026-11-16; Business is 20% off for 3 months."
+PRICE_NOTES["2026-11-16|ElevenLabs"] = ("changed", "ElevenLabs' list prices are unchanged (Starter $6/mo, Creator $22/mo). The $1 first-month Starter offer is now tagged Until Dec 1 on the pricing page (was Until Nov 16); Creator is still $11 for the first month.")
+PRICE_NOTES["2026-11-16|InVideo"] = ("down", "InVideo Max now starts at $150/mo per seat ($75/mo billed annually) for 5,000 credits; we previously listed Max from $250/mo. Starter ($20, $10 yearly) and Plus ($60, $30 yearly) are unchanged.")
+PRICE_NOTES["2026-11-16|Lindy"] = ("up", "Lindy's paid plan is now Team at $49.99/mo per active user with 5,000 credits a month (top-ups $10 per 1,000 credits); we previously listed credit tiers from $29.99/mo.")
+PRICE_NOTES["2026-11-16|Qodo"] = ("up", "Qodo credits now cost $0.015 each (was $0.012), in packs of 2,000, 4,000 or 16,000 credits a month (was 2,500, 5,000 or 20,000). The pricing page no longer shows a $30 Pro Team price.")
+PRICE_NOTES["2026-11-16|Otter"] = ("changed", "Otter's list prices are unchanged (Pro $16.99/user/mo, Business $30/user/mo). The first-time Pro offer ($8.49/mo) is no longer shown; Business is still $24/user/mo for 3 months (20% off).")
+PRICE_NOTES["2026-11-16|SciSpace"] = ("changed", "SciSpace now shows its monthly price: Premium $20/mo, or $12/mo billed yearly (unchanged). Advanced is $90 ($70 yearly) and Max $200 ($160 yearly).")
+PRICE_NOTES["2026-11-16|Magnific"] = ("changed", "Magnific prices are unchanged; two plans were renamed: Premium+ is now Plus ($45, $33.75 annually) and Pro Starter is now Pro ($110, $82.50 annually).")
+V67_KIND.update({
+ "2026-11-16|ElevenLabs": ["promo", []], "2026-11-16|Otter": ["promo", []],
+ "2026-11-16|InVideo": ["cut", [["Max", "per month, billed monthly", 250, 150]]],
+ "2026-11-16|Lindy": ["raise", [["Team", "per month, billed monthly", 29.99, 49.99]]],
+ "2026-11-16|Qodo": ["raise", []], "2026-11-16|SciSpace": ["detail", []], "2026-11-16|Magnific": ["rename", []],
+})
+# weekly pass 2026-11-16: two compare pages between tools whose official pricing was re-checked today
+COMPARISONS += [
+ ("gamma-vs-plus-ai", "Gamma vs Plus AI", "Gamma", "Plus AI", "presentations"),
+ ("leonardo-vs-krea", "Leonardo vs Krea", "Leonardo", "Krea", "images"),
+]
